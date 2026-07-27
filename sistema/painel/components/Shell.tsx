@@ -63,13 +63,21 @@ export default async function Shell({
     if (marca?.nome) nomeNegocio = marca.nome;
     if (marca?.corPrimaria || marca?.corDestaque) {
       const prim = marca.corPrimaria || "#6e1f30";
+      const primD = escurecer(prim, 0.7);
       const dest = marca.corDestaque || "#bb921f";
-      // sobrescreve as variáveis da marca -> recolore o painel inteiro
+      const destL = clarear(dest, 0.6);
+      // As classes (bg-vinho, text-dourado...) resolvem --color-*. Sobrescrevo
+      // tanto --color-* (o que as classes usam) quanto --brand-* (a fonte), pra
+      // recolorir o painel inteiro com as cores do tenant, seja qual for a resolução.
       tema = {
+        ["--color-vinho" as string]: prim,
+        ["--color-vinho-d" as string]: primD,
+        ["--color-dourado" as string]: dest,
+        ["--color-dourado-l" as string]: destL,
         ["--brand-vinho" as string]: prim,
-        ["--brand-vinho-d" as string]: escurecer(prim, 0.7),
+        ["--brand-vinho-d" as string]: primD,
         ["--brand-dourado" as string]: dest,
-        ["--brand-dourado-l" as string]: clarear(dest, 0.6),
+        ["--brand-dourado-l" as string]: destL,
       };
     }
   }
