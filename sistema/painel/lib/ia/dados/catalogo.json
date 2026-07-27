@@ -1,0 +1,67 @@
+{
+  "_fonte": "Extraído dos 5 PDFs oficiais da Doce Pão (dados/tabelas de produtos), julho 2026. Esta é a tabela-fonte do orçamento. Preço que o sistema cotar SAI DAQUI.",
+  "_moeda": "BRL",
+  "_regra_preco": "O sabor NÃO muda o preço. O que define o valor é a linha (frito x assado, faixa do bolo, etc.). Sabores ficam como metadados pra IA saber o que oferecer.",
+
+  "salgados": {
+    "frito":  { "preco": 1.00, "sabores": ["almofadinha","bolinha de queijo","coxinha","chodo","croquete","mini pão de queijo","mini bolha","risólis","salsicha frita"] },
+    "assado": { "preco": 1.25, "sabores": ["pastel assado","esfirra","empadinha","quiche","mini sanduíche de patê de frango","mini x","salsicha assada","croissant","mini pizza","pão de batata"] }
+  },
+
+  "doces": {
+    "_nota": "Preço por unidade. Especialidades variam 1,25–1,75; trufas 2,25 fixo.",
+    "itens": [
+      { "nome": "brigadeiro",            "preco": 1.25 },
+      { "nome": "beijinho",              "preco": 1.25 },
+      { "nome": "cajuzinho",             "preco": 1.25 },
+      { "nome": "café",                  "preco": 1.25 },
+      { "nome": "leite ninho",           "preco": 1.25 },
+      { "nome": "bicho de pé",           "preco": 1.75 },
+      { "nome": "camafeu de nozes",      "preco": 1.75 },
+      { "nome": "docinho de churros",    "preco": 1.75 },
+      { "nome": "leite ninho com avelã", "preco": 1.75 },
+      { "nome": "olho de sogra",         "preco": 1.75 },
+      { "nome": "ouriço",                "preco": 1.75 },
+      { "nome": "trufa",                 "preco": 2.25, "sabores": ["morango","uva","cereja","café","nozes","limão","amendoim","maracujá","brigadeiro"] }
+    ],
+    "_preco_padrao_doce": 1.25
+  },
+
+  "bolos_recheados": {
+    "_nota": "3 faixas de preço. serve = nº de pessoas por bolo (ESTIMATIVA parametrizada em rendimento.json, confirmar com a dona).",
+    "faixas": [
+      { "faixa": "A", "preco": 46.90, "sabores": ["4 leites","brigadeiro","dois amores","frutas (pêssego e abacaxi)","laka","mineira","prestígio","porto alegre","brigadeiro com maracujá"] },
+      { "faixa": "B", "preco": 49.90, "sabores": ["bombom","biz","morango","marta rocha"] },
+      { "faixa": "C", "preco": 55.90, "sabores": ["0% lactose","strogonoff de nozes"] }
+    ]
+  },
+
+  "bolos_caseiros": {
+    "_nota": "Preço por unidade (bolo inteiro caseiro).",
+    "itens": [
+      { "nome": "apim",                          "preco": 30.90 },
+      { "nome": "banana caramelizada",           "preco": 30.90 },
+      { "nome": "chocolate preto com leite ninho","preco": 30.90 },
+      { "nome": "floresta negra",                "preco": 30.90 },
+      { "nome": "formigueiro",                   "preco": 30.90 },
+      { "nome": "fubá com goiabada",             "preco": 30.90 },
+      { "nome": "inglês",                        "preco": 33.90 },
+      { "nome": "nega maluca",                   "preco": 33.90 },
+      { "nome": "prestígio com ganache",         "preco": 33.90 },
+      { "nome": "red velvet",                    "preco": 33.90 },
+      { "nome": "cenoura",                       "preco": 34.90 },
+      { "nome": "churros",                       "preco": 34.90 },
+      { "nome": "laranja caramelizada",          "preco": 34.90 },
+      { "nome": "café",                          "preco": 35.90 },
+      { "nome": "limão",                         "preco": 35.90 }
+    ]
+  },
+
+  "pizza": {
+    "_nota": "Forma 60x40cm. O rendimento (serve X pessoas) VEM DO CARDÁPIO DELA — está impresso, não é chute.",
+    "inteira": { "preco": 120.00, "serve": [6, 8], "sabores_ate": 4 },
+    "meia":    { "preco": 60.00,  "serve": [1, 4], "sabores_ate": 2 },
+    "sabores_salgados": ["bacon","bacon com milho","bacon com brócolis","4 queijos","filé ao molho madeira com fritas","filé acebolado","frango com catupiry","alho e óleo","hot dog","moda da casa","lombinho","lombinho com abacaxi","brócolis","milho","bolonhesa","vegetariana","strogonoff de frango","strogonoff de gado","calabresa","calabresa acebolada","portuguesa"],
+    "sabores_doces": ["abacaxi com coco","brigadeiro","prestígio","crocante","califórnia","banana","chocolate preto com morango","chocolate branco com morango","chocolate com confete","banana com suspiro"]
+  }
+}

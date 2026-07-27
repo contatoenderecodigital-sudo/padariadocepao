@@ -1,0 +1,11 @@
+{
+  "name": "docepao-ponte-impressao",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Ponte de impressao que roda na padaria: puxa pedidos aprovados (via API HTTPS) e imprime tickets por estacao.",
+  "scripts": {
+    "start": "node --env-file=.env imprimir.mjs",
+    "teste": "MODO_TESTE=1 node teste.mjs"
+  }
+}

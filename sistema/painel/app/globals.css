@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Tema Doce Pão — vinho + dourado (mesmo da proposta/site).
+   Tailwind v4: cores da marca viram utilities (bg-vinho, text-dourado, ...).
+   ========================================================================== */
+:root {
+  --brand-vinho:    #6e1f30;
+  --brand-vinho-d:  #491020;
+  --brand-dourado:  #bb921f;
+  --brand-dourado-l:#e7cf94;
+  --brand-cream:    #fbf5ec;
+  --brand-cream2:   #f4e8d6;
+  --brand-ink:      #46352c;
+  --brand-ink-soft: #7a6356;
+  --brand-line:     #ece0cf;
+  --brand-wa:       #1faf54;
+
+  --background: var(--brand-cream);
+  --foreground: var(--brand-ink);
+}
+
+@theme inline {
+  --color-vinho:     var(--brand-vinho);
+  --color-vinho-d:   var(--brand-vinho-d);
+  --color-dourado:   var(--brand-dourado);
+  --color-dourado-l: var(--brand-dourado-l);
+  --color-cream:     var(--brand-cream);
+  --color-cream2:    var(--brand-cream2);
+  --color-ink:       var(--brand-ink);
+  --color-ink-soft:  var(--brand-ink-soft);
+  --color-line:      var(--brand-line);
+  --color-wa:        var(--brand-wa);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-serif: var(--font-fraunces);
+  --font-sans:  var(--font-poppins);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+/* animação de saída do card ao aprovar/recusar */
+@keyframes card-out {
+  to { opacity: 0; transform: translateX(24px) scale(.97); }
+}
+.card-out { animation: card-out .32s ease forwards; }

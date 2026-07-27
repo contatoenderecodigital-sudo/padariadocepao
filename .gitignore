@@ -1,0 +1,44 @@
+# ============================================================================
+#  .gitignore — protege segredo, build e DOCUMENTOS DE NEGÓCIO.
+#  Este repo é pra DEPLOY (Vercel). Só o código de sistema/ vai pro git.
+# ============================================================================
+
+# --- dependências e build ---
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+.vercel/
+
+# --- segredos (NUNCA subir) ---
+.env
+.env.*
+!.env.example
+
+# --- sistema operacional / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+
+# --- logs ---
+*.log
+npm-debug.log*
+
+# ============================================================================
+#  DOCUMENTOS DE NEGÓCIO / ESTRATÉGIA — ficam FORA do repo público.
+#  (briefing, proposta, preços, notas de reunião, site/mockup antigos)
+# ============================================================================
+/abordagem-whatsapp.md
+/briefing.md
+/catalogo-precos.md
+/coleta-reuniao.md
+/docepao-conteudo-previo.md
+/projeto-doce-pao.md
+/resumo-combinado.md
+/proposta/
+/conteudo/
+/mockup/
+/site/
