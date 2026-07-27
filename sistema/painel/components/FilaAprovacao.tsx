@@ -120,10 +120,12 @@ export default function FilaAprovacao({
   inicial,
   aprovar,
   recusar,
+  nomeNegocio = "",
 }: {
   inicial: Pedido[];
   aprovar?: (id: string) => Promise<{ ok: boolean }>;
   recusar?: (id: string) => Promise<{ ok: boolean }>;
+  nomeNegocio?: string;
 }) {
   const [fila, setFila] = useState(inicial);
   const [saindo, setSaindo] = useState<Record<string, boolean>>({});
@@ -210,7 +212,9 @@ export default function FilaAprovacao({
         </div>
       )}
 
-      {cupom ? <CupomPreview pedido={cupom} onClose={() => setCupom(null)} /> : null}
+      {cupom ? (
+        <CupomPreview pedido={cupom} nomeNegocio={nomeNegocio} onClose={() => setCupom(null)} />
+      ) : null}
     </div>
   );
 }
