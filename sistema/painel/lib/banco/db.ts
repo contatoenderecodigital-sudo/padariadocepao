@@ -10,7 +10,15 @@
 //  Ex: DATABASE_URL=postgres://postgres.xxxx:senha@aws-0-...pooler.supabase.com:6543/postgres
 // ============================================================================
 
-import { Pool, type QueryResultRow } from "pg";
+import { Pool, types, type QueryResultRow } from "pg";
+
+// ⚠️ IMPORTANTE: por padrão o pg converte date/timestamp em objeto Date do JS.
+// O painel trata data como TEXTO ("YYYY-MM-DD") e faz .split()/.slice() nela.
+// Então forçamos date/timestamp a virem como STRING crua (evita "e.split is not
+// a function" ao renderizar pedidos reais).
+types.setTypeParser(1082, (v) => v); // date        -> "2026-07-28"
+types.setTypeParser(1114, (v) => v); // timestamp   -> string crua
+types.setTypeParser(1184, (v) => v); // timestamptz -> string crua
 
 // Está configurado? (o painel cai no mock se não houver banco — bom pra demo.)
 export const bancoConfigurado = Boolean(
