@@ -7,8 +7,15 @@ import { useState } from "react";
 import type { Pedido } from "@/lib/tipos";
 import { brl } from "@/lib/tipos";
 
+function dataBr(iso: string | null) {
+  if (!iso) return "combinado";
+  const [a, m, d] = iso.split("-");
+  return `${d}/${m}`;
+}
+
 export default function Recuperar({ parados }: { parados: Pedido[] }) {
   const [cobrados, setCobrados] = useState<Record<string, boolean>>({});
+  const [preview, setPreview] = useState<Pedido | null>(null);
   const total = parados.reduce((s, p) => s + p.totalCentavos, 0);
 
   return (
@@ -66,7 +73,7 @@ export default function Recuperar({ parados }: { parados: Pedido[] }) {
                   </div>
                 ) : (
                   <button
-                    onClick={() => setCobrados((c) => ({ ...c, [p.id]: true }))}
+                    onClick={() => setPreview(p)}
                     className="mt-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-wa hover:brightness-95 transition shadow-sm"
                   >
                     Cobrar de volta
@@ -80,9 +87,58 @@ export default function Recuperar({ parados }: { parados: Pedido[] }) {
 
       <div className="mt-6 text-sm text-ink-soft bg-cream2/60 border border-line rounded-xl px-5 py-4 max-w-2xl">
         <b className="text-vinho">Como a cobrança automática funciona:</b> o sistema manda sozinho
-        uma mensagem gentil no WhatsApp — <i>"Oi! Seu orçamento pro dia 20 ainda está de pé. Quer
-        confirmar?"</i> — sem vocês levantarem um dedo.
+        uma mensagem gentil no WhatsApp, <i>"Oi! Seu orçamento pro dia 20 ainda está de pé. Quer
+        confirmar?"</i>, sem vocês levantarem um dedo.
       </div>
+
+      {/* Preview do TEMPLATE (fora da janela de 24h, via whatsapp_business_messaging) */}
+      {preview ? (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-6"
+          onClick={() => setPreview(null)}
+        >
+          <div
+            className="bg-white rounded-2xl border border-line shadow-xl w-full max-w-md p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-[11px] uppercase tracking-wider text-dourado font-semibold">
+              Template aprovado · fora da janela de 24h
+            </div>
+            <h3 className="font-[family-name:var(--font-serif)] text-lg font-bold text-vinho mt-1 mb-4">
+              Mensagem que vai pro WhatsApp de {preview.clienteNome}
+            </h3>
+
+            {/* balão estilo WhatsApp */}
+            <div className="bg-[#e6f5e9] border border-wa/20 rounded-xl rounded-tl-sm px-4 py-3 text-sm text-ink leading-relaxed">
+              Oi {preview.clienteNome.split(" ")[0]}! 😊 Seu orçamento da Padaria Aroma pro dia{" "}
+              <b>{dataBr(preview.retiradaData)}</b> ainda está de pé, no valor de{" "}
+              <b>{brl(preview.totalCentavos)}</b>. Quer confirmar? É só responder aqui 🙏
+            </div>
+
+            <div className="text-[11px] text-ink-soft/70 mt-2">
+              Enviado como <b>template</b> (mensagem iniciada pela empresa fora das 24h).
+            </div>
+
+            <div className="flex justify-end gap-2 mt-5">
+              <button
+                onClick={() => setPreview(null)}
+                className="px-3.5 py-2 rounded-lg text-sm text-ink-soft border border-line hover:bg-cream2 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  setCobrados((c) => ({ ...c, [preview.id]: true }));
+                  setPreview(null);
+                }}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-wa hover:brightness-95 transition shadow-sm"
+              >
+                Enviar template
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -9,6 +9,7 @@
 import { useState } from "react";
 import type { Pedido } from "@/lib/tipos";
 import { brl } from "@/lib/tipos";
+import CupomPreview from "./CupomPreview";
 
 function formataData(iso: string | null) {
   if (!iso) return null;
@@ -22,11 +23,13 @@ function CardPedido({
   pedido,
   onAprovar,
   onRecusar,
+  onVerCupom,
   saindo,
 }: {
   pedido: Pedido;
   onAprovar: (id: string) => void;
   onRecusar: (id: string) => void;
+  onVerCupom: (p: Pedido) => void;
   saindo: boolean;
 }) {
   const data = formataData(pedido.retiradaData);
@@ -90,6 +93,12 @@ function CardPedido({
         </div>
         <div className="flex gap-2">
           <button
+            onClick={() => onVerCupom(pedido)}
+            className="px-3.5 py-2 rounded-lg text-sm font-medium text-vinho border border-line hover:bg-cream2 transition-colors"
+          >
+            Ver cupom
+          </button>
+          <button
             onClick={() => onRecusar(pedido.id)}
             className="px-3.5 py-2 rounded-lg text-sm font-medium text-ink-soft border border-line hover:bg-cream2 transition-colors"
           >
@@ -119,6 +128,7 @@ export default function FilaAprovacao({
   const [fila, setFila] = useState(inicial);
   const [saindo, setSaindo] = useState<Record<string, boolean>>({});
   const [ultimo, setUltimo] = useState<{ nome: string; acao: "aprovado" | "recusado" } | null>(null);
+  const [cupom, setCupom] = useState<Pedido | null>(null);
 
   function resolver(id: string, acao: "aprovado" | "recusado") {
     const p = fila.find((x) => x.id === id);
@@ -184,6 +194,7 @@ export default function FilaAprovacao({
               saindo={!!saindo[p.id]}
               onAprovar={(id) => resolver(id, "aprovado")}
               onRecusar={(id) => resolver(id, "recusado")}
+              onVerCupom={setCupom}
             />
           ))}
         </div>
@@ -198,6 +209,8 @@ export default function FilaAprovacao({
           </p>
         </div>
       )}
+
+      {cupom ? <CupomPreview pedido={cupom} onClose={() => setCupom(null)} /> : null}
     </div>
   );
 }

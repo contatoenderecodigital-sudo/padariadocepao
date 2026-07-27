@@ -9,17 +9,22 @@
 // ============================================================================
 
 import { bancoConfigurado } from "@/lib/banco/db";
+import { lerSessao } from "@/lib/auth";
 
 export async function aprovarPedido(pedidoId: string): Promise<{ ok: boolean }> {
   if (!bancoConfigurado) return { ok: true };
+  const sessao = await lerSessao();
+  if (!sessao) return { ok: false };
   const { mudarStatus } = await import("@/lib/banco/pedidos");
-  await mudarStatus(pedidoId, "aprovado");
+  await mudarStatus(pedidoId, "aprovado", sessao.negocioId);
   return { ok: true };
 }
 
 export async function recusarPedido(pedidoId: string): Promise<{ ok: boolean }> {
   if (!bancoConfigurado) return { ok: true };
+  const sessao = await lerSessao();
+  if (!sessao) return { ok: false };
   const { mudarStatus } = await import("@/lib/banco/pedidos");
-  await mudarStatus(pedidoId, "recusado");
+  await mudarStatus(pedidoId, "recusado", sessao.negocioId);
   return { ok: true };
 }
