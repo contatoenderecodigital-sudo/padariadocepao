@@ -8,6 +8,28 @@ import { bancoConfigurado } from "@/lib/banco/db";
 import { lerSessao } from "@/lib/auth";
 import { sair } from "@/app/login/acao";
 
+// Ajusta uma cor hex pra mais escura (fator<1) ou mais clara (mistura com branco).
+function ajustar(hex: string, fator: number, paraBranco: boolean): string {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  const n = parseInt(h, 16);
+  let r = (n >> 16) & 255,
+    g = (n >> 8) & 255,
+    b = n & 255;
+  if (paraBranco) {
+    r = Math.round(r + (255 - r) * fator);
+    g = Math.round(g + (255 - g) * fator);
+    b = Math.round(b + (255 - b) * fator);
+  } else {
+    r = Math.round(r * fator);
+    g = Math.round(g * fator);
+    b = Math.round(b * fator);
+  }
+  return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+const escurecer = (hex: string, f: number) => ajustar(hex, f, false);
+const clarear = (hex: string, f: number) => ajustar(hex, f, true);
+
 type Item = { href: string; label: string; icon: string; badge?: number };
 
 const ITENS: Item[] = [
@@ -32,16 +54,28 @@ export default async function Shell({
   const sessao = bancoConfigurado ? await lerSessao() : null;
   if (bancoConfigurado && !sessao) redirect("/login");
 
-  // Marca o painel com o nome do NEGÓCIO logado (multi-tenant).
+  // Marca o painel com o NOME e as CORES do negócio logado (multi-tenant).
   let nomeNegocio = "Doce Pão";
+  let tema: React.CSSProperties = {};
   if (sessao) {
     const { carregarMarca } = await import("@/lib/banco/negocios");
     const marca = await carregarMarca(sessao.negocioId);
     if (marca?.nome) nomeNegocio = marca.nome;
+    if (marca?.corPrimaria || marca?.corDestaque) {
+      const prim = marca.corPrimaria || "#6e1f30";
+      const dest = marca.corDestaque || "#bb921f";
+      // sobrescreve as variáveis da marca -> recolore o painel inteiro
+      tema = {
+        ["--brand-vinho" as string]: prim,
+        ["--brand-vinho-d" as string]: escurecer(prim, 0.7),
+        ["--brand-dourado" as string]: dest,
+        ["--brand-dourado-l" as string]: clarear(dest, 0.6),
+      };
+    }
   }
 
   return (
-    <div className="min-h-screen flex bg-cream text-ink">
+    <div className="min-h-screen flex bg-cream text-ink" style={tema}>
       {/* Sidebar */}
       <aside className="w-60 shrink-0 bg-vinho text-white flex flex-col">
         <div className="px-6 py-6 border-b border-white/10">

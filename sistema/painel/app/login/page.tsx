@@ -13,7 +13,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho">
-            Doce Pão
+            Endereço Digital
           </div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mt-1">
             Painel de atendimento

@@ -22,16 +22,17 @@ function formataData(iso: string | null) {
   return `${d}/${m}/${a}`;
 }
 
-function Ticket({ titulo, pedido, itens, master }: {
+function Ticket({ titulo, pedido, itens, nomeNegocio, master }: {
   titulo: string;
   pedido: Pedido;
   itens: Pedido["itens"];
+  nomeNegocio: string;
   master?: boolean;
 }) {
   return (
     <div className="bg-white text-black font-mono text-[12px] leading-tight w-[280px] shrink-0 rounded-sm shadow-md border border-line px-4 py-3">
       <div className="text-center font-bold text-[15px]">{titulo}</div>
-      <div className="text-center">Padaria Aroma</div>
+      <div className="text-center">{nomeNegocio || "Padaria"}</div>
       <div className="border-t border-dashed border-black/40 my-1.5" />
       <div className="font-bold">CLIENTE: {pedido.clienteNome}</div>
       <div>Fone: {pedido.clienteTelefone}</div>
@@ -67,7 +68,15 @@ function Ticket({ titulo, pedido, itens, master }: {
   );
 }
 
-export default function CupomPreview({ pedido, onClose }: { pedido: Pedido; onClose: () => void }) {
+export default function CupomPreview({
+  pedido,
+  nomeNegocio = "",
+  onClose,
+}: {
+  pedido: Pedido;
+  nomeNegocio?: string;
+  onClose: () => void;
+}) {
   // agrupa por estação
   const porEstacao: Record<string, Pedido["itens"]> = {};
   for (const it of pedido.itens) {
@@ -103,9 +112,15 @@ export default function CupomPreview({ pedido, onClose }: { pedido: Pedido; onCl
 
         <div className="flex gap-4 overflow-x-auto pb-2">
           {Object.entries(porEstacao).map(([estacao, itens]) => (
-            <Ticket key={estacao} titulo={`== ${estacao} ==`} pedido={pedido} itens={itens} />
+            <Ticket
+              key={estacao}
+              titulo={`== ${estacao} ==`}
+              pedido={pedido}
+              itens={itens}
+              nomeNegocio={nomeNegocio}
+            />
           ))}
-          <Ticket titulo="*** CAIXA ***" pedido={pedido} itens={pedido.itens} master />
+          <Ticket titulo="*** CAIXA ***" pedido={pedido} itens={pedido.itens} nomeNegocio={nomeNegocio} master />
         </div>
       </div>
     </div>

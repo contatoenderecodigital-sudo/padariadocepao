@@ -13,7 +13,7 @@ function dataBr(iso: string | null) {
   return `${d}/${m}`;
 }
 
-export default function Recuperar({ parados }: { parados: Pedido[] }) {
+export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedido[]; nomeNegocio?: string }) {
   const [cobrados, setCobrados] = useState<Record<string, boolean>>({});
   const [preview, setPreview] = useState<Pedido | null>(null);
   const total = parados.reduce((s, p) => s + p.totalCentavos, 0);
@@ -110,7 +110,7 @@ export default function Recuperar({ parados }: { parados: Pedido[] }) {
 
             {/* balão estilo WhatsApp */}
             <div className="bg-[#e6f5e9] border border-wa/20 rounded-xl rounded-tl-sm px-4 py-3 text-sm text-ink leading-relaxed">
-              Oi {preview.clienteNome.split(" ")[0]}! 😊 Seu orçamento da Padaria Aroma pro dia{" "}
+              Oi {preview.clienteNome.split(" ")[0]}! 😊 Seu orçamento da {nomeNegocio || "padaria"} pro dia{" "}
               <b>{dataBr(preview.retiradaData)}</b> ainda está de pé, no valor de{" "}
               <b>{brl(preview.totalCentavos)}</b>. Quer confirmar? É só responder aqui 🙏
             </div>

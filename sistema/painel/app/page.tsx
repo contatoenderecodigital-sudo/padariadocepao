@@ -11,9 +11,19 @@ export default async function Home() {
   // Escopa pelo negócio do usuário logado (isolamento multi-tenant).
   const sessao = await lerSessao();
   const fila = await carregarFilaAprovacao(sessao?.negocioId);
+  let nomeNegocio = "";
+  if (sessao) {
+    const { carregarMarca } = await import("@/lib/banco/negocios");
+    nomeNegocio = (await carregarMarca(sessao.negocioId))?.nome ?? "";
+  }
   return (
     <Shell ativo="/" filaCount={fila.length}>
-      <FilaAprovacao inicial={fila} aprovar={aprovarPedido} recusar={recusarPedido} />
+      <FilaAprovacao
+        inicial={fila}
+        aprovar={aprovarPedido}
+        recusar={recusarPedido}
+        nomeNegocio={nomeNegocio}
+      />
     </Shell>
   );
 }

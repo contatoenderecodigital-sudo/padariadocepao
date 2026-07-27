@@ -12,9 +12,14 @@ export default async function Page() {
     carregarParados(sessao?.negocioId),
     carregarFilaAprovacao(sessao?.negocioId),
   ]);
+  let nomeNegocio = "";
+  if (sessao) {
+    const { carregarMarca } = await import("@/lib/banco/negocios");
+    nomeNegocio = (await carregarMarca(sessao.negocioId))?.nome ?? "";
+  }
   return (
     <Shell ativo="/recuperar" filaCount={fila.length}>
-      <Recuperar parados={parados} />
+      <Recuperar parados={parados} nomeNegocio={nomeNegocio} />
     </Shell>
   );
 }

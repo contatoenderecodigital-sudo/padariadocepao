@@ -15,7 +15,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Painel · Doce Pão",
+  title: "Painel de Atendimento",
   description: "Atendimento, aprovação de pedidos e cozinha.",
 };
 
