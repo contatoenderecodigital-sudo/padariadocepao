@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  body { width:470px; height:1200px; background:#e8e0d4; font-family:"Segoe UI", system-ui, Arial, sans-serif; display:flex; align-items:center; justify-content:center; }
+  .phone { width:430px; height:1130px; background:#fbf5ec; border-radius:42px; border:10px solid #2a1410; box-shadow:0 30px 60px rgba(80,30,25,.28); overflow:hidden; position:relative; }
+  .statusbar { height:28px; background:#6e1f30; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:12px; font-weight:600; color:#f3d9b8; }
+  .head { background:#6e1f30; color:#fff; padding:4px 20px 18px; display:flex; align-items:center; gap:14px; }
+  .head .logo { width:66px; height:66px; border-radius:50%; object-fit:cover; border:2px solid #c9a227; flex-shrink:0; }
+  .head .brand { font-size:20px; font-weight:800; letter-spacing:.2px; }
+  .head .sub { font-size:12px; color:#f0d4ad; margin-top:2px; }
+  .label { font-size:11px; font-weight:700; color:#a9762a; letter-spacing:2.5px; text-transform:uppercase; margin:16px 18px 11px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 18px; }
+  .gcard { background:#fff; border:1px solid #ece0cf; border-radius:15px; overflow:hidden; box-shadow:0 5px 13px rgba(120,60,30,.07); }
+  .gcard img { width:100%; height:94px; object-fit:cover; display:block; }
+  .gcard .nm { font-size:13.5px; font-weight:700; color:#4a2c20; padding:9px 11px 11px; }
+  .calc { background:#fff; border:1px solid #ece0cf; border-radius:18px; margin:16px 18px 0; padding:15px 16px 14px; box-shadow:0 6px 16px rgba(120,60,30,.06); }
+  .calc .t { font-size:16px; font-weight:800; color:#4a2c20; margin-bottom:12px; }
+  .row { display:flex; align-items:center; justify-content:space-between; }
+  .k { font-size:13px; color:#8a7461; }
+  .pill { display:flex; align-items:center; gap:12px; background:#f4ebdd; border-radius:30px; padding:6px 12px; }
+  .pill .b { width:24px; height:24px; border-radius:50%; background:#6e1f30; color:#fff; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .pill .n { font-size:15px; font-weight:800; color:#6e1f30; min-width:78px; text-align:center; }
+  .divider { height:1px; background:#f0e6d6; margin:13px 0; }
+  .need { font-size:11px; font-weight:700; color:#4a2c20; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+  .item { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #efe2cf; }
+  .item:last-child { border-bottom:none; }
+  .item .nm2 { font-size:14px; color:#4a3528; }
+  .item .q { font-size:14px; font-weight:800; color:#6e1f30; }
+  .dayrow { margin-top:12px; }
+  .day { background:#f4ebdd; border-radius:11px; padding:8px 13px; font-size:13.5px; font-weight:700; color:#4a2c20; }
+  .wbtn { display:flex; align-items:center; justify-content:center; gap:9px; background:#1faf54; color:#fff; font-size:15.5px; font-weight:700; padding:14px; border-radius:13px; margin:14px 18px 0; box-shadow:0 8px 18px rgba(31,175,84,.28); }
+  .wbtn .wa { width:21px; height:21px; border-radius:50%; background:#fff; color:#1faf54; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .chat { background:#efe5d5; border-radius:14px; margin:13px 18px 0; padding:12px; }
+  .chathead { font-size:10.5px; color:#9a866c; text-align:center; margin-bottom:8px; font-weight:600; }
+  .bubble { background:#dcf8c6; border-radius:13px 13px 13px 4px; padding:10px 12px; font-size:12.5px; line-height:1.5; color:#24372a; box-shadow:0 1px 2px rgba(0,0,0,.07); }
+  .bubble .tick { display:block; text-align:right; font-size:10px; color:#5a9e6f; margin-top:3px; }
+  .foot { text-align:center; font-size:10.5px; color:#a48a6c; margin-top:12px; }
+  .foot b { color:#6e1f30; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="statusbar"><span>20:14</span><span>97%</span></div>
+    <div class="head">
+      <img class="logo" src="img/logo-docepao.png" alt="Doce Pão">
+      <div><div class="brand">Padaria Doce Pão</div><div class="sub">Delícias fresquinhas todos os dias</div></div>
+    </div>
+    <div class="label">Tudo o que sai do forno</div>
+    <div class="grid">
+      <div class="gcard"><img src="img/folhados.jpg" alt=""><div class="nm">Pães e folhados</div></div>
+      <div class="gcard"><img src="img/salgados.jpg" alt=""><div class="nm">Salgados</div></div>
+      <div class="gcard"><img src="img/torta.jpg" alt=""><div class="nm">Tortas geladas</div></div>
+      <div class="gcard"><img src="img/bolo.jpg" alt=""><div class="nm">Bolos e festas</div></div>
+    </div>
+    <div class="calc">
+      <div class="t">Vai dar uma festa?</div>
+      <div class="row">
+        <span class="k">Para quantas pessoas?</span>
+        <span class="pill"><span class="b">–</span><span class="n">50 pessoas</span><span class="b">+</span></span>
+      </div>
+      <div class="divider"></div>
+      <div class="need">Sugestão pra você</div>
+      <div class="item"><span class="nm2">Salgados</span><span class="q">500 un</span></div>
+      <div class="item"><span class="nm2">Docinhos</span><span class="q">250 un</span></div>
+      <div class="item"><span class="nm2">Bolo</span><span class="q">1 de 3kg</span></div>
+      <div class="row dayrow"><span class="k">Para qual dia?</span><span class="day">Sábado, 21/06</span></div>
+    </div>
+    <div class="wbtn"><span class="wa">✓</span> Pedir no WhatsApp</div>
+    <div class="chat">
+      <div class="chathead">Cai pronto no WhatsApp da padaria</div>
+      <div class="bubble">Oi! Quero encomendar pra uma festa de 50 pessoas, dia 21/06: 500 salgados, 250 docinhos e 1 bolo de 3kg. Quanto fica e até quando dá pra pedir?<span class="tick">20:14 ✓✓</span></div>
+    </div>
+    <div class="foot">@padariadocepaoxanxere · (49) 99139 2535 · 6h30 às 20h · por <b>Endereço Digital</b></div>
+  </div>
+</body>
+</html>
