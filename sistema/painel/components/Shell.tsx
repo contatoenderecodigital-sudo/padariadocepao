@@ -32,13 +32,21 @@ export default async function Shell({
   const sessao = bancoConfigurado ? await lerSessao() : null;
   if (bancoConfigurado && !sessao) redirect("/login");
 
+  // Marca o painel com o nome do NEGÓCIO logado (multi-tenant).
+  let nomeNegocio = "Doce Pão";
+  if (sessao) {
+    const { carregarMarca } = await import("@/lib/banco/negocios");
+    const marca = await carregarMarca(sessao.negocioId);
+    if (marca?.nome) nomeNegocio = marca.nome;
+  }
+
   return (
     <div className="min-h-screen flex bg-cream text-ink">
       {/* Sidebar */}
       <aside className="w-60 shrink-0 bg-vinho text-white flex flex-col">
         <div className="px-6 py-6 border-b border-white/10">
           <div className="font-[family-name:var(--font-serif)] text-xl font-bold leading-tight">
-            Doce Pão
+            {nomeNegocio}
           </div>
           <div className="text-[11px] uppercase tracking-[0.18em] text-dourado-l mt-1">
             Painel
