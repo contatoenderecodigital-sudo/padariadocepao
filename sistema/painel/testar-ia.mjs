@@ -25,9 +25,9 @@ try {
   process.exit(1);
 }
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error("\n⚠️  Falta a ANTHROPIC_API_KEY. Rode assim:\n" +
-    "   ANTHROPIC_API_KEY=sk-ant-... npx tsx testar-ia.mjs\n");
+if (!process.env.OPENAI_API_KEY) {
+  console.error("\n⚠️  Falta a OPENAI_API_KEY. Rode assim:\n" +
+    "   OPENAI_API_KEY=sk-... npx tsx testar-ia.mjs\n");
   process.exit(1);
 }
 
