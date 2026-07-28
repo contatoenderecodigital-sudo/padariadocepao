@@ -28,6 +28,15 @@ const RESPOSTAS = [
   "Já anotei seu pedido. Qualquer coisa é só chamar!",
 ];
 
+// Popover OPACO (nao deixa o conteudo de tras vazar por cima).
+const POPOVER: React.CSSProperties = {
+  background: "rgba(58,16,28,0.98)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  boxShadow: "0 16px 44px rgba(0,0,0,0.5)",
+};
+
 type Aba = "todas" | "ia" | "humano" | "resolvidas";
 const ABAS: { id: Aba; nome: string }[] = [
   { id: "todas", nome: "Todas" },
@@ -324,7 +333,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 {menuAberto && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setMenuAberto(false)} />
-                    <div className="glass absolute right-0 top-11 z-20 w-52 rounded-[14px] p-1.5 text-[13px]">
+                    <div className="absolute right-0 top-11 z-20 w-52 rounded-[14px] p-1.5 text-[13px]" style={POPOVER}>
                       <button onClick={() => { setResolvidas((r) => ({ ...r, [ativa.id]: !r[ativa.id] })); setMenuAberto(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-cream/85 hover:bg-white/10">
                         <CheckCheck size={16} /> {resolvida ? "Reabrir conversa" : "Marcar como resolvida"}
                       </button>
@@ -396,7 +405,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 {emojiAberto && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setEmojiAberto(false)} />
-                    <div className="glass absolute left-0 bottom-14 z-20 w-64 rounded-[16px] p-2 grid grid-cols-8 gap-0.5">
+                    <div className="absolute left-0 bottom-14 z-20 w-64 rounded-[16px] p-2 grid grid-cols-8 gap-0.5" style={POPOVER}>
                       {EMOJIS.map((e) => (
                         <button key={e} onClick={() => { setTexto((t) => t + e); }} className="text-lg rounded-lg hover:bg-white/10 aspect-square grid place-items-center">
                           {e}
@@ -409,7 +418,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 {mostrarRespostas && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setRespostasAbertas(false)} />
-                    <div className="glass absolute left-0 right-14 bottom-14 z-20 rounded-[16px] p-1.5 max-h-72 overflow-auto">
+                    <div className="absolute left-0 right-14 bottom-14 z-20 rounded-[16px] p-1.5 max-h-72 overflow-auto" style={POPOVER}>
                       <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-cream/40">Respostas rápidas</div>
                       {respostasFiltradas.map((r, i) => (
                         <button key={i} onClick={() => { setTexto(r); setRespostasAbertas(false); }} className="w-full text-left px-3 py-2 rounded-lg text-[13px] text-cream/85 hover:bg-white/10 leading-snug">
