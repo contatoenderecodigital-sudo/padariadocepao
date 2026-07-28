@@ -12,7 +12,7 @@ export default function Login() {
     <div className="min-h-screen grid place-items-center bg-cream text-ink px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho">
+          <div className="tracking-tight-apple text-3xl font-bold text-vinho">
             Endereço Digital
           </div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mt-1">

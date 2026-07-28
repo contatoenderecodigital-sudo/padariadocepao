@@ -19,12 +19,12 @@ function Card({
         "rounded-2xl p-6 border " +
         (destaque
           ? "bg-vinho text-white border-transparent shadow-lg"
-          : "bg-white border-line shadow-sm")
+          : "glass")
       }
     >
       <div
         className={
-          "font-[family-name:var(--font-serif)] text-4xl font-bold leading-none " +
+          "tracking-tight-apple text-4xl font-bold leading-none " +
           (destaque ? "text-dourado-l" : "text-vinho")
         }
       >
@@ -53,7 +53,7 @@ export default function Page() {
         <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
           Números do mês
         </div>
-        <h1 className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho mt-1">
+        <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
           O que a Doce Pão ganhou este mês
         </h1>
         <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
@@ -96,7 +96,7 @@ export default function Page() {
         </div>
 
         {/* gráfico de barrinhas por dia */}
-        <div className="mt-8 bg-white border border-line rounded-2xl p-6">
+        <div className="mt-8 glass rounded-2xl p-6">
           <div className="text-sm font-semibold text-vinho mb-1">Pedidos por dia da semana</div>
           <div className="text-xs text-ink-soft mb-5">
             O pico é sexta e sábado — o atendimento aguenta o movimento sem ninguém travar.

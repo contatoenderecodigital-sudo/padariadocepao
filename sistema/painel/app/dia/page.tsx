@@ -20,7 +20,7 @@ export default function Page() {
         <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
           Pedidos do dia
         </div>
-        <h1 className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho mt-1">
+        <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
           O que a cozinha produz hoje
         </h1>
         <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
@@ -32,11 +32,11 @@ export default function Page() {
           {doDia.map((p) => (
             <div
               key={p.id}
-              className="bg-white border border-line rounded-2xl px-5 py-4 flex items-center gap-5"
+              className="glass rounded-2xl px-5 py-4 flex items-center gap-5"
             >
               {/* hora */}
               <div className="w-20 shrink-0 text-center">
-                <div className="font-[family-name:var(--font-serif)] text-2xl font-bold text-vinho leading-none">
+                <div className="tracking-tight-apple text-2xl font-bold text-vinho leading-none">
                   {p.retiradaHora}
                 </div>
                 <div className="text-[10px] uppercase tracking-wider text-ink-soft/60 mt-1">

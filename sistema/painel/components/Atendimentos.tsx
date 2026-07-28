@@ -115,21 +115,13 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
     backdropFilter: "blur(12px)",
     WebkitBackdropFilter: "blur(12px)",
   };
-  // Fundo colorido (mesh) vivo que vaza por trás do vidro e dá vida ao desfoque.
-  const MESH =
-    "radial-gradient(1100px 560px at 4% -12%, #ffc188 0%, rgba(255,193,136,0) 55%)," +
-    "radial-gradient(960px 520px at 102% -2%, #78e6b6 0%, rgba(120,230,182,0) 52%)," +
-    "radial-gradient(1060px 740px at 94% 114%, #ff9f8f 0%, rgba(255,159,143,0) 55%)," +
-    "radial-gradient(920px 660px at -12% 110%, #c3a7ef 0%, rgba(195,167,239,0) 55%)," +
-    "radial-gradient(680px 480px at 48% 46%, #fff0da 0%, rgba(255,240,218,0) 62%)," +
-    "linear-gradient(135deg,#fbf0e3,#ece3d6)";
 
   return (
     <div className="px-6 py-6">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mb-3">Atendimentos</div>
 
-      {/* fundo colorido mesh com os painéis de vidro flutuando */}
-      <div className="rounded-[28px] p-4" style={{ background: MESH }}>
+      {/* painéis de vidro flutuando sobre o mesh do app (Shell) */}
+      <div>
         <div className="grid grid-cols-[300px_1fr_268px] gap-4 h-[640px]">
           {/* ---------- lista ---------- */}
           <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>

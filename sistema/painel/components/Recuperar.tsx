@@ -23,7 +23,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
         Recuperar orçamento
       </div>
-      <h1 className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho mt-1">
+      <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
         Clientes que sumiram sem confirmar
       </h1>
       <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
@@ -32,7 +32,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
       </p>
 
       <div className="mb-5 inline-flex items-center gap-3 bg-vinho text-white rounded-xl px-5 py-3">
-        <span className="font-[family-name:var(--font-serif)] text-2xl font-bold text-dourado-l">
+        <span className="tracking-tight-apple text-2xl font-bold text-dourado-l">
           {brl(total)}
         </span>
         <span className="text-sm text-white/85">parados, esperando um "sim"</span>
@@ -44,11 +44,11 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
           return (
             <div
               key={p.id}
-              className="bg-white border border-line rounded-2xl p-5 flex items-center justify-between gap-5"
+              className="glass rounded-2xl p-5 flex items-center justify-between gap-5"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-3">
-                  <span className="font-[family-name:var(--font-serif)] text-lg font-bold text-vinho">
+                  <span className="tracking-tight-apple text-lg font-bold text-vinho">
                     {p.clienteNome}
                   </span>
                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-cream2 text-ink-soft border border-line">
@@ -64,7 +64,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
               </div>
 
               <div className="text-right shrink-0">
-                <div className="font-[family-name:var(--font-serif)] text-xl font-bold text-vinho">
+                <div className="tracking-tight-apple text-xl font-bold text-vinho">
                   {brl(p.totalCentavos)}
                 </div>
                 {cobrado ? (
@@ -98,13 +98,13 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
           onClick={() => setPreview(null)}
         >
           <div
-            className="bg-white rounded-2xl border border-line shadow-xl w-full max-w-md p-6"
+            className="glass rounded-2xl shadow-xl w-full max-w-md p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-[11px] uppercase tracking-wider text-dourado font-semibold">
               Template aprovado · fora da janela de 24h
             </div>
-            <h3 className="font-[family-name:var(--font-serif)] text-lg font-bold text-vinho mt-1 mb-4">
+            <h3 className="tracking-tight-apple text-lg font-bold text-vinho mt-1 mb-4">
               Mensagem que vai pro WhatsApp de {preview.clienteNome}
             </h3>
 

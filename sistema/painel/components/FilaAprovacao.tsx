@@ -36,14 +36,14 @@ function CardPedido({
   return (
     <div
       className={
-        "bg-white border border-line rounded-2xl shadow-sm overflow-hidden flex flex-col " +
+        "glass rounded-2xl overflow-hidden flex flex-col " +
         (saindo ? "card-out" : "")
       }
     >
       {/* topo: cliente + retirada */}
       <div className="px-5 pt-4 pb-3 flex items-start justify-between gap-3 border-b border-line">
         <div className="min-w-0">
-          <div className="font-[family-name:var(--font-serif)] text-lg font-bold text-vinho truncate">
+          <div className="tracking-tight-apple text-lg font-bold text-vinho truncate">
             {pedido.clienteNome}
           </div>
           <div className="text-xs text-ink-soft mt-0.5">{pedido.clienteTelefone}</div>
@@ -86,7 +86,7 @@ function CardPedido({
       <div className="px-5 py-3 border-t border-line flex items-center justify-between gap-3">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-ink-soft/60">Total</div>
-          <div className="font-[family-name:var(--font-serif)] text-xl font-bold text-vinho leading-none">
+          <div className="tracking-tight-apple text-xl font-bold text-vinho leading-none">
             {brl(pedido.totalCentavos)}
           </div>
           <div className="text-[11px] text-ink-soft mt-0.5">pagamento na retirada</div>
@@ -157,7 +157,7 @@ export default function FilaAprovacao({
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
             Fila de aprovação
           </div>
-          <h1 className="font-[family-name:var(--font-serif)] text-3xl font-bold text-vinho mt-1">
+          <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
             {fila.length > 0
               ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
               : "Tudo aprovado 🎉"}
@@ -201,9 +201,9 @@ export default function FilaAprovacao({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-line bg-white/50 px-8 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-line glass-soft px-8 py-16 text-center">
           <div className="text-4xl mb-3">☕</div>
-          <div className="font-[family-name:var(--font-serif)] text-xl font-bold text-vinho">
+          <div className="tracking-tight-apple text-xl font-bold text-vinho">
             Fila vazia
           </div>
           <p className="text-sm text-ink-soft mt-1">

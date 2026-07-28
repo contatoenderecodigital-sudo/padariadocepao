@@ -108,11 +108,20 @@ export default async function Shell({
   }
 
   return (
-    <div className="min-h-screen flex bg-cream text-ink" style={tema}>
-      {/* Sidebar */}
-      <aside className="w-60 shrink-0 bg-vinho text-white flex flex-col">
+    <div className="min-h-screen flex app-mesh text-ink" style={tema}>
+      {/* Sidebar — material fosco da marca (estilo Apple) */}
+      <aside
+        className="w-60 shrink-0 text-white flex flex-col"
+        style={{
+          background:
+            "linear-gradient(180deg, color-mix(in srgb, var(--color-vinho) 90%, transparent), color-mix(in srgb, var(--color-vinho-d) 92%, transparent))",
+          backdropFilter: "blur(22px) saturate(180%)",
+          WebkitBackdropFilter: "blur(22px) saturate(180%)",
+          borderRight: "1px solid rgba(255,255,255,0.12)",
+        }}
+      >
         <div className="px-6 py-6 border-b border-white/10">
-          <div className="font-[family-name:var(--font-serif)] text-xl font-bold leading-tight">
+          <div className="text-xl font-bold leading-tight tracking-tight-apple">
             {nomeNegocio}
           </div>
           <div className="text-[11px] uppercase tracking-[0.18em] text-dourado-l mt-1">
