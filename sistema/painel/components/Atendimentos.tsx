@@ -54,7 +54,7 @@ function Balao({
     return (
       <div className={"flex items-end gap-2 justify-start " + (avatar ? "mt-1.5" : "mt-0.5")}>
         {avatar ? <Avatar nome={nome} tam={34} raio={10} /> : espaco}
-        <div className="max-w-[70%] rounded-[16px] rounded-bl-[5px] bg-[#ececef] text-ink px-3 py-1.5 text-[13.5px] leading-relaxed whitespace-pre-line">
+        <div className="max-w-[70%] rounded-[16px] rounded-bl-[5px] bg-white text-ink px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_2px_rgba(0,0,0,0.09)]">
           {texto}
           <span className="text-[10px] text-ink-soft/40 ml-2 float-right relative top-[6px]">{hora}</span>
         </div>
@@ -63,7 +63,7 @@ function Balao({
   }
   return (
     <div className={"flex items-end gap-2 justify-end " + (avatar ? "mt-1.5" : "mt-0.5")}>
-      <div className="max-w-[70%] rounded-[16px] rounded-br-[5px] bg-wa text-white px-3 py-1.5 text-[13.5px] leading-relaxed whitespace-pre-line">
+      <div className="max-w-[70%] rounded-[16px] rounded-br-[5px] bg-wa text-white px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_2px_rgba(20,110,60,0.28)]">
         {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
         {texto}
         <span className="text-[10px] text-white/60 ml-2 float-right relative top-[6px]">{hora}</span>
@@ -182,8 +182,16 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3.5 min-h-0" style={{ background: "#f6f7fb" }}>
-                  <div className="self-center text-[10px] text-ink-soft/45 bg-white rounded-full px-3 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">Hoje</div>
+                <div
+                  className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3.5 min-h-0"
+                  style={{
+                    backgroundColor: "#efe9e1",
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%236b5a3e' stroke-opacity='0.06' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='24' cy='28' r='8'/%3E%3Cpath d='M66 20l7 7-7 7-7-7z'/%3E%3Cpath d='M104 34h14M111 27v14'/%3E%3Cpath d='M28 80q9-11 20 0'/%3E%3Ccircle cx='104' cy='96' r='7'/%3E%3Cpath d='M16 110h16M16 118h10'/%3E%3Cpath d='M120 118l5-6 5 6'/%3E%3C/g%3E%3C/svg%3E\")",
+                    backgroundSize: "140px 140px",
+                  }}
+                >
+                  <div className="self-center text-[10px] text-ink-soft/60 bg-white/80 backdrop-blur rounded-full px-3 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">Hoje</div>
                   {ativa.mensagens.map((m, i) => {
                     const ant = ativa.mensagens[i - 1];
                     const primeiro = !ant || ant.de !== m.de;
