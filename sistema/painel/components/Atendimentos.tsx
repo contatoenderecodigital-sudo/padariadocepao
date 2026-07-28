@@ -9,12 +9,32 @@ import type { Conversa, Mensagem } from "@/lib/tipos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatarTelefoneBR, linkWhatsapp } from "@/lib/tipos";
 import {
-  Search, Plus, Smile, Paperclip, SendHorizontal, MoreVertical,
+  Search, Plus, Smile, Paperclip, SendHorizontal, MoreVertical, Zap,
   UserRound, Bot, ShoppingBag, Clock, CheckCheck, Archive, Ban, X,
 } from "lucide-react";
 
 const CORES = ["#5b8c7b", "#c58a3d", "#7a6cae", "#4a7ba6", "#a85b52", "#6f9b52", "#b0713e", "#8a5a86"];
 const EMOJIS = ["😊", "👍", "🙏", "🎉", "🍰", "🧁", "🥖", "😍", "👋", "✅", "❤️", "😉", "🤝", "🔥", "😅", "☕"];
+
+// Respostas rapidas (canned) da padaria. Digite "/" no campo ou clique no raio.
+const RESPOSTAS = [
+  "Nosso horário é das 7h às 19h, de segunda a sábado.",
+  "O cento de salgado assado sai R$ 130,00.",
+  "O cento de coxinha sai R$ 120,00.",
+  "O cento de brigadeiro sai R$ 90,00.",
+  "Pode retirar a partir das 14h.",
+  "Aceitamos PIX, cartão e dinheiro na retirada.",
+  "Bolos por encomenda pedimos com 2 dias de antecedência.",
+  "Já anotei seu pedido. Qualquer coisa é só chamar!",
+];
+
+type Aba = "todas" | "ia" | "humano" | "resolvidas";
+const ABAS: { id: Aba; nome: string }[] = [
+  { id: "todas", nome: "Todas" },
+  { id: "ia", nome: "IA" },
+  { id: "humano", nome: "Humano" },
+  { id: "resolvidas", nome: "Resolvidas" },
+];
 
 function iniciais(nome: string) {
   const p = nome.trim().split(/\s+/);
@@ -126,15 +146,42 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const [addTag, setAddTag] = useState(false);
   const [novaTag, setNovaTag] = useState("");
   const [verPedidos, setVerPedidos] = useState(false);
+  const [aba, setAba] = useState<Aba>("todas");
+  const [respostasAbertas, setRespostasAbertas] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const fim = useRef<HTMLDivElement>(null);
 
+  // ultima mensagem de uma conversa (considerando as enviadas agora).
+  const ultimaDe = (c: Conversa): Mensagem | undefined => {
+    const ex = msgsExtra[c.id];
+    return ex && ex.length ? ex[ex.length - 1] : c.mensagens[c.mensagens.length - 1];
+  };
+  const controleDe = (c: Conversa) => controle[c.id] ?? "ia";
+  const aguardandoDe = (c: Conversa) => ultimaDe(c)?.de === "cliente"; // cliente esperando resposta
+
   const filtradas = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    return conversas
+    const base = conversas
       .filter((c) => !arquivadas[c.id])
-      .filter((c) => (!q ? true : c.clienteNome.toLowerCase().includes(q) || c.previa.toLowerCase().includes(q)));
-  }, [busca, conversas, arquivadas]);
+      .filter((c) => {
+        if (aba === "resolvidas") return resolvidas[c.id];
+        if (resolvidas[c.id]) return false;
+        if (aba === "ia") return controleDe(c) === "ia";
+        if (aba === "humano") return controleDe(c) === "humano";
+        return true; // todas
+      })
+      .filter((c) =>
+        !q ? true : c.clienteNome.toLowerCase().includes(q) || c.clienteTelefone.replace(/\D/g, "").includes(q.replace(/\D/g, "")) || c.previa.toLowerCase().includes(q),
+      );
+    // quem espera resposta ha mais tempo no topo; resto por mais recente.
+    return base.sort((a, b) => {
+      const aa = aguardandoDe(a), ab = aguardandoDe(b);
+      if (aa !== ab) return aa ? -1 : 1;
+      const ha = ultimaDe(a)?.hora ?? "", hb = ultimaDe(b)?.hora ?? "";
+      return aa ? ha.localeCompare(hb) : hb.localeCompare(ha);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busca, conversas, arquivadas, aba, resolvidas, controle, msgsExtra]);
 
   const ativa = conversas.find((c) => c.id === ativaId) ?? filtradas[0] ?? conversas[0];
   const ctrl = ativa ? controle[ativa.id] ?? "ia" : "ia";
@@ -159,6 +206,11 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const aguardando = ultima?.de !== "cliente"; // se a ultima foi nossa, esperamos o cliente
 
   const tags = tagsExtra[ativa.id] ?? [];
+
+  // respostas rapidas: abre pelo raio ou digitando "/" no campo
+  const slashQ = texto.startsWith("/") ? texto.slice(1).toLowerCase() : null;
+  const respostasFiltradas = slashQ !== null ? RESPOSTAS.filter((r) => r.toLowerCase().includes(slashQ)) : RESPOSTAS;
+  const mostrarRespostas = (respostasAbertas || slashQ !== null) && respostasFiltradas.length > 0;
 
   function enviar() {
     const t = texto.trim();
@@ -199,6 +251,14 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 />
               </div>
             </div>
+            {/* abas de filtro */}
+            <div className="px-3 pb-2 flex items-center gap-1">
+              {ABAS.map((a) => (
+                <button key={a.id} onClick={() => setAba(a.id)} className={"text-[11.5px] font-medium px-2.5 py-1 rounded-full transition-colors " + (aba === a.id ? "bg-cobre/20 text-[color:var(--brand-cobre-l)]" : "text-cream/55 hover:text-cream hover:bg-white/8")}>
+                  {a.nome}
+                </button>
+              ))}
+            </div>
             <ScrollArea className="flex-1 min-h-0">
               <div className="px-2 pb-2">
                 {filtradas.length === 0 && <div className="px-3 py-10 text-[13px] text-cream/55 text-center">Nada encontrado.</div>}
@@ -219,7 +279,18 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                           <span className={"font-semibold text-[13.5px] truncate " + (on ? "text-white" : "text-cream")}>{c.clienteNome}</span>
                           <span className={"text-[10px] shrink-0 " + (on ? "text-white/70" : "text-cream/50")}>{c.ultimaHora}</span>
                         </div>
-                        <div className={"text-[12px] truncate mt-0.5 " + (on ? "text-white/85" : "text-cream/70")}>{c.previa}</div>
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <span className={"text-[12px] truncate " + (on ? "text-white/85" : "text-cream/70")}>{c.previa}</span>
+                          {aguardandoDe(c) && (
+                            <span className="shrink-0">
+                              {c.naoLidas > 0 ? (
+                                <span className="min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full text-[10px] font-bold" style={{ background: on ? "#fff" : "#e08a3c", color: on ? "#8f4712" : "#fff" }}>{c.naoLidas}</span>
+                              ) : (
+                                <span className="w-2 h-2 rounded-full inline-block" style={{ background: on ? "#fff" : "#e08a3c" }} />
+                              )}
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span className="w-1.5 h-1.5 rounded-full" style={{ background: on ? "#fff" : sc }} />
                           <span className={"text-[10px] " + (on ? "text-white/85" : "")} style={on ? undefined : { color: sc }}>{st}</span>
@@ -307,6 +378,9 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 <button onClick={() => fileRef.current?.click()} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Anexar arquivo">
                   <Paperclip size={18} />
                 </button>
+                <button onClick={() => setRespostasAbertas((v) => !v)} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Respostas rápidas" title="Respostas rápidas (ou digite /)">
+                  <Zap size={18} />
+                </button>
                 <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) anexar(f.name); e.target.value = ""; }} />
                 <input
                   value={texto}
@@ -326,6 +400,20 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                       {EMOJIS.map((e) => (
                         <button key={e} onClick={() => { setTexto((t) => t + e); }} className="text-lg rounded-lg hover:bg-white/10 aspect-square grid place-items-center">
                           {e}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {mostrarRespostas && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setRespostasAbertas(false)} />
+                    <div className="glass absolute left-0 right-14 bottom-14 z-20 rounded-[16px] p-1.5 max-h-72 overflow-auto">
+                      <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-cream/40">Respostas rápidas</div>
+                      {respostasFiltradas.map((r, i) => (
+                        <button key={i} onClick={() => { setTexto(r); setRespostasAbertas(false); }} className="w-full text-left px-3 py-2 rounded-lg text-[13px] text-cream/85 hover:bg-white/10 leading-snug">
+                          {r}
                         </button>
                       ))}
                     </div>
