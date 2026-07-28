@@ -73,7 +73,7 @@ function Etiqueta({ tom, comPonto, icone, children, onRemover }: { tom: Etiqueta
     : tom === "whatsapp" ? { bg: "rgba(37,211,102,0.12)", c: "#4fd07f" }
     : { bg: "rgba(255,255,255,0.06)", c: "rgba(251,245,236,0.75)" };
   return (
-    <span className="group inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ background: est.bg, color: est.c }}>
+    <span className="group inline-flex items-center gap-1.5 text-[11px] font-medium h-6 px-2.5 rounded-full" style={{ background: est.bg, color: est.c }}>
       {comPonto && <span className="w-1.5 h-1.5 rounded-full" style={{ background: est.c }} />}
       {icone}
       {children}
@@ -118,6 +118,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const [msgsExtra, setMsgsExtra] = useState<Record<string, Mensagem[]>>({});
   const [controle, setControle] = useState<Record<string, "ia" | "humano">>({});
   const [tagsExtra, setTagsExtra] = useState<Record<string, string[]>>({});
+  const [notas, setNotas] = useState<Record<string, string>>({});
   const [arquivadas, setArquivadas] = useState<Record<string, boolean>>({});
   const [resolvidas, setResolvidas] = useState<Record<string, boolean>>({});
   const [emojiAberto, setEmojiAberto] = useState(false);
@@ -156,7 +157,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
 
   const ultima = mensagens[mensagens.length - 1];
   const aguardando = ultima?.de !== "cliente"; // se a ultima foi nossa, esperamos o cliente
-  const primeiraDoCliente = ativa.mensagens.find((m) => m.de === "cliente")?.texto;
 
   const tags = tagsExtra[ativa.id] ?? [];
 
@@ -353,55 +353,64 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
 
                 {/* etiquetas */}
                 <div className="border-t border-white/10 pt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="t-label text-cream/45">Etiquetas</span>
-                    <button onClick={() => setAddTag((v) => !v)} className="w-5 h-5 grid place-items-center rounded-full bg-white/8 text-cream/60 hover:bg-white/15 hover:text-cream transition-colors" aria-label="Adicionar etiqueta">
-                      <Plus size={13} />
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <span className="t-label text-cream/45">Etiquetas</span>
+                  <div className="flex flex-wrap items-center gap-2 mt-2.5">
                     <Etiqueta tom="dourado">Cliente</Etiqueta>
                     <Etiqueta tom={ctrl === "humano" ? "cobre" : "whatsapp"} comPonto>{statusTxt}</Etiqueta>
                     <Etiqueta tom="whatsapp" icone={<WhatsAppIcon size={11} />}>WhatsApp</Etiqueta>
                     {tags.map((t, i) => (
                       <Etiqueta key={i} tom="neutro" onRemover={() => setTagsExtra((x) => ({ ...x, [ativa.id]: tags.filter((_, j) => j !== i) }))}>{t}</Etiqueta>
                     ))}
-                  </div>
-                  {addTag && (
-                    <div className="mt-2 flex items-center gap-1.5">
+                    {addTag ? (
                       <input
                         autoFocus
                         value={novaTag}
                         onChange={(e) => setNovaTag(e.target.value)}
+                        onBlur={addEtiqueta}
                         onKeyDown={(e) => { if (e.key === "Enter") addEtiqueta(); if (e.key === "Escape") setAddTag(false); }}
-                        placeholder="Nova etiqueta"
-                        className="flex-1 bg-white/10 rounded-lg px-2.5 py-1.5 text-[12px] text-cream placeholder:text-cream/40 focus:outline-none focus:ring-2 focus:ring-cobre/25"
+                        placeholder="Nome da etiqueta"
+                        className="h-6 w-32 bg-white/10 rounded-full px-3 text-[11px] text-cream placeholder:text-cream/40 focus:outline-none focus:ring-2 focus:ring-cobre/25"
                       />
-                      <button onClick={addEtiqueta} className="btn-cobre press px-2.5 py-1.5 text-[12px] font-semibold">Ok</button>
-                    </div>
-                  )}
+                    ) : (
+                      <button onClick={() => setAddTag(true)} className="h-6 w-6 grid place-items-center rounded-full bg-white/8 text-cream/60 hover:bg-white/15 hover:text-cream transition-colors" aria-label="Adicionar etiqueta">
+                        <Plus size={13} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* info operacional do atendimento */}
                 <div className="border-t border-white/10 pt-4 mt-4">
                   <span className="t-label text-cream/45">Atendimento</span>
                   <div className="mt-2.5 space-y-2.5 text-[13px]">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusCor }} />
-                      <span className="text-cream/85">{statusTxt}</span>
+                    <div className="flex items-center gap-2.5">
+                      {ctrl === "humano" ? <UserRound size={14} className="shrink-0" style={{ color: statusCor }} /> : <Bot size={14} className="shrink-0" style={{ color: statusCor }} />}
+                      <span style={{ color: statusCor }}>{statusTxt}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-cream/70">
-                      <Clock size={14} className="text-cream/45" /> Aberta desde {ativa.mensagens[0]?.hora ?? "-"}
+                    <div className="flex items-center gap-2.5 text-cream/75">
+                      <Clock size={14} className="shrink-0 text-cream/45" />
+                      <span>Aberta desde {ativa.mensagens[0]?.hora ?? "-"}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-cream/70">
-                      <CheckCheck size={14} className="text-cream/45" /> {aguardando ? "Aguardando o cliente responder" : "Cliente aguardando resposta"} · {ultima?.hora ?? "-"}
-                    </div>
-                    {primeiraDoCliente && (
-                      <div className="rounded-[10px] px-3 py-2 text-[12.5px] text-cream/75 leading-relaxed" style={{ background: "rgba(255,255,255,0.05)" }}>
-                        <span className="text-cream/45">Assunto:</span> {primeiraDoCliente}
+                    <div className="flex items-start gap-2.5 text-cream/75">
+                      <CheckCheck size={14} className="shrink-0 mt-0.5 text-cream/45" />
+                      <div className="min-w-0">
+                        <div>{aguardando ? "Aguardando cliente" : "Cliente aguardando resposta"}</div>
+                        <div className="text-[11px] text-cream/45 mt-0.5">último contato {ultima?.hora ?? "-"}</div>
                       </div>
-                    )}
+                    </div>
                   </div>
+                </div>
+
+                {/* nota interna (memoria do cliente) */}
+                <div className="border-t border-white/10 pt-4 mt-4">
+                  <span className="t-label text-cream/45">Nota interna</span>
+                  <textarea
+                    value={notas[ativa.clienteTelefone] ?? ""}
+                    onChange={(e) => setNotas((n) => ({ ...n, [ativa.clienteTelefone]: e.target.value }))}
+                    placeholder="Adicionar nota..."
+                    rows={2}
+                    className="w-full mt-2 bg-white/[0.06] rounded-[10px] px-3 py-2 text-[12.5px] text-cream placeholder:text-cream/40 focus:outline-none focus:ring-2 focus:ring-cobre/25 resize-none leading-relaxed"
+                  />
                 </div>
 
                 {/* dados */}
