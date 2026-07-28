@@ -1,7 +1,7 @@
 import Shell from "@/components/Shell";
 import { METRICAS_MOCK as M, PEDIDOS_MOCK } from "@/lib/mock";
-import { brl } from "@/lib/tipos";
 import { nomeNegocioAtual } from "@/lib/negocio";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 function Card({
   destaque = false,
@@ -10,7 +10,7 @@ function Card({
   sub,
 }: {
   destaque?: boolean;
-  valor: string;
+  valor: React.ReactNode;
   rotulo: string;
   sub?: string;
 }) {
@@ -67,19 +67,19 @@ export default async function Page() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card
             destaque
-            valor={`${M.horasEconomizadas}h`}
+            valor={<NumberTicker value={M.horasEconomizadas} suffix="h" />}
             rotulo="de volta pra vocês"
             sub="tempo que a equipe não gastou digitando no WhatsApp"
           />
           <Card
             destaque
-            valor={brl(M.valorRecuperadoCentavos)}
+            valor={<NumberTicker value={M.valorRecuperadoCentavos / 100} prefix="R$ " decimals={2} />}
             rotulo="em orçamentos recuperados"
             sub={`${M.orcamentosRecuperados} clientes que iam sumir e voltaram`}
           />
           <Card
             destaque
-            valor={brl(M.faturamentoWhatsappCentavos)}
+            valor={<NumberTicker value={M.faturamentoWhatsappCentavos / 100} prefix="R$ " decimals={2} />}
             rotulo="faturados pelo WhatsApp"
             sub="pedidos que entraram pelo atendimento"
           />
@@ -87,14 +87,14 @@ export default async function Page() {
 
         {/* segunda linha */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-          <Card valor={String(M.atendimentosMes)} rotulo="atendimentos" sub="no mês" />
+          <Card valor={<NumberTicker value={M.atendimentosMes} />} rotulo="atendimentos" sub="no mês" />
           <Card
-            valor={String(M.atendimentosForaHorario)}
+            valor={<NumberTicker value={M.atendimentosForaHorario} />}
             rotulo="fora do horário"
             sub="madrugada, domingo, feriado — a IA atendeu"
           />
-          <Card valor={String(M.pedidosNoDia)} rotulo="pedidos hoje" />
-          <Card valor={String(M.orcamentosRecuperados)} rotulo="recuperados" sub="este mês" />
+          <Card valor={<NumberTicker value={M.pedidosNoDia} />} rotulo="pedidos hoje" />
+          <Card valor={<NumberTicker value={M.orcamentosRecuperados} />} rotulo="recuperados" sub="este mês" />
         </div>
 
         {/* gráfico de barrinhas por dia */}

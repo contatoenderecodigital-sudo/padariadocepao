@@ -94,19 +94,19 @@ function CardPedido({
         <div className="flex gap-2">
           <button
             onClick={() => onVerCupom(pedido)}
-            className="px-3.5 py-2 rounded-lg text-sm font-medium text-vinho border border-line hover:bg-cream2 transition-colors"
+            className="btn-cobre press px-3.5 py-2 text-sm font-semibold"
           >
             Ver cupom
           </button>
           <button
             onClick={() => onRecusar(pedido.id)}
-            className="px-3.5 py-2 rounded-lg text-sm font-medium text-ink-soft border border-line hover:bg-cream2 transition-colors"
+            className="btn-vermelho press px-3.5 py-2 text-sm font-semibold"
           >
             Recusar
           </button>
           <button
             onClick={() => onAprovar(pedido.id)}
-            className="btn-cobre press px-4 py-2 text-sm font-semibold transition"
+            className="btn-verde press px-4 py-2 text-sm font-semibold"
           >
             Aprovar e imprimir
           </button>

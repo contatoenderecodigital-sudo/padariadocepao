@@ -61,8 +61,8 @@ export default async function Shell({
   // a "regra da casa" é a mesma pra todo tenant; muda o nome (a Meta vê "Aroma").
   let nomeNegocio = "Doce Pão";
   if (sessao) {
-    const { carregarMarca } = await import("@/lib/banco/negocios");
-    const marca = await carregarMarca(sessao.negocioId);
+    const { carregarMarcaCache } = await import("@/lib/banco/negocios");
+    const marca = await carregarMarcaCache(sessao.negocioId);
     if (marca?.nome) nomeNegocio = marca.nome;
   }
 

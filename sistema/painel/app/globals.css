@@ -71,25 +71,38 @@ h1, h2, h3, .tracking-tight-apple { letter-spacing: -0.021em; }
    Degradês premium da marca (vinho + dourado + cobre).
    Usar SÓ em destaque: sidebar, botões primários, cards grandes, números-chave.
    ========================================================================== */
-.grad-vinho   { background: linear-gradient(160deg, #491020, #6e1f30); }
-.grad-dourado { background: linear-gradient(135deg, #bb921f, #e7cf94); }
-.grad-cobre   { background: linear-gradient(135deg, #8f4712, #e08a3c); }
+.grad-vinho    { background: linear-gradient(160deg, #491020, #6e1f30); }
+.grad-dourado  { background: linear-gradient(135deg, #bb921f, #e7cf94); }
+.grad-cobre    { background: linear-gradient(135deg, #8f4712, #e08a3c); }
+.grad-verde    { background: linear-gradient(135deg, #1f7a43, #35c46f); }
+.grad-vermelho { background: linear-gradient(135deg, #a11d1d, #e0533c); }
 .text-grad-dourado {
   background: linear-gradient(135deg, #bb921f, #e7cf94);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-/* botão de ação da marca: cobre + sombra + cantos 10px */
-.btn-cobre {
-  background: linear-gradient(135deg, #8f4712, #e08a3c);
+/* botões de ação — gradiente + sombra + cantos 10px + texto branco */
+.btn-cobre,
+.btn-verde,
+.btn-vermelho {
   color: #fff;
   border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(143, 71, 18, 0.3);
 }
-.btn-cobre:hover { filter: brightness(1.05); }
+.btn-cobre    { background: linear-gradient(135deg, #8f4712, #e08a3c); box-shadow: 0 6px 16px rgba(143, 71, 18, 0.30); }
+.btn-verde    { background: linear-gradient(135deg, #1f7a43, #35c46f); box-shadow: 0 6px 16px rgba(31, 122, 67, 0.30); }
+.btn-vermelho { background: linear-gradient(135deg, #a11d1d, #e0533c); box-shadow: 0 6px 16px rgba(161, 29, 29, 0.28); }
+.btn-cobre:hover, .btn-verde:hover, .btn-vermelho:hover { filter: brightness(1.06); }
 /* badge/etiqueta de status: dourado claro + texto vinho */
 .chip-marca { background: #f4e8d6; color: #6e1f30; }
+
+/* Cursor de clique em tudo que é clicável (o padrão do browser hoje é seta). */
+button:not(:disabled), a[href], [role="button"], label, summary, select {
+  cursor: pointer;
+}
+button:disabled { cursor: default; }
+/* transição suave padrão em botões/links pra dar sensação "lisa" */
+button, a { transition: filter 120ms ease, background-color 120ms ease, color 120ms ease, transform 120ms ease; }
 
 /* ==========================================================================
    Vidro fosco (glassmorphism Apple) — usado no site inteiro.

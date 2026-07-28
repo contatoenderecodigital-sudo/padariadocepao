@@ -19,3 +19,16 @@ export async function carregarMarca(negocioId: string): Promise<NegocioMarca | n
   if (!n) return null;
   return { nome: n.nome, corPrimaria: n.cor_primaria, corDestaque: n.cor_destaque };
 }
+
+// Cache em memória (TTL curto) — evita bater no banco a CADA troca de aba.
+// A instância serverless fica quente entre navegações, então quase toda
+// navegação lê daqui em vez de ir ao Supabase. Nome muda? some em <2min.
+const _cacheMarca = new Map<string, { marca: NegocioMarca | null; exp: number }>();
+export async function carregarMarcaCache(negocioId: string): Promise<NegocioMarca | null> {
+  const agora = Date.now();
+  const hit = _cacheMarca.get(negocioId);
+  if (hit && hit.exp > agora) return hit.marca;
+  const marca = await carregarMarca(negocioId);
+  _cacheMarca.set(negocioId, { marca, exp: agora + 120_000 });
+  return marca;
+}
