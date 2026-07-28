@@ -1,15 +1,21 @@
 "use client";
 
-// Atendimentos — extraído da referência WeChat: fundo lavanda suave, três
-// painéis flutuantes com sombra difusa, avatares quadrados-arredondados,
-// balões com avatar ao lado, área de digitação com ícones, painel de contato.
-// Conversas REAIS do banco. Acento verde = cor do tenant.
+// Tela de Atendimentos (chat) premium sobre vidro escuro. IA atende sozinha; o
+// humano assume quando precisa e devolve pra IA. Composer funcional (emoji,
+// anexo, enviar), etiquetas refinadas, info operacional e menu de acoes.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Conversa } from "@/lib/tipos";
+import type { Conversa, Mensagem } from "@/lib/tipos";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatarTelefoneBR, linkWhatsapp } from "@/lib/tipos";
+import {
+  Search, Plus, Smile, Paperclip, SendHorizontal, MoreVertical,
+  UserRound, Bot, ShoppingBag, Clock, CheckCheck, Archive, Ban, X,
+} from "lucide-react";
 
 const CORES = ["#5b8c7b", "#c58a3d", "#7a6cae", "#4a7ba6", "#a85b52", "#6f9b52", "#b0713e", "#8a5a86"];
+const EMOJIS = ["😊", "👍", "🙏", "🎉", "🍰", "🧁", "🥖", "😍", "👋", "✅", "❤️", "😉", "🤝", "🔥", "😅", "☕"];
+
 function iniciais(nome: string) {
   const p = nome.trim().split(/\s+/);
   return ((p[0]?.[0] ?? "") + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase() || "?";
@@ -19,7 +25,11 @@ function corDoNome(nome: string) {
   for (let i = 0; i < nome.length; i++) h = (h * 31 + nome.charCodeAt(i)) >>> 0;
   return CORES[h % CORES.length];
 }
-// Avatar quadrado-arredondado (estilo WeChat)
+function agora() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 function Avatar({ nome, tam = 40, raio = 12 }: { nome: string; tam?: number; raio?: number }) {
   return (
     <div
@@ -31,105 +41,156 @@ function Avatar({ nome, tam = 40, raio = 12 }: { nome: string; tam?: number; rai
     </div>
   );
 }
-function AvatarIA({ tam = 32 }: { tam?: number }) {
+function AvatarIA({ tam = 34 }: { tam?: number }) {
   return (
     <div className="shrink-0 grid place-items-center text-white select-none grad-cobre" style={{ width: tam, height: tam, borderRadius: 10 }} aria-hidden="true">
-      <svg width={tam * 0.58} height={tam * 0.58} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="8" width="16" height="11" rx="3" /><path d="M12 8V4M9 13h.01M15 13h.01M9.5 16.5h5" /><path d="M12 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
-      </svg>
+      <Bot size={tam * 0.56} strokeWidth={2} />
     </div>
   );
 }
-
-function estadoInfo(estado: Conversa["estado"]) {
-  if (estado === "ia") return { txt: "IA atendendo", dot: "bg-cobre", cls: "text-[color:var(--brand-cobre-l)]" };
-  if (estado === "precisa_humano") return { txt: "Precisa de você", dot: "bg-dourado", cls: "text-[color:var(--brand-dourado-l)]" };
-  return { txt: "Resolvido", dot: "bg-cream/40", cls: "text-cream/55" };
-}
-
-const BOLHA_CLIENTE: React.CSSProperties = {
-  background: "rgba(255,255,255,0.90)",
-  border: "1px solid rgba(255,255,255,0.6)",
-  boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
-};
-const BOLHA_IA: React.CSSProperties = {
-  background: "linear-gradient(135deg, #8f4712, #e08a3c)",
-  boxShadow: "0 6px 18px rgba(143,71,18,0.30)",
-};
-function Balao({ de, texto, nome }: Conversa["mensagens"][number] & { nome: string }) {
-  const isCliente = de === "cliente";
-  const av = isCliente ? <Avatar nome={nome} tam={36} raio={9} /> : <AvatarIA tam={36} />;
+function AvatarEquipe({ tam = 34 }: { tam?: number }) {
   return (
-    <div className={"flex items-start gap-2.5 mt-3 " + (isCliente ? "justify-start" : "justify-end")}>
-      {isCliente && av}
-      <div
-        className={
-          "max-w-[62%] rounded-[14px] px-3.5 py-2.5 text-[13.5px] leading-[1.5] whitespace-pre-line " +
-          (isCliente ? "text-[#4a1020] rounded-tl-[4px]" : "text-white rounded-tr-[4px]")
-        }
-        style={isCliente ? BOLHA_CLIENTE : BOLHA_IA}
-      >
-        {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
-        {texto}
-      </div>
-      {!isCliente && av}
+    <div className="shrink-0 grid place-items-center text-white select-none" style={{ width: tam, height: tam, borderRadius: 10, background: "linear-gradient(135deg,#6e1f30,#491020)" }} aria-hidden="true">
+      <UserRound size={tam * 0.56} strokeWidth={2} />
     </div>
   );
 }
 
-// ícone genérico da barra de digitação
-function IconBtn({ children }: { children: React.ReactNode }) {
-  return <button className="text-cream/50 hover:text-cream transition-colors" tabIndex={-1}>{children}</button>;
+function WhatsAppIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.05-.98.23-3.3-.68-2.79-1.1-4.56-3.96-4.7-4.15-.14-.19-1.12-1.49-1.12-2.84 0-1.35.7-2.01.96-2.29.24-.26.53-.32.7-.32.18 0 .35 0 .5.01.16.01.38-.06.6.46.23.53.77 1.86.84 2 .07.14.11.3.02.48-.09.19-.14.3-.28.47-.14.16-.29.36-.42.48-.14.14-.28.28-.12.55.16.28.72 1.18 1.54 1.91 1.06.94 1.95 1.24 2.23 1.38.28.14.44.12.6-.07.16-.19.69-.8.87-1.08.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.28.14.46.21.53.32.07.12.07.68-.17 1.36Z" />
+    </svg>
+  );
+}
+
+// Etiqueta (pill pequena) com cor por tipo.
+type EtiquetaTom = "dourado" | "cobre" | "whatsapp" | "neutro";
+function Etiqueta({ tom, comPonto, icone, children, onRemover }: { tom: EtiquetaTom; comPonto?: boolean; icone?: React.ReactNode; children: React.ReactNode; onRemover?: () => void }) {
+  const est =
+    tom === "dourado" ? { bg: "rgba(231,207,148,0.14)", c: "#e7cf94" }
+    : tom === "cobre" ? { bg: "rgba(224,138,60,0.14)", c: "#e59355" }
+    : tom === "whatsapp" ? { bg: "rgba(37,211,102,0.12)", c: "#4fd07f" }
+    : { bg: "rgba(255,255,255,0.06)", c: "rgba(251,245,236,0.75)" };
+  return (
+    <span className="group inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ background: est.bg, color: est.c }}>
+      {comPonto && <span className="w-1.5 h-1.5 rounded-full" style={{ background: est.c }} />}
+      {icone}
+      {children}
+      {onRemover && (
+        <button onClick={onRemover} className="opacity-0 group-hover:opacity-100 transition-opacity ml-0.5" aria-label="Remover etiqueta">
+          <X size={11} />
+        </button>
+      )}
+    </span>
+  );
+}
+
+// Bolha agrupada: avatar so no primeiro do bloco.
+function Balao({ de, texto, hora, nome, primeiro }: Mensagem & { nome: string; primeiro: boolean }) {
+  const isCliente = de === "cliente";
+  const av = isCliente ? <Avatar nome={nome} tam={34} raio={9} /> : de === "equipe" ? <AvatarEquipe /> : <AvatarIA />;
+  const espaco = <div style={{ width: 34 }} className="shrink-0" />;
+  return (
+    <div className={"flex items-end gap-2.5 " + (primeiro ? "mt-3" : "mt-1") + (isCliente ? " justify-start" : " justify-end")}>
+      {isCliente && (primeiro ? av : espaco)}
+      <div className="max-w-[64%]">
+        {!isCliente && de === "equipe" && primeiro && <div className="text-[10px] text-cream/45 mb-0.5 text-right pr-1">Você</div>}
+        <div
+          className={"rounded-[14px] px-3.5 py-2 text-[13.5px] leading-[1.5] whitespace-pre-line " + (isCliente ? "text-[#4a1020] rounded-bl-[4px]" : "text-white rounded-br-[4px]")}
+          style={isCliente
+            ? { background: "rgba(255,255,255,0.92)", boxShadow: "0 3px 12px rgba(0,0,0,0.16)" }
+            : { background: "linear-gradient(135deg,#8f4712,#e08a3c)", boxShadow: "0 4px 14px rgba(143,71,18,0.28)" }}
+        >
+          {texto}
+          <span className={"text-[10px] ml-2 float-right relative top-[7px] " + (isCliente ? "text-black/35" : "text-white/55")}>{hora}</span>
+        </div>
+      </div>
+      {!isCliente && (primeiro ? av : espaco)}
+    </div>
+  );
 }
 
 export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const [busca, setBusca] = useState("");
   const [ativaId, setAtivaId] = useState<string | undefined>(conversas[0]?.id);
+  const [texto, setTexto] = useState("");
+  const [msgsExtra, setMsgsExtra] = useState<Record<string, Mensagem[]>>({});
+  const [controle, setControle] = useState<Record<string, "ia" | "humano">>({});
+  const [tagsExtra, setTagsExtra] = useState<Record<string, string[]>>({});
+  const [arquivadas, setArquivadas] = useState<Record<string, boolean>>({});
+  const [resolvidas, setResolvidas] = useState<Record<string, boolean>>({});
+  const [emojiAberto, setEmojiAberto] = useState(false);
+  const [menuAberto, setMenuAberto] = useState(false);
+  const [addTag, setAddTag] = useState(false);
+  const [novaTag, setNovaTag] = useState("");
+  const [verPedidos, setVerPedidos] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const fim = useRef<HTMLDivElement>(null);
 
   const filtradas = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    if (!q) return conversas;
-    return conversas.filter((c) => c.clienteNome.toLowerCase().includes(q) || c.previa.toLowerCase().includes(q));
-  }, [busca, conversas]);
+    return conversas
+      .filter((c) => !arquivadas[c.id])
+      .filter((c) => (!q ? true : c.clienteNome.toLowerCase().includes(q) || c.previa.toLowerCase().includes(q)));
+  }, [busca, conversas, arquivadas]);
 
   const ativa = conversas.find((c) => c.id === ativaId) ?? filtradas[0] ?? conversas[0];
+  const ctrl = ativa ? controle[ativa.id] ?? "ia" : "ia";
+  const mensagens = useMemo(
+    () => (ativa ? [...ativa.mensagens, ...(msgsExtra[ativa.id] ?? [])] : []),
+    [ativa, msgsExtra],
+  );
 
-  const fim = useRef<HTMLDivElement>(null);
   useEffect(() => {
     fim.current?.scrollIntoView({ block: "end" });
-  }, [ativa?.id]);
+  }, [ativa?.id, mensagens.length]);
 
-  const info = ativa ? estadoInfo(ativa.estado) : null;
+  if (!ativa) {
+    return <div className="px-6 py-6 text-cream/60">Nenhuma conversa ainda.</div>;
+  }
 
-  // Vidro fosco escuro (glassmorphism sobre fundo vinho): translúcido + blur.
-  const GLASS: React.CSSProperties = {
-    background: "rgba(255,255,255,0.12)",
-    backdropFilter: "blur(24px) saturate(140%)",
-    WebkitBackdropFilter: "blur(24px) saturate(140%)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    borderTop: "1px solid rgba(255,255,255,0.30)",
-    boxShadow: "0 8px 32px rgba(73,16,32,0.35)",
-  };
-  const VIDRO_LEVE: React.CSSProperties = {
-    background: "rgba(255,255,255,0.06)",
-    backdropFilter: "blur(14px)",
-    WebkitBackdropFilter: "blur(14px)",
-  };
+  const resolvida = resolvidas[ativa.id];
+  const statusTxt = resolvida ? "Resolvido" : ctrl === "humano" ? "Você está atendendo" : "IA atendendo";
+  const statusCor = resolvida ? "#9aa0a6" : ctrl === "humano" ? "#e59355" : "#4fd07f";
+
+  const ultima = mensagens[mensagens.length - 1];
+  const aguardando = ultima?.de !== "cliente"; // se a ultima foi nossa, esperamos o cliente
+  const primeiraDoCliente = ativa.mensagens.find((m) => m.de === "cliente")?.texto;
+
+  const tags = tagsExtra[ativa.id] ?? [];
+
+  function enviar() {
+    const t = texto.trim();
+    if (!t) return;
+    setMsgsExtra((m) => ({ ...m, [ativa.id]: [...(m[ativa.id] ?? []), { de: "equipe", texto: t, hora: agora() }] }));
+    setTexto("");
+    setControle((c) => ({ ...c, [ativa.id]: "humano" })); // digitou = assumiu
+    setEmojiAberto(false);
+  }
+  function anexar(nome: string) {
+    setMsgsExtra((m) => ({ ...m, [ativa.id]: [...(m[ativa.id] ?? []), { de: "equipe", texto: `Enviou um arquivo: ${nome}`, hora: agora() }] }));
+    setControle((c) => ({ ...c, [ativa.id]: "humano" }));
+  }
+  function addEtiqueta() {
+    const t = novaTag.trim();
+    if (!t) return setAddTag(false);
+    setTagsExtra((x) => ({ ...x, [ativa.id]: [...(x[ativa.id] ?? []), t] }));
+    setNovaTag("");
+    setAddTag(false);
+  }
 
   return (
     <div className="px-6 py-6 h-screen flex flex-col">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mb-3 shrink-0">Atendimentos</div>
 
-      {/* painéis de vidro preenchendo a altura da tela (sem sobra embaixo) */}
       <div className="flex-1 min-h-0">
-        <div className="grid grid-cols-[300px_1fr_268px] gap-4 h-full">
-          {/* ---------- lista ---------- */}
-          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
+        <div className="grid grid-cols-[300px_1fr_280px] gap-4 h-full">
+          {/* ---------- LISTA ---------- */}
+          <div className="glass rounded-[20px] flex flex-col min-h-0 overflow-hidden">
             <div className="p-3 flex items-center gap-2">
               <div className="relative flex-1">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/45" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
-                </svg>
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/45" />
                 <input
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
@@ -137,162 +198,250 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   className="w-full bg-white/10 rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-cream placeholder:text-cream/45 focus:outline-none focus:ring-2 focus:ring-cobre/25"
                 />
               </div>
-              <button className="w-9 h-9 rounded-[10px] bg-white/10 grid place-items-center text-cream/60 hover:bg-white/20 transition-colors" tabIndex={-1}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-              </button>
             </div>
             <ScrollArea className="flex-1 min-h-0">
               <div className="px-2 pb-2">
-              {filtradas.length === 0 && (
-                <div className="px-3 py-10 text-[13px] text-cream/55 text-center">
-                  {conversas.length === 0 ? "Nenhuma conversa ainda." : "Nada encontrado."}
-                </div>
-              )}
-              {filtradas.map((c) => {
-                const on = c.id === ativa?.id;
-                const ci = estadoInfo(c.estado);
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => setAtivaId(c.id)}
-                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "grad-cobre" : "hover:bg-white/10")}
-                  >
-                    <Avatar nome={c.clienteNome} tam={44} raio={12} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className={"font-semibold text-[13.5px] truncate " + (on ? "text-white" : "text-cream")}>{c.clienteNome}</span>
-                        <span className={"text-[10px] shrink-0 " + (on ? "text-white/70" : "text-cream/50")}>{c.ultimaHora}</span>
+                {filtradas.length === 0 && <div className="px-3 py-10 text-[13px] text-cream/55 text-center">Nada encontrado.</div>}
+                {filtradas.map((c) => {
+                  const on = c.id === ativa.id;
+                  const cctrl = controle[c.id] ?? "ia";
+                  const st = resolvidas[c.id] ? "Resolvido" : cctrl === "humano" ? "Você atendendo" : "IA atendendo";
+                  const sc = resolvidas[c.id] ? "#9aa0a6" : cctrl === "humano" ? "#e59355" : "#4fd07f";
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => setAtivaId(c.id)}
+                      className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "grad-cobre" : "hover:bg-white/10")}
+                    >
+                      <Avatar nome={c.clienteNome} tam={44} raio={12} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className={"font-semibold text-[13.5px] truncate " + (on ? "text-white" : "text-cream")}>{c.clienteNome}</span>
+                          <span className={"text-[10px] shrink-0 " + (on ? "text-white/70" : "text-cream/50")}>{c.ultimaHora}</span>
+                        </div>
+                        <div className={"text-[12px] truncate mt-0.5 " + (on ? "text-white/85" : "text-cream/70")}>{c.previa}</div>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: on ? "#fff" : sc }} />
+                          <span className={"text-[10px] " + (on ? "text-white/85" : "")} style={on ? undefined : { color: sc }}>{st}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between gap-2 mt-0.5">
-                        <span className={"text-[12px] truncate " + (on ? "text-white/85" : "text-cream/70")}>{c.previa}</span>
-                        {c.naoLidas > 0 && (
-                          <span className={"text-[10px] min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full font-bold shrink-0 " + (on ? "bg-white text-[color:var(--brand-cobre)]" : "bg-[#f24e4e] text-white")}>
-                            {c.naoLidas}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className={"w-1.5 h-1.5 rounded-full " + (on ? "bg-white/80" : ci.dot)} />
-                        <span className={"text-[10px] " + (on ? "text-white/85" : ci.cls)}>{ci.txt}</span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
               </div>
             </ScrollArea>
           </div>
 
-          {/* ---------- chat ---------- */}
-          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
-            {!ativa ? (
-              <div className="flex-1 grid place-items-center text-[13px] text-cream/55">Selecione uma conversa.</div>
-            ) : (
-              <>
-                <div className="px-4 h-[54px] border-b border-white/12 flex items-center justify-between relative">
-                  <div className="flex items-center gap-1.5 text-cream/40 text-[11.5px]">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
-                    Não perturbe
-                  </div>
-                  <span className="font-semibold text-cream text-[15px] absolute left-1/2 -translate-x-1/2">{ativa.clienteNome}</span>
-                  <div className="flex items-center gap-4 text-cream/45">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M15.5 5A9.5 9.5 0 0 1 19 8.5M14 9a4 4 0 0 1 1 1M4.5 3h3l1.5 5-2 1a12 12 0 0 0 6 6l1-2 5 1.5v3a2 2 0 0 1-2 2A17 17 0 0 1 2.5 5a2 2 0 0 1 2-2Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="6" width="13" height="12" rx="2" /><path d="m15 10 6-3v10l-6-3" strokeLinejoin="round" /></svg>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
+          {/* ---------- CHAT ---------- */}
+          <div className="glass rounded-[20px] flex flex-col min-h-0 overflow-hidden">
+            {/* cabecalho */}
+            <div className="px-4 h-[58px] border-b border-white/10 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Avatar nome={ativa.clienteNome} tam={38} raio={12} />
+                <div className="min-w-0">
+                  <div className="font-semibold text-cream text-[14.5px] truncate">{ativa.clienteNome}</div>
+                  <div className="flex items-center gap-1.5 text-[11px] mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusCor }} />
+                    <span style={{ color: statusCor }}>{statusTxt}</span>
                   </div>
                 </div>
+              </div>
+              <div className="relative shrink-0">
+                <button onClick={() => setMenuAberto((v) => !v)} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Mais opções">
+                  <MoreVertical size={18} />
+                </button>
+                {menuAberto && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setMenuAberto(false)} />
+                    <div className="glass absolute right-0 top-11 z-20 w-52 rounded-[14px] p-1.5 text-[13px]">
+                      <button onClick={() => { setResolvidas((r) => ({ ...r, [ativa.id]: !r[ativa.id] })); setMenuAberto(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-cream/85 hover:bg-white/10">
+                        <CheckCheck size={16} /> {resolvida ? "Reabrir conversa" : "Marcar como resolvida"}
+                      </button>
+                      <button onClick={() => { setArquivadas((a) => ({ ...a, [ativa.id]: true })); setMenuAberto(false); setAtivaId(undefined); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-cream/85 hover:bg-white/10">
+                        <Archive size={16} /> Arquivar conversa
+                      </button>
+                      <button onClick={() => { setArquivadas((a) => ({ ...a, [ativa.id]: true })); setMenuAberto(false); setAtivaId(undefined); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#ff8a8a] hover:bg-white/10">
+                        <Ban size={16} /> Bloquear contato
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
 
-                <ScrollArea className="flex-1 min-h-0">
-                  <div className="px-6 py-4 flex flex-col">
-                    <div className="self-center text-[10.5px] text-cream/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(6px)" }}>Hoje {ativa.ultimaHora}</div>
-                    {ativa.mensagens.map((m, i) => (
-                      <Balao key={i} {...m} nome={ativa.clienteNome} />
-                    ))}
-                    <div ref={fim} />
-                  </div>
-                </ScrollArea>
+            {/* mensagens agrupadas */}
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="px-6 py-4 flex flex-col">
+                <div className="self-center text-[10.5px] text-cream/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(6px)" }}>
+                  Hoje {ativa.ultimaHora}
+                </div>
+                {mensagens.map((m, i) => {
+                  const ant = mensagens[i - 1];
+                  const primeiro = !ant || ant.de !== m.de;
+                  return <Balao key={i} {...m} nome={ativa.clienteNome} primeiro={primeiro} />;
+                })}
+                <div ref={fim} />
+              </div>
+            </ScrollArea>
 
-                <div className="border-t border-white/12 px-3 py-2.5 flex items-center gap-2" style={VIDRO_LEVE}>
-                  <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
-                  <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m21 15-5-5L5 21M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
-                  <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cobre inline-block animate-pulse shrink-0" />
-                    <span className="text-[12.5px] text-cream/60 truncate">A IA está respondendo. Toque para assumir a conversa</span>
-                  </div>
-                  <button className="w-10 h-10 rounded-full grad-cobre grid place-items-center text-white shrink-0 shadow-[0_6px_16px_rgba(143,71,18,0.3)] hover:brightness-105 transition press" tabIndex={-1}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" /></svg>
+            {/* controle IA / humano */}
+            <div className="px-3 pt-2.5 border-t border-white/10" style={{ background: "rgba(255,255,255,0.04)" }}>
+              <div className="flex items-center justify-between gap-2 mb-2 text-[12px]">
+                <span className="flex items-center gap-1.5" style={{ color: statusCor }}>
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: statusCor }} />
+                  {ctrl === "humano" ? "Você está atendendo" : "A IA está respondendo"}
+                </span>
+                {ctrl === "humano" ? (
+                  <button onClick={() => setControle((c) => ({ ...c, [ativa.id]: "ia" }))} className="press inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-full border border-cobre/40 text-[color:var(--brand-cobre-l)] hover:bg-cobre/10 transition-colors">
+                    <Bot size={14} /> Devolver para a IA
                   </button>
-                </div>
-              </>
-            )}
+                ) : (
+                  <button onClick={() => setControle((c) => ({ ...c, [ativa.id]: "humano" }))} className="btn-cobre press inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5">
+                    <UserRound size={14} /> Assumir conversa
+                  </button>
+                )}
+              </div>
+
+              {/* composer */}
+              <div className="relative flex items-center gap-1.5 pb-2.5">
+                <button onClick={() => setEmojiAberto((v) => !v)} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Emoji">
+                  <Smile size={19} />
+                </button>
+                <button onClick={() => fileRef.current?.click()} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Anexar arquivo">
+                  <Paperclip size={18} />
+                </button>
+                <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) anexar(f.name); e.target.value = ""; }} />
+                <input
+                  value={texto}
+                  onChange={(e) => setTexto(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") enviar(); }}
+                  placeholder="Escreva uma mensagem"
+                  className="flex-1 bg-white/10 rounded-full px-4 py-2.5 text-[13.5px] text-cream placeholder:text-cream/40 focus:outline-none focus:ring-2 focus:ring-cobre/25"
+                />
+                <button onClick={enviar} disabled={!texto.trim()} className="grad-cobre press w-10 h-10 rounded-full grid place-items-center text-white shrink-0 shadow-[0_6px_16px_rgba(143,71,18,0.3)] disabled:opacity-45 disabled:cursor-default" aria-label="Enviar">
+                  <SendHorizontal size={18} />
+                </button>
+
+                {emojiAberto && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setEmojiAberto(false)} />
+                    <div className="glass absolute left-0 bottom-14 z-20 w-64 rounded-[16px] p-2 grid grid-cols-8 gap-0.5">
+                      {EMOJIS.map((e) => (
+                        <button key={e} onClick={() => { setTexto((t) => t + e); }} className="text-lg rounded-lg hover:bg-white/10 aspect-square grid place-items-center">
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* ---------- info do contato ---------- */}
-          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
-            {!ativa ? (
-              <div className="flex-1" />
-            ) : (
-              <ScrollArea className="flex-1 min-h-0">
+          {/* ---------- INFO DO CONTATO ---------- */}
+          <div className="glass rounded-[20px] flex flex-col min-h-0 overflow-hidden">
+            <ScrollArea className="flex-1 min-h-0">
               <div className="p-5">
+                {/* topo */}
                 <div className="flex flex-col items-center text-center pb-4">
-                  <Avatar nome={ativa.clienteNome} tam={68} raio={18} />
-                  <div className="font-semibold text-cream text-[15px] mt-3">{ativa.clienteNome}</div>
-                  <div className="text-xs text-cream/60 mt-0.5">{ativa.clienteTelefone}</div>
-                  {info && (
-                    <span className="chip-marca mt-2 inline-flex items-center gap-1.5 text-[11px] rounded-full px-2.5 py-1 font-medium">
-                      <span className={"w-1.5 h-1.5 rounded-full " + info.dot} />
-                      {info.txt}
-                    </span>
+                  <Avatar nome={ativa.clienteNome} tam={64} raio={18} />
+                  <div className="font-semibold text-cream text-[16px] mt-3">{ativa.clienteNome}</div>
+                  <a href={linkWhatsapp(ativa.clienteTelefone)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-cream/60 mt-1 hover:text-cream transition-colors">
+                    <span className="text-[#4fd07f]"><WhatsAppIcon size={12} /></span> {formatarTelefoneBR(ativa.clienteTelefone)}
+                  </a>
+                </div>
+
+                {/* etiquetas */}
+                <div className="border-t border-white/10 pt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="t-label text-cream/45">Etiquetas</span>
+                    <button onClick={() => setAddTag((v) => !v)} className="w-5 h-5 grid place-items-center rounded-full bg-white/8 text-cream/60 hover:bg-white/15 hover:text-cream transition-colors" aria-label="Adicionar etiqueta">
+                      <Plus size={13} />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Etiqueta tom="dourado">Cliente</Etiqueta>
+                    <Etiqueta tom={ctrl === "humano" ? "cobre" : "whatsapp"} comPonto>{statusTxt}</Etiqueta>
+                    <Etiqueta tom="whatsapp" icone={<WhatsAppIcon size={11} />}>WhatsApp</Etiqueta>
+                    {tags.map((t, i) => (
+                      <Etiqueta key={i} tom="neutro" onRemover={() => setTagsExtra((x) => ({ ...x, [ativa.id]: tags.filter((_, j) => j !== i) }))}>{t}</Etiqueta>
+                    ))}
+                  </div>
+                  {addTag && (
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <input
+                        autoFocus
+                        value={novaTag}
+                        onChange={(e) => setNovaTag(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") addEtiqueta(); if (e.key === "Escape") setAddTag(false); }}
+                        placeholder="Nova etiqueta"
+                        className="flex-1 bg-white/10 rounded-lg px-2.5 py-1.5 text-[12px] text-cream placeholder:text-cream/40 focus:outline-none focus:ring-2 focus:ring-cobre/25"
+                      />
+                      <button onClick={addEtiqueta} className="btn-cobre press px-2.5 py-1.5 text-[12px] font-semibold">Ok</button>
+                    </div>
                   )}
                 </div>
 
-                <div className="border-t border-white/12 pt-4 space-y-3.5">
-                  {[
-                    ["Telefone", ativa.clienteTelefone],
-                    ["Canal", "WhatsApp"],
-                    ["Mensagens", String(ativa.mensagens.length)],
-                  ].map(([label, val]) => (
-                    <div key={label} className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] text-cream/50">{label}</span>
-                      <span className="text-[13px] text-cream font-medium text-right truncate">{val}</span>
+                {/* info operacional do atendimento */}
+                <div className="border-t border-white/10 pt-4 mt-4">
+                  <span className="t-label text-cream/45">Atendimento</span>
+                  <div className="mt-2.5 space-y-2.5 text-[13px]">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusCor }} />
+                      <span className="text-cream/85">{statusTxt}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-cream/70">
+                      <Clock size={14} className="text-cream/45" /> Aberta desde {ativa.mensagens[0]?.hora ?? "-"}
+                    </div>
+                    <div className="flex items-center gap-2 text-cream/70">
+                      <CheckCheck size={14} className="text-cream/45" /> {aguardando ? "Aguardando o cliente responder" : "Cliente aguardando resposta"} · {ultima?.hora ?? "-"}
+                    </div>
+                    {primeiraDoCliente && (
+                      <div className="rounded-[10px] px-3 py-2 text-[12.5px] text-cream/75 leading-relaxed" style={{ background: "rgba(255,255,255,0.05)" }}>
+                        <span className="text-cream/45">Assunto:</span> {primeiraDoCliente}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* dados */}
+                <div className="border-t border-white/10 pt-4 mt-4 space-y-3">
+                  {[["Canal", "WhatsApp"], ["Mensagens", String(mensagens.length)]].map(([l, v]) => (
+                    <div key={l} className="flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-cream/45">{l}</span>
+                      <span className="text-[13px] text-cream font-medium">{v}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t border-white/12 pt-4 mt-4">
-                  <div className="text-[11px] text-cream/50 mb-2">Etiquetas</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["Cliente", info?.txt ?? "", "WhatsApp"].filter(Boolean).map((t) => (
-                      <span key={t} className="chip-marca inline-flex items-center text-[11px] rounded-full px-2.5 py-1 font-medium">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="glass-strong mt-5 rounded-[14px] p-4 text-white">
-                  <div className="text-[11px] uppercase tracking-wider text-dourado-l">Atendimento</div>
-                  <div className="text-sm font-medium mt-1 leading-snug">
-                    A IA responde 24h com a voz da padaria e monta o orçamento sozinha.
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <button className="btn-cobre press w-full py-2.5 text-[13px] font-semibold transition flex items-center justify-center gap-2" tabIndex={-1}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v7M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 8 8h1a8 8 0 0 0 8-8v-1a2 2 0 0 0-4 0" /></svg>
-                    Assumir conversa
-                  </button>
-                  <button className="w-full py-2.5 rounded-[12px] bg-white/10 text-cream/60 text-[13px] font-medium hover:bg-white/20 transition flex items-center justify-center gap-2" tabIndex={-1}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z" /><path d="M14 2v6h6M9 13h6M9 17h4" strokeLinecap="round" /></svg>
-                    Ver pedidos do cliente
-                  </button>
-                </div>
+                <button onClick={() => setVerPedidos(true)} className="w-full mt-5 py-2.5 rounded-[12px] bg-white/8 text-cream/85 text-[13px] font-medium hover:bg-white/14 transition-colors flex items-center justify-center gap-2">
+                  <ShoppingBag size={16} /> Ver pedidos do cliente
+                </button>
               </div>
-              </ScrollArea>
-            )}
+            </ScrollArea>
           </div>
         </div>
       </div>
+
+      {/* modal: pedidos do cliente (dados reais do banco quando houver) */}
+      {verPedidos && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(0,0,0,0.5)" }} onClick={() => setVerPedidos(false)}>
+          <div className="rounded-[20px] w-full max-w-md overflow-hidden flex flex-col" style={{ background: "rgba(73,16,32,0.9)", backdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.14)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/10">
+              <div>
+                <div className="t-label text-dourado">Pedidos do cliente</div>
+                <h3 className="t-h2 text-cream mt-1">{ativa.clienteNome}</h3>
+              </div>
+              <button onClick={() => setVerPedidos(false)} className="w-9 h-9 grid place-items-center rounded-full text-cream/60 hover:text-cream hover:bg-white/10" aria-label="Fechar"><X size={18} /></button>
+            </div>
+            <div className="p-6 text-center">
+              <ShoppingBag size={30} className="mx-auto text-cream/30" />
+              <div className="text-cream/70 text-sm mt-3">Nenhum pedido registrado no sistema ainda para este cliente.</div>
+              <div className="text-cream/45 text-xs mt-1">O histórico aparece aqui conforme os pedidos entram pela plataforma.</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
