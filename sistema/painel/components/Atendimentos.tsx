@@ -47,28 +47,26 @@ function estadoInfo(estado: Conversa["estado"]) {
 }
 
 function Balao({
-  de, texto, hora, nome, avatar,
-}: Conversa["mensagens"][number] & { nome: string; avatar: boolean }) {
-  const espaco = <div style={{ width: 34 }} className="shrink-0" />;
+  de, texto, hora, primeiro,
+}: Conversa["mensagens"][number] & { primeiro: boolean }) {
+  const margem = primeiro ? "mt-2.5" : "mt-1";
   if (de === "cliente") {
     return (
-      <div className={"flex items-end gap-2 justify-start " + (avatar ? "mt-1.5" : "mt-0.5")}>
-        {avatar ? <Avatar nome={nome} tam={34} raio={10} /> : espaco}
-        <div className="max-w-[70%] rounded-[16px] rounded-bl-[5px] bg-white text-ink px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_2px_rgba(0,0,0,0.09)]">
+      <div className={"flex justify-start " + margem}>
+        <div className="max-w-[62%] rounded-[14px] rounded-tl-[4px] bg-white text-ink pl-3.5 pr-2 py-2 text-[13.5px] leading-[1.45] whitespace-pre-line shadow-[0_1px_1.5px_rgba(0,0,0,0.10)]">
           {texto}
-          <span className="text-[10px] text-ink-soft/40 ml-2 float-right relative top-[6px]">{hora}</span>
+          <span className="text-[10px] text-ink-soft/35 ml-1.5 float-right relative top-[7px]">{hora}</span>
         </div>
       </div>
     );
   }
   return (
-    <div className={"flex items-end gap-2 justify-end " + (avatar ? "mt-1.5" : "mt-0.5")}>
-      <div className="max-w-[70%] rounded-[16px] rounded-br-[5px] bg-wa text-white px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_2px_rgba(20,110,60,0.28)]">
+    <div className={"flex justify-end " + margem}>
+      <div className="max-w-[62%] rounded-[14px] rounded-tr-[4px] bg-wa text-white pl-3.5 pr-2 py-2 text-[13.5px] leading-[1.45] whitespace-pre-line shadow-[0_1px_2px_rgba(20,110,60,0.22)]">
         {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
         {texto}
-        <span className="text-[10px] text-white/60 ml-2 float-right relative top-[6px]">{hora}</span>
+        <span className="text-[10px] text-white/55 ml-1.5 float-right relative top-[7px]">{hora}</span>
       </div>
-      {avatar ? <AvatarIA tam={34} /> : espaco}
     </div>
   );
 }
@@ -195,7 +193,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   {ativa.mensagens.map((m, i) => {
                     const ant = ativa.mensagens[i - 1];
                     const primeiro = !ant || ant.de !== m.de;
-                    return <Balao key={i} {...m} nome={ativa.clienteNome} avatar={primeiro} />;
+                    return <Balao key={i} {...m} primeiro={primeiro} />;
                   })}
                   <div ref={fim} />
                 </div>
