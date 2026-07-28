@@ -46,6 +46,17 @@ function estadoInfo(estado: Conversa["estado"]) {
   return { txt: "Resolvido", dot: "bg-ink-soft/40", cls: "text-ink-soft" };
 }
 
+const BOLHA_CLIENTE: React.CSSProperties = {
+  background: "rgba(255,255,255,0.72)",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  border: "1px solid rgba(255,255,255,0.75)",
+  boxShadow: "0 4px 16px rgba(70,55,45,0.08)",
+};
+const BOLHA_IA: React.CSSProperties = {
+  background: "linear-gradient(135deg, var(--color-wa), color-mix(in srgb, var(--color-wa) 78%, #063))",
+  boxShadow: "0 6px 18px rgba(20,120,70,0.30)",
+};
 function Balao({ de, texto, nome }: Conversa["mensagens"][number] & { nome: string }) {
   const isCliente = de === "cliente";
   const av = isCliente ? <Avatar nome={nome} tam={36} raio={9} /> : <AvatarIA tam={36} />;
@@ -54,11 +65,10 @@ function Balao({ de, texto, nome }: Conversa["mensagens"][number] & { nome: stri
       {isCliente && av}
       <div
         className={
-          "max-w-[62%] rounded-[10px] px-3.5 py-2.5 text-[13.5px] leading-[1.5] whitespace-pre-line " +
-          (isCliente
-            ? "bg-white text-ink rounded-tl-[3px] shadow-[0_1px_2px_rgba(0,0,0,0.07)]"
-            : "bg-wa text-white rounded-tr-[3px]")
+          "max-w-[62%] rounded-[14px] px-3.5 py-2.5 text-[13.5px] leading-[1.5] whitespace-pre-line " +
+          (isCliente ? "text-ink rounded-tl-[4px]" : "text-white rounded-tr-[4px]")
         }
+        style={isCliente ? BOLHA_CLIENTE : BOLHA_IA}
       >
         {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
         {texto}
@@ -91,17 +101,38 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   }, [ativa?.id]);
 
   const info = ativa ? estadoInfo(ativa.estado) : null;
-  const SOMBRA = "0 10px 34px rgba(60,70,120,0.10)";
+
+  // Vidro fosco (glassmorphism estilo Apple): translúcido + blur + borda clara.
+  const GLASS: React.CSSProperties = {
+    background: "rgba(255,255,255,0.30)",
+    backdropFilter: "blur(34px) saturate(200%)",
+    WebkitBackdropFilter: "blur(34px) saturate(200%)",
+    border: "1px solid rgba(255,255,255,0.6)",
+    boxShadow: "0 14px 44px rgba(80,60,50,0.16), inset 0 1px 0 rgba(255,255,255,0.7)",
+  };
+  const VIDRO_LEVE: React.CSSProperties = {
+    background: "rgba(255,255,255,0.45)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+  };
+  // Fundo colorido (mesh) vivo que vaza por trás do vidro e dá vida ao desfoque.
+  const MESH =
+    "radial-gradient(1100px 560px at 4% -12%, #ffc188 0%, rgba(255,193,136,0) 55%)," +
+    "radial-gradient(960px 520px at 102% -2%, #78e6b6 0%, rgba(120,230,182,0) 52%)," +
+    "radial-gradient(1060px 740px at 94% 114%, #ff9f8f 0%, rgba(255,159,143,0) 55%)," +
+    "radial-gradient(920px 660px at -12% 110%, #c3a7ef 0%, rgba(195,167,239,0) 55%)," +
+    "radial-gradient(680px 480px at 48% 46%, #fff0da 0%, rgba(255,240,218,0) 62%)," +
+    "linear-gradient(135deg,#fbf0e3,#ece3d6)";
 
   return (
     <div className="px-6 py-6">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mb-3">Atendimentos</div>
 
-      {/* fundo lavanda suave com os painéis flutuando */}
-      <div className="rounded-[26px] p-4" style={{ background: "linear-gradient(135deg,#eaedf6,#e6e9f3)" }}>
+      {/* fundo colorido mesh com os painéis de vidro flutuando */}
+      <div className="rounded-[28px] p-4" style={{ background: MESH }}>
         <div className="grid grid-cols-[300px_1fr_268px] gap-4 h-[640px]">
           {/* ---------- lista ---------- */}
-          <div className="bg-white rounded-[18px] flex flex-col min-h-0 overflow-hidden" style={{ boxShadow: SOMBRA }}>
+          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
             <div className="p-3 flex items-center gap-2">
               <div className="relative flex-1">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/45" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -111,10 +142,10 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
                   placeholder="Pesquisar"
-                  className="w-full bg-[#f1f2f6] rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-ink placeholder:text-ink-soft/45 focus:outline-none focus:ring-2 focus:ring-wa/25"
+                  className="w-full bg-white/40 rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-ink placeholder:text-ink-soft/45 focus:outline-none focus:ring-2 focus:ring-wa/25"
                 />
               </div>
-              <button className="w-9 h-9 rounded-[10px] bg-[#f1f2f6] grid place-items-center text-ink-soft/70 hover:bg-[#e9eaf0] transition-colors" tabIndex={-1}>
+              <button className="w-9 h-9 rounded-[10px] bg-white/40 grid place-items-center text-ink-soft/70 hover:bg-white/60 transition-colors" tabIndex={-1}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
               </button>
             </div>
@@ -131,7 +162,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <button
                     key={c.id}
                     onClick={() => setAtivaId(c.id)}
-                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "bg-wa" : "hover:bg-[#f5f6f9]")}
+                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "bg-wa" : "hover:bg-white/40")}
                   >
                     <Avatar nome={c.clienteNome} tam={44} raio={12} />
                     <div className="min-w-0 flex-1">
@@ -159,7 +190,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
           </div>
 
           {/* ---------- chat ---------- */}
-          <div className="bg-white rounded-[18px] flex flex-col min-h-0 overflow-hidden" style={{ boxShadow: SOMBRA }}>
+          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
             {!ativa ? (
               <div className="flex-1 grid place-items-center text-[13px] text-ink-soft/60">Selecione uma conversa.</div>
             ) : (
@@ -177,18 +208,18 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col min-h-0" style={{ backgroundColor: "#f6f6f8" }}>
-                  <div className="self-center text-[10.5px] text-ink-soft/40 mt-1 mb-1">Hoje {ativa.ultimaHora}</div>
+                <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col min-h-0">
+                  <div className="self-center text-[10.5px] text-ink-soft/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.4)", backdropFilter: "blur(6px)" }}>Hoje {ativa.ultimaHora}</div>
                   {ativa.mensagens.map((m, i) => (
                     <Balao key={i} {...m} nome={ativa.clienteNome} />
                   ))}
                   <div ref={fim} />
                 </div>
 
-                <div className="border-t border-line/60 bg-white px-3 py-2.5 flex items-center gap-2">
+                <div className="border-t border-white/40 px-3 py-2.5 flex items-center gap-2" style={VIDRO_LEVE}>
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m21 15-5-5L5 21M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
-                  <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-[#f1f2f6] px-4 py-2.5">
+                  <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/40 px-4 py-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block animate-pulse shrink-0" />
                     <span className="text-[12.5px] text-ink-soft/70 truncate">A IA está respondendo — toque para assumir a conversa</span>
                   </div>
@@ -201,7 +232,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
           </div>
 
           {/* ---------- info do contato ---------- */}
-          <div className="bg-white rounded-[18px] flex flex-col min-h-0 overflow-hidden" style={{ boxShadow: SOMBRA }}>
+          <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
             {!ativa ? (
               <div className="flex-1" />
             ) : (
@@ -211,7 +242,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <div className="font-semibold text-ink text-[15px] mt-3">{ativa.clienteNome}</div>
                   <div className="text-xs text-ink-soft/70 mt-0.5">{ativa.clienteTelefone}</div>
                   {info && (
-                    <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] bg-[#f1f2f6] rounded-full px-2.5 py-1">
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] bg-white/40 rounded-full px-2.5 py-1">
                       <span className={"w-1.5 h-1.5 rounded-full " + info.dot} />
                       <span className={info.cls}>{info.txt}</span>
                     </span>
@@ -254,7 +285,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v7M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 8 8h1a8 8 0 0 0 8-8v-1a2 2 0 0 0-4 0" /></svg>
                     Assumir conversa
                   </button>
-                  <button className="w-full py-2.5 rounded-[12px] bg-[#f1f2f6] text-ink-soft text-[13px] font-medium hover:bg-[#e9eaf0] transition flex items-center justify-center gap-2" tabIndex={-1}>
+                  <button className="w-full py-2.5 rounded-[12px] bg-white/40 text-ink-soft text-[13px] font-medium hover:bg-white/60 transition flex items-center justify-center gap-2" tabIndex={-1}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z" /><path d="M14 2v6h6M9 13h6M9 17h4" strokeLinecap="round" /></svg>
                     Ver pedidos do cliente
                   </button>
