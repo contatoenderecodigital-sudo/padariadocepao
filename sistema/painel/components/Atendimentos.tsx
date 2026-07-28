@@ -167,12 +167,17 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
               <div className="flex-1 grid place-items-center text-[13px] text-ink-soft/60">Selecione uma conversa.</div>
             ) : (
               <>
-                <div className="px-5 h-[52px] border-b border-line/60 flex items-center justify-between relative">
-                  <div className="flex items-center gap-1.5 text-ink-soft/45 text-[12px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block" />
-                    {info?.txt}
+                <div className="px-4 h-[60px] border-b border-line/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar nome={ativa.clienteNome} tam={40} raio={13} />
+                    <div className="leading-tight">
+                      <div className="font-semibold text-ink text-[14.5px]">{ativa.clienteNome}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-ink-soft/55 mt-0.5">
+                        <span className={"w-1.5 h-1.5 rounded-full " + (info?.dot ?? "bg-wa")} />
+                        {info?.txt}
+                      </div>
+                    </div>
                   </div>
-                  <span className="font-semibold text-ink text-[15px] absolute left-1/2 -translate-x-1/2">{ativa.clienteNome}</span>
                   <div className="flex items-center gap-4 text-ink-soft/45">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M15.5 5A9.5 9.5 0 0 1 19 8.5M14 9a4 4 0 0 1 1 1M4.5 3h3l1.5 5-2 1a12 12 0 0 0 6 6l1-2 5 1.5v3a2 2 0 0 1-2 2A17 17 0 0 1 2.5 5a2 2 0 0 1 2-2Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="6" width="13" height="12" rx="2" /><path d="m15 10 6-3v10l-6-3" strokeLinejoin="round" /></svg>
@@ -198,16 +203,16 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <div ref={fim} />
                 </div>
 
-                <div className="border-t border-line/60 bg-white px-4 pt-2 pb-3">
-                  <div className="flex items-center gap-4 px-1 pb-2 text-ink-soft/55">
-                    <IconBtn><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
-                    <IconBtn><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
-                    <IconBtn><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M4 6h16M4 12h16M4 18h10" strokeLinecap="round" /></svg></IconBtn>
+                <div className="border-t border-line/60 bg-white px-3 py-2.5 flex items-center gap-2">
+                  <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
+                  <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m21 15-5-5L5 21M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
+                  <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-[#f1f2f6] px-4 py-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block animate-pulse shrink-0" />
+                    <span className="text-[12.5px] text-ink-soft/70 truncate">A IA está respondendo — toque para assumir a conversa</span>
                   </div>
-                  <div className="flex items-center gap-2 rounded-[10px] bg-[#f1f2f6] px-3 py-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block animate-pulse" />
-                    <span className="text-[12px] text-ink-soft/80 flex-1 truncate">A IA está respondendo. Toque pra assumir a conversa.</span>
-                  </div>
+                  <button className="w-10 h-10 rounded-full bg-wa grid place-items-center text-white shrink-0 hover:brightness-105 transition" tabIndex={-1}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" /></svg>
+                  </button>
                 </div>
               </>
             )}
@@ -249,6 +254,17 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <div className="text-sm font-medium mt-1 leading-snug">
                     A IA responde 24h com a voz da padaria e monta o orçamento sozinha.
                   </div>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  <button className="w-full py-2.5 rounded-[12px] border border-wa/40 text-wa text-[13px] font-semibold hover:bg-wa/[0.06] transition flex items-center justify-center gap-2" tabIndex={-1}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v7M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 8 8h1a8 8 0 0 0 8-8v-1a2 2 0 0 0-4 0" /></svg>
+                    Assumir conversa
+                  </button>
+                  <button className="w-full py-2.5 rounded-[12px] bg-[#f1f2f6] text-ink-soft text-[13px] font-medium hover:bg-[#e9eaf0] transition flex items-center justify-center gap-2" tabIndex={-1}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z" /><path d="M14 2v6h6M9 13h6M9 17h4" strokeLinecap="round" /></svg>
+                    Ver pedidos do cliente
+                  </button>
                 </div>
               </div>
             )}
