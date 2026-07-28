@@ -26,6 +26,13 @@ type Badge = { nome: string; cor: string; id: DeptoId | "caixa" };
 function esc(s: string) {
   return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);
 }
+// Remove acento e c-cedilha. IMPRESSAO fica ASCII ate a impressora termica ser
+// testada (acento/ç em bobina depende do codepage e pode sair como lixo).
+function semAcento(s: string) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+// pra impressao: sem acento + escapado
+const pr = (s: string) => esc(semAcento(s));
 
 function htmlDoTicket(
   t: { badge: Badge; itens: Pedido["itens"]; master?: boolean },
@@ -35,22 +42,22 @@ function htmlDoTicket(
   const itens = t.itens
     .map(
       (it) =>
-        `<div class="row"><span><b>${it.qtd}x</b> ${esc(it.produto)}</span>${t.master ? `<span>${brl(it.subtotalCentavos)}</span>` : ""}</div>`,
+        `<div class="row"><span class="nm"><b>${it.qtd}x</b> ${pr(it.produto)}</span>${t.master ? `<span class="pc">${brl(it.subtotalCentavos)}</span>` : ""}</div>`,
     )
     .join("");
   const rodape = t.master
     ? `<div><b>TOTAL: ${brl(pedido.totalCentavos)}</b></div><div>Pagamento na RETIRADA</div>`
-    : `<div class="center">Producao ${esc(t.badge.nome)}</div>`;
-  const obs = pedido.observacoes ? `<div class="ln"></div><div><b>OBS:</b> ${esc(pedido.observacoes)}</div>` : "";
+    : `<div class="center">Producao ${pr(t.badge.nome)}</div>`;
+  const obs = pedido.observacoes ? `<div class="ln"></div><div><b>OBS:</b> ${pr(pedido.observacoes)}</div>` : "";
   return `<div class="tk">
-    <div class="center"><span class="badge">${esc(t.badge.nome)}</span></div>
-    <div class="center b">${esc(nomeNegocio || "Padaria")}</div>
+    <div class="center"><span class="badge">${pr(t.badge.nome)}</span></div>
+    <div class="center b">${pr(nomeNegocio || "Padaria")}</div>
     <div class="ln"></div>
-    <div><b>CLIENTE:</b> ${esc(pedido.clienteNome)}</div>
+    <div><b>CLIENTE:</b> ${pr(pedido.clienteNome)}</div>
     <div>Fone: ${formatarTelefoneBR(pedido.clienteTelefone)}</div>
     <div><b>RETIRADA:</b> ${fmtData(pedido.retiradaData)}${pedido.retiradaHora ? " - " + pedido.retiradaHora : ""}</div>
     ${pedido.pessoas ? `<div>Festa: ${pedido.pessoas} pessoas</div>` : ""}
-    <div>Pedido #${esc(pedido.id.slice(0, 8))}</div>
+    <div>Pedido #${pr(pedido.id.slice(0, 8))}</div>
     <div class="ln"></div>
     ${itens}
     <div class="ln"></div>
@@ -68,7 +75,9 @@ const PRINT_CSS = `
   .center { text-align: center; }
   .badge { display: inline-block; border: 1px solid #000; padding: 1px 8px; margin-bottom: 3px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
   .ln { border-top: 1px dashed #000; margin: 5px 0; }
-  .row { display: flex; justify-content: space-between; gap: 8px; }
+  .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .row .nm { min-width: 0; }
+  .row .pc { white-space: nowrap; text-align: right; }
 `;
 
 function imprimirHTML(inner: string) {
@@ -135,11 +144,11 @@ function Ticket({
         <div>Pedido #{pedido.id.slice(0, 8)}</div>
         <div className="border-t border-dashed border-black/30 my-1.5" />
         {itens.map((it, i) => (
-          <div key={i} className="flex justify-between gap-2">
-            <span>
+          <div key={i} className="flex items-start justify-between gap-2">
+            <span className="min-w-0">
               <b>{it.qtd}x</b> {it.produto}
             </span>
-            {master ? <span>{brl(it.subtotalCentavos)}</span> : null}
+            {master ? <span className="shrink-0 whitespace-nowrap text-right">{brl(it.subtotalCentavos)}</span> : null}
           </div>
         ))}
         <div className="border-t border-dashed border-black/30 my-1.5" />
@@ -149,7 +158,7 @@ function Ticket({
             <div>Pagamento na RETIRADA</div>
           </>
         ) : (
-          <div className="text-center">Producao {badge.nome}</div>
+          <div className="text-center">Produção {badge.nome}</div>
         )}
         {pedido.observacoes ? (
           <>
@@ -218,7 +227,7 @@ export default function CupomPreview({
         <div className="no-print flex items-start justify-between gap-6 px-6 pt-5 pb-4 border-b border-white/10">
           <div>
             <div className="t-label text-dourado">Cupom da cozinha</div>
-            <h3 className="t-h2 text-cream mt-1">Um ticket por estacao, mais o do caixa</h3>
+            <h3 className="t-h2 text-cream mt-1">Um ticket por estação, mais o do caixa</h3>
           </div>
           <button
             onClick={onClose}
