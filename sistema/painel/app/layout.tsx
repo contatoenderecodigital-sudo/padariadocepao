@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-// Fraunces: serifa só para TÍTULOS (h1/h2) e logo.
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-fraunces",
-});
-
-// Plus Jakarta Sans: fonte padrão de TODO o corpo do texto.
+// UMA fonte pro site inteiro: Plus Jakarta Sans. Hierarquia por peso/tamanho,
+// nunca por familia diferente. (Fraunces e Inter foram removidas.)
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-jakarta",
 });
 
@@ -29,7 +23,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${fraunces.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>

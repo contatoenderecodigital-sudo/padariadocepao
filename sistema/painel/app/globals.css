@@ -43,7 +43,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-serif: var(--font-fraunces);
+  --font-serif: var(--font-jakarta);
   --font-sans:  var(--font-jakarta);
 }
 
@@ -61,11 +61,27 @@ body {
 }
 h1, h2, h3, .tracking-tight-apple { letter-spacing: -0.021em; }
 
-/* Títulos de destaque em serifa (Fraunces) — corpo segue em Inter. */
-.font-title {
-  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  letter-spacing: -0.02em;
-}
+/* ==========================================================================
+   ESCALA TIPOGRAFICA unica do site. UMA fonte (Jakarta), hierarquia por
+   peso/tamanho. Use estas classes em vez de tamanhos soltos.
+   ========================================================================== */
+/* Titulo de tela */
+.t-h1 { font-weight: 800; font-size: 30px; line-height: 1.1; letter-spacing: -0.02em; }
+/* Subtitulo/secao */
+.t-h2 { font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; }
+/* Nome de card/cliente */
+.t-cardname { font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
+/* Corpo */
+.t-body { font-weight: 400; font-size: 15px; }
+/* Secundario/descricao */
+.t-sec { font-weight: 400; font-size: 14px; }
+/* Rotulo pequeno (TOTAL, RETIRADA) */
+.t-label { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+/* Valor em dinheiro: peso 700, numeros alinhados (o degrade vem do .text-grad-dourado) */
+.t-money { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+/* Compat: font-title agora e Jakarta 800 (Fraunces foi removida). */
+.font-title { font-weight: 800; letter-spacing: -0.02em; }
 
 /* ==========================================================================
    Degradês premium da marca (vinho + dourado + cobre).
