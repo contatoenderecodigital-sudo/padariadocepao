@@ -29,7 +29,7 @@ function esc(s: string) {
 // Remove acento e c-cedilha. IMPRESSAO fica ASCII ate a impressora termica ser
 // testada (acento/ç em bobina depende do codepage e pode sair como lixo).
 function semAcento(s: string) {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return s; // acentos mantidos (navegador rasteriza; ESC-POS usa CP850 na ponte)
 }
 // pra impressao: sem acento + escapado
 const pr = (s: string) => esc(semAcento(s));
