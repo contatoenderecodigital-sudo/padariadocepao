@@ -7,9 +7,19 @@
 // Anima otimista (some na hora) e grava no banco por trás via Server Action.
 
 import { useState } from "react";
-import type { Pedido } from "@/lib/tipos";
-import { brl } from "@/lib/tipos";
+import type { Pedido, FormaPagamento, HistoricoCliente } from "@/lib/tipos";
+import { brl, formatarTelefoneBR, linkWhatsapp, mesAno } from "@/lib/tipos";
+import { Repeat, UserPlus, Wallet, CalendarDays, AlertTriangle, CreditCard, Banknote, Zap, CheckCircle2, Clock } from "lucide-react";
 import CupomPreview from "./CupomPreview";
+
+// Icone verde do WhatsApp (marca; lucide nao tem logo de marca).
+function WhatsAppIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
+      <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.05-.98.23-3.3-.68-2.79-1.1-4.56-3.96-4.7-4.15-.14-.19-1.12-1.49-1.12-2.84 0-1.35.7-2.01.96-2.29.24-.26.53-.32.7-.32.18 0 .35 0 .5.01.16.01.38-.06.6.46.23.53.77 1.86.84 2 .07.14.11.3.02.48-.09.19-.14.3-.28.47-.14.16-.29.36-.42.48-.14.14-.28.28-.12.55.16.28.72 1.18 1.54 1.91 1.06.94 1.95 1.24 2.23 1.38.28.14.44.12.6-.07.16-.19.69-.8.87-1.08.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.28.14.46.21.53.32.07.12.07.68-.17 1.36Z" />
+    </svg>
+  );
+}
 
 function formataData(iso: string | null) {
   if (!iso) return null;
@@ -17,6 +27,64 @@ function formataData(iso: string | null) {
   const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
   const dt = new Date(Number(a), Number(m) - 1, Number(d));
   return `${dias[dt.getDay()]} ${d}/${m}`;
+}
+
+type IconTipo = React.ComponentType<{ size?: number }>;
+
+// Selo (pill pequena) do historico do cliente.
+function Selo({ tom = "neutro", Icon, children }: { tom?: "dourado" | "neutro" | "alerta"; Icon: IconTipo; children: React.ReactNode }) {
+  const est =
+    tom === "dourado"
+      ? { bg: "rgba(231,207,148,0.15)", c: "#e7cf94" }
+      : tom === "alerta"
+        ? { bg: "rgba(224,30,30,0.15)", c: "#ff8a8a" }
+        : { bg: "rgba(255,255,255,0.06)", c: "rgba(251,245,236,0.7)" };
+  return (
+    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ background: est.bg, color: est.c }}>
+      <Icon size={12} /> {children}
+    </span>
+  );
+}
+
+// Selos do historico REGISTRADO PELO SISTEMA (nunca o relacionamento real da
+// padaria). Sem dados, mostra estado vazio honesto.
+function HistoricoSelos({ h }: { h?: HistoricoCliente | null }) {
+  if (!h) {
+    return (
+      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+        <Selo Icon={UserPlus}>Primeiro pedido pelo sistema</Selo>
+        <span className="text-[11px] text-cream/40">Sem histórico ainda</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 mt-2">
+      {h.pedidosSistema > 1 ? (
+        <Selo tom="dourado" Icon={Repeat}>Cliente recorrente · {h.pedidosSistema} pedidos pelo sistema</Selo>
+      ) : (
+        <Selo Icon={UserPlus}>Primeiro pedido pelo sistema</Selo>
+      )}
+      {h.totalRegistradoCentavos > 0 && <Selo Icon={Wallet}>{brl(h.totalRegistradoCentavos)} registrados</Selo>}
+      {h.primeiroPedidoEm && <Selo Icon={CalendarDays}>No sistema desde {mesAno(h.primeiroPedidoEm)}</Selo>}
+      {h.naoRetirados > 0 && <Selo tom="alerta" Icon={AlertTriangle}>{h.naoRetirados} pedidos não retirados</Selo>}
+    </div>
+  );
+}
+
+// Badge da forma de pagamento (do banco). Sem forma, mostra neutro na retirada.
+function PagamentoBadge({ forma }: { forma?: FormaPagamento | null }) {
+  const map: Record<FormaPagamento, { txt: string; c: string; bg: string; Icon: IconTipo }> = {
+    pix: { txt: "PIX", c: "#35c46f", bg: "rgba(53,196,111,0.15)", Icon: Zap },
+    dinheiro: { txt: "Dinheiro", c: "#e0b04a", bg: "rgba(231,207,148,0.15)", Icon: Banknote },
+    cartao: { txt: "Cartão", c: "#7aa2e3", bg: "rgba(122,162,227,0.15)", Icon: CreditCard },
+    pago: { txt: "Já pago", c: "#35c46f", bg: "rgba(53,196,111,0.15)", Icon: CheckCircle2 },
+  };
+  const f = forma ? map[forma] : { txt: "Pagamento na retirada", c: "rgba(251,245,236,0.7)", bg: "rgba(255,255,255,0.06)", Icon: Clock };
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: f.bg, color: f.c }}>
+      <f.Icon size={13} /> {f.txt}
+    </span>
+  );
 }
 
 function CardPedido({
@@ -43,13 +111,19 @@ function CardPedido({
       {/* Cabeçalho: cliente + retirada */}
       <div className="px-6 pt-5 pb-4 flex items-start justify-between gap-4 border-b border-white/10">
         <div className="min-w-0">
-          <div className="tracking-tight-apple text-[19px] font-semibold text-cream truncate">
-            {pedido.clienteNome}
-          </div>
-          <div className="text-[13px] text-cream/55 mt-1">{pedido.clienteTelefone}</div>
+          <div className="t-cardname text-cream truncate">{pedido.clienteNome}</div>
+          <a
+            href={linkWhatsapp(pedido.clienteTelefone)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[13px] text-cream/60 mt-1 hover:text-cream transition-colors"
+          >
+            <WhatsAppIcon /> {formatarTelefoneBR(pedido.clienteTelefone)}
+          </a>
+          <HistoricoSelos h={pedido.historicoCliente} />
         </div>
         <div className="text-right shrink-0">
-          <div className="text-[10px] uppercase tracking-[0.15em] text-cream/45">Retirada</div>
+          <div className="t-label text-cream/45">Retirada</div>
           <div className="text-sm font-semibold text-cream mt-0.5">
             {data ?? "-"}{pedido.retiradaHora ? ` · ${pedido.retiradaHora}` : ""}
           </div>
@@ -92,11 +166,13 @@ function CardPedido({
       {/* Rodapé: total + ações */}
       <div className="px-6 py-4 border-t border-white/10 flex items-end justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.15em] text-cream/45">Total</div>
-          <div className="font-title text-[26px] font-bold leading-none mt-1 text-grad-dourado">
+          <div className="t-label text-cream/45">Total</div>
+          <div className="t-money text-[26px] leading-none mt-1 text-grad-dourado">
             {brl(pedido.totalCentavos)}
           </div>
-          <div className="text-[11px] text-cream/55 mt-1.5">pagamento na retirada</div>
+          <div className="mt-2">
+            <PagamentoBadge forma={pedido.formaPagamento} />
+          </div>
         </div>
         <div className="flex gap-2">
           <button
