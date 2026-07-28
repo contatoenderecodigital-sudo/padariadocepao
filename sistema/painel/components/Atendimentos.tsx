@@ -117,12 +117,12 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   };
 
   return (
-    <div className="px-6 py-6">
-      <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mb-3">Atendimentos</div>
+    <div className="px-6 py-6 h-screen flex flex-col">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold mb-3 shrink-0">Atendimentos</div>
 
-      {/* painéis de vidro flutuando sobre o mesh do app (Shell) */}
-      <div>
-        <div className="grid grid-cols-[300px_1fr_268px] gap-4 h-[640px]">
+      {/* painéis de vidro preenchendo a altura da tela (sem sobra embaixo) */}
+      <div className="flex-1 min-h-0">
+        <div className="grid grid-cols-[300px_1fr_268px] gap-4 h-full">
           {/* ---------- lista ---------- */}
           <div className="rounded-[20px] flex flex-col min-h-0 overflow-hidden" style={GLASS}>
             <div className="p-3 flex items-center gap-2">

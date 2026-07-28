@@ -17,7 +17,9 @@ export function ScrollArea({
       scrollHideDelay={600}
       {...props}
     >
-      <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+      {/* [&>div]:!block corrige o display:table interno do Radix, que senao
+          quebra o truncate e faz o texto vazar pra fora do painel. */}
+      <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit] [&>div]:!block [&>div]:!min-w-0">
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
