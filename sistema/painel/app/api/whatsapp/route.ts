@@ -25,8 +25,22 @@ import {
   marcarWebhookNovo,
 } from "@/lib/banco/conversas";
 import { queryUm } from "@/lib/banco/db";
+import crypto from "node:crypto";
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
+
+// Valida a assinatura do Meta (X-Hub-Signature-256 = HMAC do corpo com o App Secret).
+// Se APP_SECRET não estiver setado ainda, não bloqueia (fase inicial de setup).
+function assinaturaValida(req: NextRequest, corpoBruto: string): boolean {
+  if (!APP_SECRET) return true;
+  const recebida = req.headers.get("x-hub-signature-256") || "";
+  const esperada = "sha256=" + crypto.createHmac("sha256", APP_SECRET).update(corpoBruto).digest("hex");
+  return (
+    recebida.length === esperada.length &&
+    crypto.timingSafeEqual(Buffer.from(recebida), Buffer.from(esperada))
+  );
+}
 
 // O loop da IA (+ transcrição de áudio) pode passar de 10s. No Vercel: Hobby
 // limita a 60s, Pro deixa subir. `after()` mantém o processamento vivo depois
@@ -45,9 +59,14 @@ export async function GET(req: NextRequest) {
 
 // --- Recebe mensagens ---
 export async function POST(req: NextRequest) {
+  // Lê o corpo CRU (pra validar a assinatura do Meta antes de confiar nele).
+  const corpoBruto = await req.text();
+  if (!assinaturaValida(req, corpoBruto)) {
+    return new Response("invalid signature", { status: 401 });
+  }
   let corpo: WebhookPayload;
   try {
-    corpo = (await req.json()) as WebhookPayload;
+    corpo = JSON.parse(corpoBruto) as WebhookPayload;
   } catch {
     return new Response("bad request", { status: 400 });
   }
