@@ -32,7 +32,7 @@ function Avatar({ nome, tam = 40, raio = 12 }: { nome: string; tam?: number; rai
 }
 function AvatarIA({ tam = 32 }: { tam?: number }) {
   return (
-    <div className="shrink-0 grid place-items-center text-white select-none bg-wa" style={{ width: tam, height: tam, borderRadius: 10 }} aria-hidden="true">
+    <div className="shrink-0 grid place-items-center text-white select-none grad-cobre" style={{ width: tam, height: tam, borderRadius: 10 }} aria-hidden="true">
       <svg width={tam * 0.58} height={tam * 0.58} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <rect x="4" y="8" width="16" height="11" rx="3" /><path d="M12 8V4M9 13h.01M15 13h.01M9.5 16.5h5" /><path d="M12 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
       </svg>
@@ -41,7 +41,7 @@ function AvatarIA({ tam = 32 }: { tam?: number }) {
 }
 
 function estadoInfo(estado: Conversa["estado"]) {
-  if (estado === "ia") return { txt: "IA atendendo", dot: "bg-wa", cls: "text-[color:var(--brand-wa)]" };
+  if (estado === "ia") return { txt: "IA atendendo", dot: "bg-cobre", cls: "text-[color:var(--brand-vinho)]" };
   if (estado === "precisa_humano") return { txt: "Precisa de você", dot: "bg-dourado", cls: "text-[color:#8a6d12]" };
   return { txt: "Resolvido", dot: "bg-ink-soft/40", cls: "text-ink-soft" };
 }
@@ -54,8 +54,8 @@ const BOLHA_CLIENTE: React.CSSProperties = {
   boxShadow: "0 4px 16px rgba(70,55,45,0.08)",
 };
 const BOLHA_IA: React.CSSProperties = {
-  background: "linear-gradient(135deg, var(--color-wa), color-mix(in srgb, var(--color-wa) 78%, #063))",
-  boxShadow: "0 6px 18px rgba(20,120,70,0.30)",
+  background: "linear-gradient(135deg, #8f4712, #e08a3c)",
+  boxShadow: "0 6px 18px rgba(143,71,18,0.30)",
 };
 function Balao({ de, texto, nome }: Conversa["mensagens"][number] & { nome: string }) {
   const isCliente = de === "cliente";
@@ -134,7 +134,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
                   placeholder="Pesquisar"
-                  className="w-full bg-white/40 rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-ink placeholder:text-ink-soft/45 focus:outline-none focus:ring-2 focus:ring-wa/25"
+                  className="w-full bg-white/40 rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-ink placeholder:text-ink-soft/45 focus:outline-none focus:ring-2 focus:ring-cobre/25"
                 />
               </div>
               <button className="w-9 h-9 rounded-[10px] bg-white/40 grid place-items-center text-ink-soft/70 hover:bg-white/60 transition-colors" tabIndex={-1}>
@@ -154,7 +154,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <button
                     key={c.id}
                     onClick={() => setAtivaId(c.id)}
-                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "bg-wa" : "hover:bg-white/40")}
+                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "grad-cobre" : "hover:bg-white/40")}
                   >
                     <Avatar nome={c.clienteNome} tam={44} raio={12} />
                     <div className="min-w-0 flex-1">
@@ -165,7 +165,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                       <div className="flex items-center justify-between gap-2 mt-0.5">
                         <span className={"text-[12px] truncate " + (on ? "text-white/85" : "text-ink-soft/90")}>{c.previa}</span>
                         {c.naoLidas > 0 && (
-                          <span className={"text-[10px] min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full font-bold shrink-0 " + (on ? "bg-white text-wa" : "bg-[#f24e4e] text-white")}>
+                          <span className={"text-[10px] min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full font-bold shrink-0 " + (on ? "bg-white text-[color:var(--brand-cobre)]" : "bg-[#f24e4e] text-white")}>
                             {c.naoLidas}
                           </span>
                         )}
@@ -212,10 +212,10 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m21 15-5-5L5 21M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
                   <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/40 px-4 py-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block animate-pulse shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-cobre inline-block animate-pulse shrink-0" />
                     <span className="text-[12.5px] text-ink-soft/70 truncate">A IA está respondendo — toque para assumir a conversa</span>
                   </div>
-                  <button className="w-10 h-10 rounded-full bg-wa grid place-items-center text-white shrink-0 hover:brightness-105 transition" tabIndex={-1}>
+                  <button className="w-10 h-10 rounded-full grad-cobre grid place-items-center text-white shrink-0 shadow-[0_6px_16px_rgba(143,71,18,0.3)] hover:brightness-105 transition press" tabIndex={-1}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" /></svg>
                   </button>
                 </div>
@@ -234,9 +234,9 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <div className="font-semibold text-ink text-[15px] mt-3">{ativa.clienteNome}</div>
                   <div className="text-xs text-ink-soft/70 mt-0.5">{ativa.clienteTelefone}</div>
                   {info && (
-                    <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] bg-white/40 rounded-full px-2.5 py-1">
+                    <span className="chip-marca mt-2 inline-flex items-center gap-1.5 text-[11px] rounded-full px-2.5 py-1 font-medium">
                       <span className={"w-1.5 h-1.5 rounded-full " + info.dot} />
-                      <span className={info.cls}>{info.txt}</span>
+                      {info.txt}
                     </span>
                   )}
                 </div>
@@ -258,22 +258,22 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <div className="text-[11px] text-ink-soft/55 mb-2">Etiquetas</div>
                   <div className="flex flex-wrap gap-1.5">
                     {["Cliente", info?.txt ?? "", "WhatsApp"].filter(Boolean).map((t) => (
-                      <span key={t} className="inline-flex items-center text-[11px] text-wa bg-wa/[0.08] rounded-full px-2.5 py-1 font-medium">
+                      <span key={t} className="chip-marca inline-flex items-center text-[11px] rounded-full px-2.5 py-1 font-medium">
                         {t}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-[14px] p-4 text-white" style={{ background: "linear-gradient(135deg,var(--color-wa),color-mix(in srgb,var(--color-wa) 78%,#000))" }}>
-                  <div className="text-[11px] uppercase tracking-wider text-white/75">Atendimento</div>
+                <div className="grad-vinho mt-5 rounded-[14px] p-4 text-white">
+                  <div className="text-[11px] uppercase tracking-wider text-dourado-l">Atendimento</div>
                   <div className="text-sm font-medium mt-1 leading-snug">
                     A IA responde 24h com a voz da padaria e monta o orçamento sozinha.
                   </div>
                 </div>
 
                 <div className="mt-4 space-y-2">
-                  <button className="w-full py-2.5 rounded-[12px] border border-wa/40 text-wa text-[13px] font-semibold hover:bg-wa/[0.06] transition flex items-center justify-center gap-2" tabIndex={-1}>
+                  <button className="btn-cobre press w-full py-2.5 text-[13px] font-semibold transition flex items-center justify-center gap-2" tabIndex={-1}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v7M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 8 8h1a8 8 0 0 0 8-8v-1a2 2 0 0 0-4 0" /></svg>
                     Assumir conversa
                   </button>

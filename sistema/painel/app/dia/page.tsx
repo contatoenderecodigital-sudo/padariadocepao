@@ -20,7 +20,7 @@ export default function Page() {
         <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
           Pedidos do dia
         </div>
-        <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
+        <h1 className="font-title text-3xl font-bold text-vinho mt-1">
           O que a cozinha produz hoje
         </h1>
         <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">

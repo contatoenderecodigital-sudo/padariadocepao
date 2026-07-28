@@ -16,6 +16,11 @@
   --brand-line:     #ece0cf;
   --brand-wa:       #1faf54;
 
+  /* Cobre / trigo da logo — cor de AÇÃO da marca (substitui o verde). */
+  --brand-cobre:    #b5601a;
+  --brand-cobre-l:  #e08a3c;
+  --brand-cobre-d:  #8f4712;
+
   --background: var(--brand-cream);
   --foreground: var(--brand-ink);
 }
@@ -31,6 +36,9 @@
   --color-ink-soft:  var(--brand-ink-soft);
   --color-line:      var(--brand-line);
   --color-wa:        var(--brand-wa);
+  --color-cobre:     var(--brand-cobre);
+  --color-cobre-l:   var(--brand-cobre-l);
+  --color-cobre-d:   var(--brand-cobre-d);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -52,6 +60,36 @@ body {
   text-rendering: optimizeLegibility;
 }
 h1, h2, h3, .tracking-tight-apple { letter-spacing: -0.021em; }
+
+/* Títulos de destaque em serifa (Fraunces) — corpo segue em Inter. */
+.font-title {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Degradês premium da marca (vinho + dourado + cobre).
+   Usar SÓ em destaque: sidebar, botões primários, cards grandes, números-chave.
+   ========================================================================== */
+.grad-vinho   { background: linear-gradient(160deg, #491020, #6e1f30); }
+.grad-dourado { background: linear-gradient(135deg, #bb921f, #e7cf94); }
+.grad-cobre   { background: linear-gradient(135deg, #8f4712, #e08a3c); }
+.text-grad-dourado {
+  background: linear-gradient(135deg, #bb921f, #e7cf94);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* botão de ação da marca: cobre + sombra + cantos 10px */
+.btn-cobre {
+  background: linear-gradient(135deg, #8f4712, #e08a3c);
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(143, 71, 18, 0.3);
+}
+.btn-cobre:hover { filter: brightness(1.05); }
+/* badge/etiqueta de status: dourado claro + texto vinho */
+.chip-marca { background: #f4e8d6; color: #6e1f30; }
 
 /* ==========================================================================
    Vidro fosco (glassmorphism Apple) — usado no site inteiro.

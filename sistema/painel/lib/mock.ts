@@ -119,7 +119,7 @@ export const CONVERSAS_MOCK: Conversa[] = [
       { de: "cliente", texto: "oi, queria encomendar um bolo pra um casamento", hora: "10:10" },
       { de: "ia", texto: "Que lindo! 💍 Temos bolos recheados a partir de R$ 46,90. Você já tem um sabor em mente?", hora: "10:11" },
       { de: "cliente", texto: "queria um bolo bem diferente, de 3 andares, com uma decoração especial. consegue me ajudar a escolher?", hora: "10:15" },
-      { de: "ia", texto: "Esse é um pedido especial, que a nossa equipe adora fazer com carinho. Vou chamar alguém da Doce Pão pra montar isso com você certinho, tá? Já já te respondem 😊", hora: "10:15" },
+      { de: "ia", texto: "Esse é um pedido especial, que a nossa equipe adora fazer com carinho. Vou chamar alguém da nossa equipe pra montar isso com você certinho, tá? Já já te respondem 😊", hora: "10:15" },
     ],
   },
   {

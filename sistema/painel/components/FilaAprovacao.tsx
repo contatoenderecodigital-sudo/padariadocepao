@@ -106,7 +106,7 @@ function CardPedido({
           </button>
           <button
             onClick={() => onAprovar(pedido.id)}
-            className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-wa hover:brightness-95 transition shadow-sm"
+            className="btn-cobre press px-4 py-2 text-sm font-semibold transition"
           >
             Aprovar e imprimir
           </button>
@@ -157,7 +157,7 @@ export default function FilaAprovacao({
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
             Fila de aprovação
           </div>
-          <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
+          <h1 className="font-title text-3xl font-bold text-vinho mt-1">
             {fila.length > 0
               ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
               : "Tudo aprovado 🎉"}
@@ -174,7 +174,7 @@ export default function FilaAprovacao({
           className={
             "mb-5 text-sm rounded-lg px-4 py-2.5 border " +
             (ultimo.acao === "aprovado"
-              ? "bg-wa/8 border-wa/30 text-[color:var(--brand-wa)]"
+              ? "bg-cobre/10 border-cobre/30 text-[color:var(--brand-cobre-d)]"
               : "bg-cream2 border-line text-ink-soft")
           }
         >

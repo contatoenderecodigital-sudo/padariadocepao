@@ -1,6 +1,7 @@
 import Shell from "@/components/Shell";
 import { METRICAS_MOCK as M, PEDIDOS_MOCK } from "@/lib/mock";
 import { brl } from "@/lib/tipos";
+import { nomeNegocioAtual } from "@/lib/negocio";
 
 function Card({
   destaque = false,
@@ -18,14 +19,14 @@ function Card({
       className={
         "rounded-2xl p-6 border " +
         (destaque
-          ? "bg-vinho text-white border-transparent shadow-lg"
+          ? "grad-vinho text-white border-transparent shadow-lg"
           : "glass")
       }
     >
       <div
         className={
-          "tracking-tight-apple text-4xl font-bold leading-none " +
-          (destaque ? "text-dourado-l" : "text-vinho")
+          "font-title text-4xl font-bold leading-none " +
+          (destaque ? "text-grad-dourado" : "text-vinho")
         }
       >
         {valor}
@@ -43,9 +44,10 @@ function Card({
 // Passa pelo Shell (portao de login): sempre por requisicao.
 export const dynamic = "force-dynamic";
 
-export default function Page() {
+export default async function Page() {
   const fila = PEDIDOS_MOCK.filter((p) => p.status === "confirmado").length;
   const maxDia = Math.max(...M.porDia.map((d) => d.pedidos));
+  const nome = await nomeNegocioAtual();
 
   return (
     <Shell ativo="/numeros" filaCount={fila}>
@@ -53,8 +55,8 @@ export default function Page() {
         <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
           Números do mês
         </div>
-        <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
-          O que a Doce Pão ganhou este mês
+        <h1 className="font-title text-3xl font-bold text-vinho mt-1">
+          O que a {nome} ganhou este mês
         </h1>
         <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
           Não é achismo. É o resultado em número: tempo de volta, pedidos atendidos e dinheiro que
@@ -106,7 +108,7 @@ export default function Page() {
               <div key={d.dia} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
                 <div className="text-xs font-semibold text-vinho">{d.pedidos}</div>
                 <div
-                  className="w-full rounded-t-md bg-dourado/80 min-h-[4px]"
+                  className="grad-dourado w-full rounded-t-md min-h-[4px]"
                   style={{ height: `${Math.round((d.pedidos / maxDia) * 120)}px` }}
                 />
                 <div className="text-xs text-ink-soft">{d.dia}</div>

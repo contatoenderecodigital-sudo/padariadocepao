@@ -23,7 +23,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
         Recuperar orçamento
       </div>
-      <h1 className="tracking-tight-apple text-3xl font-bold text-vinho mt-1">
+      <h1 className="font-title text-3xl font-bold text-vinho mt-1">
         Clientes que sumiram sem confirmar
       </h1>
       <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
@@ -31,8 +31,8 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
         É dinheiro que hoje ia embora sem ninguém perceber.
       </p>
 
-      <div className="mb-5 inline-flex items-center gap-3 bg-vinho text-white rounded-xl px-5 py-3">
-        <span className="tracking-tight-apple text-2xl font-bold text-dourado-l">
+      <div className="mb-5 inline-flex items-center gap-3 grad-vinho text-white rounded-xl px-5 py-3">
+        <span className="font-title text-2xl font-bold text-grad-dourado">
           {brl(total)}
         </span>
         <span className="text-sm text-white/85">parados, esperando um "sim"</span>
@@ -68,13 +68,13 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
                   {brl(p.totalCentavos)}
                 </div>
                 {cobrado ? (
-                  <div className="mt-2 text-sm text-[color:var(--brand-wa)] font-medium">
+                  <div className="mt-2 text-sm text-[color:var(--brand-cobre-d)] font-medium">
                     ✓ Cobrança enviada
                   </div>
                 ) : (
                   <button
                     onClick={() => setPreview(p)}
-                    className="mt-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-wa hover:brightness-95 transition shadow-sm"
+                    className="mt-2 btn-cobre press px-4 py-2 text-sm font-semibold transition"
                   >
                     Cobrar de volta
                   </button>
@@ -109,7 +109,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
             </h3>
 
             {/* balão estilo WhatsApp */}
-            <div className="bg-[#e6f5e9] border border-wa/20 rounded-xl rounded-tl-sm px-4 py-3 text-sm text-ink leading-relaxed">
+            <div className="bg-[#f4e8d6] border border-line/60 rounded-xl rounded-tl-sm px-4 py-3 text-sm text-ink leading-relaxed">
               Oi {preview.clienteNome.split(" ")[0]}! 😊 Seu orçamento da {nomeNegocio || "padaria"} pro dia{" "}
               <b>{dataBr(preview.retiradaData)}</b> ainda está de pé, no valor de{" "}
               <b>{brl(preview.totalCentavos)}</b>. Quer confirmar? É só responder aqui 🙏
@@ -131,7 +131,7 @@ export default function Recuperar({ parados, nomeNegocio = "" }: { parados: Pedi
                   setCobrados((c) => ({ ...c, [preview.id]: true }));
                   setPreview(null);
                 }}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-wa hover:brightness-95 transition shadow-sm"
+                className="btn-cobre press px-4 py-2 text-sm font-semibold transition"
               >
                 Enviar template
               </button>
