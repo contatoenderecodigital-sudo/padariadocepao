@@ -272,9 +272,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
             {/* mensagens agrupadas */}
             <ScrollArea className="flex-1 min-h-0">
               <div className="px-6 py-4 flex flex-col">
-                <div className="self-center text-[10.5px] text-cream/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(6px)" }}>
-                  Hoje {ativa.ultimaHora}
-                </div>
                 {mensagens.map((m, i) => {
                   const ant = mensagens[i - 1];
                   const primeiro = !ant || ant.de !== m.de;
