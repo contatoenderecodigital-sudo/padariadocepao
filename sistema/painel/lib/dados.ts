@@ -5,17 +5,20 @@
 //  As telas não sabem a diferença: recebem sempre o tipo `Pedido`.
 // ============================================================================
 
+import { cache } from "react";
 import { bancoConfigurado } from "./banco/db";
 import { PEDIDOS_MOCK } from "./mock";
 import type { Pedido } from "./tipos";
 
-export async function carregarFilaAprovacao(negocioId?: string): Promise<Pedido[]> {
+// cache(): dentro da MESMA requisição, o layout e a página compartilham o
+// resultado (a fila é buscada 1x, não 2x). Menos ida ao banco = navegação mais lisa.
+export const carregarFilaAprovacao = cache(async (negocioId?: string): Promise<Pedido[]> => {
   if (!bancoConfigurado || !negocioId) {
     return PEDIDOS_MOCK.filter((p) => p.status === "confirmado");
   }
   const { listarFilaAprovacao } = await import("./banco/pedidos");
   return listarFilaAprovacao(negocioId);
-}
+});
 
 export async function carregarParados(negocioId?: string): Promise<Pedido[]> {
   if (!bancoConfigurado || !negocioId) {
