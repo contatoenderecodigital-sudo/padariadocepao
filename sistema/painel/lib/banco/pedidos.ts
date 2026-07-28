@@ -96,6 +96,27 @@ export async function listarParados(negocioId: string): Promise<Pedido[]> {
   return linhas.map(mapear);
 }
 
+// Pedidos APROVADOS (aprovado/impresso) — a tela de producao do dia.
+export async function listarDoDia(negocioId: string): Promise<Pedido[]> {
+  const linhas = await query<LinhaFila>(
+    `select p.id, p.status, p.retirada_data, p.retirada_hora, p.pessoas,
+            p.total_centavos, p.observacoes, p.criado_em,
+            c.nome as cliente_nome, c.telefone as cliente_telefone,
+            coalesce(
+              (select json_agg(json_build_object(
+                 'produto', i.produto, 'categoria', i.categoria, 'qtd', i.qtd,
+                 'unit_centavos', i.unit_centavos, 'subtotal_centavos', i.subtotal_centavos))
+               from pedido_itens i where i.pedido_id = p.id),
+              '[]'::json) as itens
+       from pedidos p
+       left join clientes c on c.id = p.cliente_id
+      where p.negocio_id = $1 and p.status in ('aprovado', 'impresso')
+      order by p.retirada_data asc nulls last, p.retirada_hora asc nulls last`,
+    [negocioId],
+  );
+  return linhas.map(mapear);
+}
+
 // Muda o status de um pedido. 'aprovado' dispara o trigger da fila de impressão.
 export async function mudarStatus(
   pedidoId: string,

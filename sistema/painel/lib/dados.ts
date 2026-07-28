@@ -28,6 +28,13 @@ export async function carregarParados(negocioId?: string): Promise<Pedido[]> {
   return listarParados(negocioId);
 }
 
+// Pedidos aprovados (a producao do dia). Sem banco, cai no mock.
+export async function carregarDoDia(negocioId?: string): Promise<Pedido[]> {
+  if (!bancoConfigurado || !negocioId) return PEDIDOS_MOCK;
+  const { listarDoDia } = await import("./banco/pedidos");
+  return listarDoDia(negocioId);
+}
+
 export async function carregarConversas(negocioId?: string) {
   if (!bancoConfigurado || !negocioId) {
     const { CONVERSAS_MOCK } = await import("./mock");
