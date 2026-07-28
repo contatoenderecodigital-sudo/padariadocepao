@@ -51,7 +51,7 @@ function CardPedido({
         <div className="text-right shrink-0">
           <div className="text-[10px] uppercase tracking-wider text-cream/55">Retirada</div>
           <div className="text-sm font-semibold text-cream">
-            {data ?? "—"} {pedido.retiradaHora ? `· ${pedido.retiradaHora}` : ""}
+            {data ?? "-"} {pedido.retiradaHora ? `· ${pedido.retiradaHora}` : ""}
           </div>
           {pedido.pessoas ? (
             <div className="text-[11px] text-dourado font-semibold mt-0.5">
@@ -179,7 +179,7 @@ export default function FilaAprovacao({
           }
         >
           {ultimo.acao === "aprovado" ? (
-            <>Pedido de <b>{ultimo.nome}</b> aprovado — saiu na impressora da cozinha. 🖨️</>
+            <>Pedido de <b>{ultimo.nome}</b> aprovado, saiu na impressora da cozinha. 🖨️</>
           ) : (
             <>Pedido de <b>{ultimo.nome}</b> recusado.</>
           )}

@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
+// Fraunces: serifa só para TÍTULOS (h1/h2) e logo.
 const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-fraunces",
 });
 
-// Inter — a sans neutra mais próxima do SF Pro da Apple. Base do sistema.
-const inter = Inter({
+// Plus Jakarta Sans: fonte padrão de TODO o corpo do texto.
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  variable: "--font-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>

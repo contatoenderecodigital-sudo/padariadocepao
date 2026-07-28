@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Conversa } from "@/lib/tipos";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CORES = ["#5b8c7b", "#c58a3d", "#7a6cae", "#4a7ba6", "#a85b52", "#6f9b52", "#b0713e", "#8a5a86"];
 function iniciais(nome: string) {
@@ -140,7 +141,8 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto min-h-0 px-2 pb-2">
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="px-2 pb-2">
               {filtradas.length === 0 && (
                 <div className="px-3 py-10 text-[13px] text-cream/55 text-center">
                   {conversas.length === 0 ? "Nenhuma conversa ainda." : "Nada encontrado."}
@@ -177,7 +179,8 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </button>
                 );
               })}
-            </div>
+              </div>
+            </ScrollArea>
           </div>
 
           {/* ---------- chat ---------- */}
@@ -199,20 +202,22 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col min-h-0">
-                  <div className="self-center text-[10.5px] text-cream/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(6px)" }}>Hoje {ativa.ultimaHora}</div>
-                  {ativa.mensagens.map((m, i) => (
-                    <Balao key={i} {...m} nome={ativa.clienteNome} />
-                  ))}
-                  <div ref={fim} />
-                </div>
+                <ScrollArea className="flex-1 min-h-0">
+                  <div className="px-6 py-4 flex flex-col">
+                    <div className="self-center text-[10.5px] text-cream/45 mt-1 mb-1 rounded-full px-2.5 py-0.5" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(6px)" }}>Hoje {ativa.ultimaHora}</div>
+                    {ativa.mensagens.map((m, i) => (
+                      <Balao key={i} {...m} nome={ativa.clienteNome} />
+                    ))}
+                    <div ref={fim} />
+                  </div>
+                </ScrollArea>
 
-                <div className="border-t border-white/40 px-3 py-2.5 flex items-center gap-2" style={VIDRO_LEVE}>
+                <div className="border-t border-white/12 px-3 py-2.5 flex items-center gap-2" style={VIDRO_LEVE}>
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9" /><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01" strokeLinecap="round" /></svg></IconBtn>
                   <IconBtn><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m21 15-5-5L5 21M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" strokeLinejoin="round" /></svg></IconBtn>
                   <div className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-cobre inline-block animate-pulse shrink-0" />
-                    <span className="text-[12.5px] text-cream/60 truncate">A IA está respondendo — toque para assumir a conversa</span>
+                    <span className="text-[12.5px] text-cream/60 truncate">A IA está respondendo. Toque para assumir a conversa</span>
                   </div>
                   <button className="w-10 h-10 rounded-full grad-cobre grid place-items-center text-white shrink-0 shadow-[0_6px_16px_rgba(143,71,18,0.3)] hover:brightness-105 transition press" tabIndex={-1}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" /></svg>
@@ -227,7 +232,8 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
             {!ativa ? (
               <div className="flex-1" />
             ) : (
-              <div className="p-5 overflow-y-auto min-h-0">
+              <ScrollArea className="flex-1 min-h-0">
+              <div className="p-5">
                 <div className="flex flex-col items-center text-center pb-4">
                   <Avatar nome={ativa.clienteNome} tam={68} raio={18} />
                   <div className="font-semibold text-cream text-[15px] mt-3">{ativa.clienteNome}</div>
@@ -282,6 +288,7 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </button>
                 </div>
               </div>
+              </ScrollArea>
             )}
           </div>
         </div>

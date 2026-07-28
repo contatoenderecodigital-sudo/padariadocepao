@@ -88,7 +88,7 @@ export default async function Page() {
           <Card
             valor={<NumberTicker value={M.atendimentosForaHorario} />}
             rotulo="fora do horário"
-            sub="madrugada, domingo, feriado — a IA atendeu"
+            sub="madrugada, domingo, feriado. A IA atendeu"
           />
           <Card valor={<NumberTicker value={M.pedidosNoDia} />} rotulo="pedidos hoje" />
           <Card valor={<NumberTicker value={M.orcamentosRecuperados} />} rotulo="recuperados" sub="este mês" />
@@ -98,7 +98,7 @@ export default async function Page() {
         <div className="mt-8 glass rounded-2xl p-6">
           <div className="text-sm font-semibold text-cream mb-1">Pedidos por dia da semana</div>
           <div className="text-xs text-cream/70 mb-5">
-            O pico é sexta e sábado — o atendimento aguenta o movimento sem ninguém travar.
+            O pico é sexta e sábado. O atendimento aguenta o movimento sem ninguém travar.
           </div>
           <div className="flex items-end gap-3" style={{ height: "180px" }}>
             {M.porDia.map((d) => (

@@ -20,7 +20,7 @@ export default function Page() {
         </h1>
         <p className="text-sm text-cream/70 mt-1 mb-6 max-w-2xl">
           Em ordem de horário de retirada. Cada pedido já saiu impresso na cozinha quando foi
-          aprovado — esta é a visão de acompanhamento.
+          aprovado. Esta é a visão de acompanhamento.
         </p>
 
         <div className="flex flex-col gap-3">
