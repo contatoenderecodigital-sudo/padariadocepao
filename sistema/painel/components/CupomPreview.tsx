@@ -9,28 +9,13 @@ import { useState } from "react";
 import type { Pedido } from "@/lib/tipos";
 import { brl, formatarTelefoneBR } from "@/lib/tipos";
 import { deptoDe, deptoInfo, type DeptoId } from "@/lib/departamentos";
+import { DeptIcone } from "@/components/DeptIcone";
 import { X, Printer } from "lucide-react";
 
 function fmtData(iso: string | null) {
   if (!iso) return "a confirmar";
   const [a, m, d] = iso.split("-");
   return `${d}/${m}/${a}`;
-}
-
-// icone SVG por estacao (mesmos da tela de producao) + caixa pro master.
-function EstacaoIcone({ id, size = 13 }: { id: DeptoId | "caixa"; size?: number }) {
-  const paths: Record<string, React.ReactNode> = {
-    padaria: <path d="M4 13c0-3 3-5 8-5s8 2 8 5c0 2-2 3-2 3H6s-2-1-2-3ZM7 16v3M12 16v3M17 16v3" />,
-    salgados: <path d="M12 3c3 3 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9Z" />,
-    confeitaria: <path d="M6 21v-6h12v6M8 15v-3a4 4 0 0 1 8 0v3M12 8V5M10.5 5h3" />,
-    bolos: <path d="M4 20h16v-6H4v6ZM6 14v-3a6 6 0 0 1 12 0v3M12 8V4M10.5 4.5h3" />,
-    caixa: <path d="M4 7h16v13H4zM4 7l2-3h12l2 3M9 12h6" />,
-  };
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      {paths[id]}
-    </svg>
-  );
 }
 
 type Badge = { nome: string; cor: string; id: DeptoId | "caixa" };
@@ -53,19 +38,25 @@ function Ticket({
   onImprimir: () => void;
 }) {
   return (
-    <div className={"flex flex-col items-center gap-2.5 shrink-0 " + (hide ? "hide-print" : "")}>
-      <div
-        className="cupom-ticket w-[248px] rounded-t-[10px] px-4 pt-4 pb-5 font-mono text-[12px] leading-tight text-black"
-        style={{ background: "#fdfbf7", boxShadow: "0 12px 34px rgba(0,0,0,0.4)" }}
+    <div
+      className={"cupom-ticket relative w-[248px] rounded-t-[10px] px-4 pt-4 pb-5 font-mono text-[12px] leading-tight text-black " + (hide ? "hide-print" : "")}
+      style={{ background: "#fdfbf7", boxShadow: "0 12px 34px rgba(0,0,0,0.4)" }}
+    >
+      <button
+        onClick={onImprimir}
+        className="no-print absolute top-2.5 right-2.5 text-black/35 hover:text-black transition-colors"
+        aria-label="Imprimir este ticket"
       >
-        <div className="flex justify-center mb-2">
-          <span
-            className="cupom-badge inline-flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-white"
-            style={{ background: badge.cor }}
-          >
-            <EstacaoIcone id={badge.id} /> {badge.nome}
-          </span>
-        </div>
+        <Printer size={15} strokeWidth={1.8} />
+      </button>
+      <div className="flex justify-center mb-2">
+        <span
+          className="cupom-badge inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
+          style={{ background: "#f0ece4", color: "#3a2a22" }}
+        >
+          <DeptIcone id={badge.id} size={12} strokeWidth={1.5} /> {badge.nome}
+        </span>
+      </div>
         <div className="text-center font-bold text-[13px]">{nomeNegocio || "Padaria"}</div>
         <div className="border-t border-dashed border-black/30 my-1.5" />
         <div className="font-bold">CLIENTE: {pedido.clienteNome}</div>
@@ -102,10 +93,6 @@ function Ticket({
             </div>
           </>
         ) : null}
-      </div>
-      <button onClick={onImprimir} className="no-print btn-cobre press inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold">
-        <Printer size={13} /> Imprimir
-      </button>
     </div>
   );
 }
@@ -182,7 +169,7 @@ export default function CupomPreview({
 
         {/* tickets */}
         <div className="overflow-auto px-6 py-6">
-          <div className="cupons-print flex gap-6 items-start">
+          <div className="cupons-print flex gap-6 items-stretch">
             {tickets.map((t) => (
               <Ticket
                 key={t.key}

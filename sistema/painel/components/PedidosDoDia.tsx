@@ -16,6 +16,7 @@ import {
   deptosDoPedido,
 } from "@/lib/departamentos";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { DeptIcone } from "@/components/DeptIcone";
 
 type StatusUI = "a_produzir" | "pronto" | "retirado";
 
@@ -34,21 +35,6 @@ function fmtLongo(base: string) {
   const [a, m, d] = base.split("-").map(Number);
   const dt = new Date(a, m - 1, d);
   return `${DOW[dt.getDay()]}, ${d} de ${MES[m - 1]}`;
-}
-
-// icone SVG por departamento (sem emoji)
-function DeptIcone({ id, size = 16 }: { id: DeptoId; size?: number }) {
-  const paths: Record<DeptoId, React.ReactNode> = {
-    padaria: <path d="M4 13c0-3 3-5 8-5s8 2 8 5c0 2-2 3-2 3H6s-2-1-2-3ZM7 16v3M12 16v3M17 16v3" />,
-    salgados: <path d="M12 3c3 3 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9Z" />,
-    confeitaria: <path d="M6 21v-6h12v6M8 15v-3a4 4 0 0 1 8 0v3M12 8V5M10.5 5h3" />,
-    bolos: <path d="M4 20h16v-6H4v6ZM6 14v-3a6 6 0 0 1 12 0v3M12 8V4M10.5 4.5h3" />,
-  };
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {paths[id]}
-    </svg>
-  );
 }
 
 function Pill({ on, cor, children, onClick }: { on: boolean; cor?: string; children: React.ReactNode; onClick: () => void }) {
