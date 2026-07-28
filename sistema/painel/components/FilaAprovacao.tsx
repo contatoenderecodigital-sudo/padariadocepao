@@ -36,60 +36,67 @@ function CardPedido({
   return (
     <div
       className={
-        "glass rounded-2xl overflow-hidden flex flex-col " +
+        "glass rounded-[18px] overflow-hidden flex flex-col " +
         (saindo ? "card-out" : "")
       }
     >
-      {/* topo: cliente + retirada */}
-      <div className="px-5 pt-4 pb-3 flex items-start justify-between gap-3 border-b border-white/12">
+      {/* Cabeçalho: cliente + retirada */}
+      <div className="px-6 pt-5 pb-4 flex items-start justify-between gap-4 border-b border-white/10">
         <div className="min-w-0">
-          <div className="tracking-tight-apple text-lg font-bold text-cream truncate">
+          <div className="tracking-tight-apple text-[19px] font-semibold text-cream truncate">
             {pedido.clienteNome}
           </div>
-          <div className="text-xs text-cream/70 mt-0.5">{pedido.clienteTelefone}</div>
+          <div className="text-[13px] text-cream/55 mt-1">{pedido.clienteTelefone}</div>
         </div>
         <div className="text-right shrink-0">
-          <div className="text-[10px] uppercase tracking-wider text-cream/55">Retirada</div>
-          <div className="text-sm font-semibold text-cream">
-            {data ?? "-"} {pedido.retiradaHora ? `· ${pedido.retiradaHora}` : ""}
+          <div className="text-[10px] uppercase tracking-[0.15em] text-cream/45">Retirada</div>
+          <div className="text-sm font-semibold text-cream mt-0.5">
+            {data ?? "-"}{pedido.retiradaHora ? ` · ${pedido.retiradaHora}` : ""}
           </div>
           {pedido.pessoas ? (
-            <div className="text-[11px] text-dourado font-semibold mt-0.5">
+            <span
+              className="inline-block mt-2 text-[11px] font-semibold text-dourado px-2.5 py-0.5 rounded-full"
+              style={{ background: "rgba(231,207,148,0.15)" }}
+            >
               festa de {pedido.pessoas} pessoas
-            </div>
+            </span>
           ) : null}
         </div>
       </div>
 
-      {/* itens */}
-      <div className="px-5 py-3 flex-1">
-        <ul className="flex flex-col gap-1.5">
+      {/* Corpo: itens */}
+      <div className="px-6 py-4 flex-1 flex flex-col">
+        <ul className="flex flex-col">
           {pedido.itens.map((it, i) => (
-            <li key={i} className="flex items-baseline justify-between text-sm gap-3">
-              <span className="text-cream">
+            <li key={i} className="flex items-baseline justify-between gap-4 py-2 text-[14px]">
+              <span className="text-cream/90 min-w-0">
                 <span className="font-semibold text-cream">{it.qtd}×</span> {it.produto}
               </span>
-              <span className="text-cream/70 tabular-nums shrink-0">
+              <span className="text-cream/65 tabular-nums shrink-0">
                 {brl(it.subtotalCentavos)}
               </span>
             </li>
           ))}
         </ul>
         {pedido.observacoes ? (
-          <div className="mt-3 text-xs text-cream/70 bg-white/[0.05] border border-white/12 rounded-lg px-3 py-2 leading-relaxed">
-            <span className="font-semibold text-cream">Obs:</span> {pedido.observacoes}
+          <div
+            className="mt-3 flex items-start gap-2 text-[13px] text-cream/75 rounded-[10px] px-3 py-2.5 leading-relaxed"
+            style={{ background: "rgba(255,255,255,0.06)" }}
+          >
+            <svg className="mt-[3px] shrink-0 text-dourado" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v12H8l-4 4V4Z" /><path d="M8 9h8M8 12.5h5" /></svg>
+            <span><span className="font-semibold text-dourado">Obs:</span> {pedido.observacoes}</span>
           </div>
         ) : null}
       </div>
 
-      {/* total + ações */}
-      <div className="px-5 py-3 border-t border-white/12 flex items-center justify-between gap-3">
+      {/* Rodapé: total + ações */}
+      <div className="px-6 py-4 border-t border-white/10 flex items-end justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-cream/55">Total</div>
-          <div className="tracking-tight-apple text-xl font-bold text-cream leading-none">
+          <div className="text-[10px] uppercase tracking-[0.15em] text-cream/45">Total</div>
+          <div className="font-title text-[26px] font-bold leading-none mt-1 text-grad-dourado">
             {brl(pedido.totalCentavos)}
           </div>
-          <div className="text-[11px] text-cream/70 mt-0.5">pagamento na retirada</div>
+          <div className="text-[11px] text-cream/55 mt-1.5">pagamento na retirada</div>
         </div>
         <div className="flex gap-2">
           <button
@@ -188,7 +195,7 @@ export default function FilaAprovacao({
 
       {/* grid de cards */}
       {fila.length > 0 ? (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {fila.map((p) => (
             <CardPedido
               key={p.id}
