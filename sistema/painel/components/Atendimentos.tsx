@@ -46,27 +46,24 @@ function estadoInfo(estado: Conversa["estado"]) {
   return { txt: "Resolvido", dot: "bg-ink-soft/40", cls: "text-ink-soft" };
 }
 
-function Balao({
-  de, texto, hora, primeiro,
-}: Conversa["mensagens"][number] & { primeiro: boolean }) {
-  const margem = primeiro ? "mt-2.5" : "mt-1";
-  if (de === "cliente") {
-    return (
-      <div className={"flex justify-start " + margem}>
-        <div className="max-w-[62%] rounded-[14px] rounded-tl-[4px] bg-white text-ink pl-3.5 pr-2 py-2 text-[13.5px] leading-[1.45] whitespace-pre-line shadow-[0_1px_1.5px_rgba(0,0,0,0.10)]">
-          {texto}
-          <span className="text-[10px] text-ink-soft/35 ml-1.5 float-right relative top-[7px]">{hora}</span>
-        </div>
-      </div>
-    );
-  }
+function Balao({ de, texto, nome }: Conversa["mensagens"][number] & { nome: string }) {
+  const isCliente = de === "cliente";
+  const av = isCliente ? <Avatar nome={nome} tam={36} raio={9} /> : <AvatarIA tam={36} />;
   return (
-    <div className={"flex justify-end " + margem}>
-      <div className="max-w-[62%] rounded-[14px] rounded-tr-[4px] bg-wa text-white pl-3.5 pr-2 py-2 text-[13.5px] leading-[1.45] whitespace-pre-line shadow-[0_1px_2px_rgba(20,110,60,0.22)]">
+    <div className={"flex items-start gap-2.5 mt-3 " + (isCliente ? "justify-start" : "justify-end")}>
+      {isCliente && av}
+      <div
+        className={
+          "max-w-[62%] rounded-[10px] px-3.5 py-2.5 text-[13.5px] leading-[1.5] whitespace-pre-line " +
+          (isCliente
+            ? "bg-white text-ink rounded-tl-[3px] shadow-[0_1px_2px_rgba(0,0,0,0.07)]"
+            : "bg-wa text-white rounded-tr-[3px]")
+        }
+      >
         {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
         {texto}
-        <span className="text-[10px] text-white/55 ml-1.5 float-right relative top-[7px]">{hora}</span>
       </div>
+      {!isCliente && av}
     </div>
   );
 }
@@ -167,17 +164,12 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
               <div className="flex-1 grid place-items-center text-[13px] text-ink-soft/60">Selecione uma conversa.</div>
             ) : (
               <>
-                <div className="px-4 h-[60px] border-b border-line/60 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <Avatar nome={ativa.clienteNome} tam={40} raio={13} />
-                    <div className="leading-tight">
-                      <div className="font-semibold text-ink text-[14.5px]">{ativa.clienteNome}</div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-ink-soft/55 mt-0.5">
-                        <span className={"w-1.5 h-1.5 rounded-full " + (info?.dot ?? "bg-wa")} />
-                        {info?.txt}
-                      </div>
-                    </div>
+                <div className="px-4 h-[54px] border-b border-line/60 flex items-center justify-between relative">
+                  <div className="flex items-center gap-1.5 text-ink-soft/40 text-[11.5px]">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+                    Não perturbe
                   </div>
+                  <span className="font-semibold text-ink text-[15px] absolute left-1/2 -translate-x-1/2">{ativa.clienteNome}</span>
                   <div className="flex items-center gap-4 text-ink-soft/45">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M15.5 5A9.5 9.5 0 0 1 19 8.5M14 9a4 4 0 0 1 1 1M4.5 3h3l1.5 5-2 1a12 12 0 0 0 6 6l1-2 5 1.5v3a2 2 0 0 1-2 2A17 17 0 0 1 2.5 5a2 2 0 0 1 2-2Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="6" width="13" height="12" rx="2" /><path d="m15 10 6-3v10l-6-3" strokeLinejoin="round" /></svg>
@@ -185,21 +177,11 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   </div>
                 </div>
 
-                <div
-                  className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3.5 min-h-0"
-                  style={{
-                    backgroundColor: "#efe9e1",
-                    backgroundImage:
-                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%236b5a3e' stroke-opacity='0.06' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='24' cy='28' r='8'/%3E%3Cpath d='M66 20l7 7-7 7-7-7z'/%3E%3Cpath d='M104 34h14M111 27v14'/%3E%3Cpath d='M28 80q9-11 20 0'/%3E%3Ccircle cx='104' cy='96' r='7'/%3E%3Cpath d='M16 110h16M16 118h10'/%3E%3Cpath d='M120 118l5-6 5 6'/%3E%3C/g%3E%3C/svg%3E\")",
-                    backgroundSize: "140px 140px",
-                  }}
-                >
-                  <div className="self-center text-[10px] text-ink-soft/60 bg-white/80 backdrop-blur rounded-full px-3 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">Hoje</div>
-                  {ativa.mensagens.map((m, i) => {
-                    const ant = ativa.mensagens[i - 1];
-                    const primeiro = !ant || ant.de !== m.de;
-                    return <Balao key={i} {...m} primeiro={primeiro} />;
-                  })}
+                <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col min-h-0" style={{ backgroundColor: "#f6f6f8" }}>
+                  <div className="self-center text-[10.5px] text-ink-soft/40 mt-1 mb-1">Hoje {ativa.ultimaHora}</div>
+                  {ativa.mensagens.map((m, i) => (
+                    <Balao key={i} {...m} nome={ativa.clienteNome} />
+                  ))}
                   <div ref={fim} />
                 </div>
 
@@ -247,6 +229,17 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                       <span className="text-[13px] text-ink font-medium text-right truncate">{val}</span>
                     </div>
                   ))}
+                </div>
+
+                <div className="border-t border-line/60 pt-4 mt-4">
+                  <div className="text-[11px] text-ink-soft/55 mb-2">Etiquetas</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Cliente", info?.txt ?? "", "WhatsApp"].filter(Boolean).map((t) => (
+                      <span key={t} className="inline-flex items-center text-[11px] text-wa bg-wa/[0.08] rounded-full px-2.5 py-1 font-medium">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="mt-5 rounded-[14px] p-4 text-white" style={{ background: "linear-gradient(135deg,var(--color-wa),color-mix(in srgb,var(--color-wa) 78%,#000))" }}>
