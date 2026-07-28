@@ -1,26 +1,33 @@
 // ============================================================================
-//  MOTOR DE ORÇAMENTO (TypeScript) — a peça que a IA chama pra calcular.
-//  Porte do sistema/src/orcamento.js. Preços reais dos PDFs da Doce Pão.
+//  MOTOR DE ORÇAMENTO — a peça que a IA chama pra calcular. Código puro.
+//  A IA NUNCA calcula preço, ela chama o motor (não erra soma, não alucina).
 //
-//  A IA NUNCA calcula preço — ela chama cotarPorItens/sugerirPorPessoas.
-//  Código puro: não erra soma, não alucina, custo zero de token.
+//  MULTI-TENANT: `criarMotor(produtos, rendimento)` monta um motor com o
+//  cardápio de QUALQUER padaria. O padrão (Doce Pão) vem do catalogo.json.
 // ============================================================================
 
 import catalogo from "./dados/catalogo.json";
-import rendimento from "./dados/rendimento.json";
+import rendimentoJson from "./dados/rendimento.json";
 
 export const brl = (n: number) =>
   "R$ " +
   n.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d)(?=,))/g, ".");
 
-export type LinhaCotacao = {
-  item: string;
-  categoria: string;
-  qtd: number;
-  unit: number;
-  subtotal: number;
+// Um produto do cardápio (formato genérico, serve pra qualquer negócio).
+export type Produto = { nome: string; preco: number; categoria: string };
+
+// Regras de rendimento (quanto por pessoa). unidadePorProduto lida com produtos
+// vendidos em pacote (ex: "cento" = 100 unidades).
+export type Rendimento = {
+  salgadoPorPessoa?: number;
+  docePorPessoa?: number;
+  boloServe?: number; // 1 bolo serve N pessoas
+  unidadePorProduto?: number; // 1 = por unidade; 100 = vendido por cento
+  minSalgado?: number;
+  confirmar?: boolean;
 };
 
+export type LinhaCotacao = { item: string; categoria: string; qtd: number; unit: number; subtotal: number };
 export type Cotacao = {
   linhas: LinhaCotacao[];
   avisos: string[];
@@ -30,116 +37,114 @@ export type Cotacao = {
   total: number;
 };
 
-type RefPreco = { preco: number; rotulo: string; categoria: string };
+export type Motor = {
+  cotarPorItens(pedido: { item: string; qtd: number }[]): Cotacao;
+  sugerirPorPessoas(pessoas: number, quer: { salgado?: boolean; doce?: boolean; bolo?: boolean }): Cotacao;
+  cardapioResumo(): string;
+};
 
-// Tabela de preços achatada: nome normalizado -> preço. Montada uma vez.
-function montarPrecos(): Record<string, RefPreco> {
-  const p: Record<string, RefPreco> = {};
-  const add = (chave: string, preco: number, rotulo: string, categoria: string) => {
-    p[chave] = { preco, rotulo, categoria };
-  };
+// Fábrica: monta um motor a partir de uma lista de produtos + rendimento.
+export function criarMotor(produtos: Produto[], rend: Rendimento = {}): Motor {
+  const PRECOS: Record<string, Produto> = {};
+  for (const p of produtos) PRECOS[p.nome.trim().toLowerCase()] = p;
 
-  add("salgado frito", catalogo.salgados.frito.preco, "Salgado frito", "salgado");
-  add("salgado assado", catalogo.salgados.assado.preco, "Salgado assado", "salgado");
+  // acha o 1º produto de uma categoria (pro "por pessoas")
+  const primeiroDaCategoria = (cat: string) =>
+    produtos.find((p) => p.categoria.toLowerCase().startsWith(cat));
 
-  for (const d of catalogo.doces.itens) {
-    add(d.nome, d.preco, d.nome.charAt(0).toUpperCase() + d.nome.slice(1), "doce");
-  }
+  const unidade = rend.unidadePorProduto && rend.unidadePorProduto > 0 ? rend.unidadePorProduto : 1;
 
-  for (const f of catalogo.bolos_recheados.faixas) {
-    add("bolo recheado " + f.faixa.toLowerCase(), f.preco, `Bolo recheado (faixa ${f.faixa})`, "bolo_recheado");
-    for (const s of f.sabores) add("bolo " + s, f.preco, `Bolo ${s}`, "bolo_recheado");
-  }
+  const norm = (s: string) => String(s).trim().toLowerCase();
 
-  for (const b of catalogo.bolos_caseiros.itens) {
-    add("bolo caseiro " + b.nome, b.preco, `Bolo caseiro ${b.nome}`, "bolo_caseiro");
-  }
-
-  add("pizza inteira", catalogo.pizza.inteira.preco, "Pizza inteira", "pizza");
-  add("pizza meia", catalogo.pizza.meia.preco, "Pizza meia", "pizza");
-
-  return p;
-}
-const PRECOS = montarPrecos();
-
-// Caminho SÓLIDO: cliente diz exatamente o que quer. Soma direta.
-export function cotarPorItens(pedido: { item: string; qtd: number }[]): Cotacao {
-  const linhas: LinhaCotacao[] = [];
-  const avisos: string[] = [];
-  let total = 0;
-
-  for (const { item, qtd } of pedido) {
-    const chave = String(item).trim().toLowerCase();
-    const ref = PRECOS[chave];
-    if (!ref) {
-      avisos.push(`Não achei "${item}" no cardápio — conferir com a equipe.`);
-      continue;
+  function cotarPorItens(pedido: { item: string; qtd: number }[]): Cotacao {
+    const linhas: LinhaCotacao[] = [];
+    const avisos: string[] = [];
+    let total = 0;
+    for (const { item, qtd } of pedido) {
+      const chave = norm(item);
+      // 1) match exato; 2) nome parcial (ex: "coxinha" acha "Cento de coxinha")
+      let ref: Produto | undefined = PRECOS[chave];
+      if (!ref) {
+        ref = produtos.find((p) => {
+          const pn = norm(p.nome);
+          if (pn.includes(chave) || chave.includes(pn)) return true;
+          const ultima = pn.split(" ").pop() || "";
+          return ultima.length > 3 && chave.includes(ultima);
+        });
+      }
+      if (!ref) {
+        avisos.push(`Não achei "${item}" no cardápio — conferir com a equipe.`);
+        continue;
+      }
+      const q = Number(qtd) || 0;
+      const subtotal = ref.preco * q;
+      total += subtotal;
+      linhas.push({ item: ref.nome, categoria: ref.categoria, qtd: q, unit: ref.preco, subtotal });
     }
-    const q = Number(qtd) || 0;
-    const subtotal = ref.preco * q;
-    total += subtotal;
-    linhas.push({ item: ref.rotulo, categoria: ref.categoria, qtd: q, unit: ref.preco, subtotal });
+    return { linhas, avisos, total };
   }
 
-  return { linhas, avisos, total };
-}
+  function sugerirPorPessoas(
+    pessoas: number,
+    quer: { salgado?: boolean; doce?: boolean; bolo?: boolean } = { salgado: true, doce: true },
+  ): Cotacao {
+    const n = Number(pessoas) || 0;
+    const pedido: { item: string; qtd: number }[] = [];
+    const notas: string[] = [];
+    let estimativa = false;
 
-// Caminho de CONVENIÊNCIA: "festa pra 50 pessoas". Usa rendimento (chutes até a dona confirmar).
-export function sugerirPorPessoas(
-  pessoas: number,
-  quer: { salgado?: boolean; doce?: boolean; bolo?: boolean } = { salgado: true, doce: true },
-): Cotacao {
-  const n = Number(pessoas) || 0;
-  const pedido: { item: string; qtd: number }[] = [];
-  const notas: string[] = [];
-  let estimativa = false;
+    if (quer.salgado && rend.salgadoPorPessoa) {
+      const prod = primeiroDaCategoria("salgado");
+      if (prod) {
+        let unidades = Math.round(n * rend.salgadoPorPessoa);
+        if (rend.minSalgado && unidades < rend.minSalgado) {
+          unidades = rend.minSalgado;
+          notas.push(`Salgado ajustado pro mínimo de ${rend.minSalgado}.`);
+        }
+        pedido.push({ item: prod.nome, qtd: Math.max(1, Math.ceil(unidades / unidade)) });
+        estimativa = true;
+      }
+    }
+    if (quer.doce && rend.docePorPessoa) {
+      const prod = primeiroDaCategoria("doce");
+      if (prod) {
+        const unidades = Math.round(n * rend.docePorPessoa);
+        pedido.push({ item: prod.nome, qtd: Math.max(1, Math.ceil(unidades / unidade)) });
+        estimativa = true;
+      }
+    }
+    if (quer.bolo && rend.boloServe) {
+      const prod = primeiroDaCategoria("bolo");
+      if (prod) {
+        pedido.push({ item: prod.nome, qtd: Math.max(1, Math.ceil(n / rend.boloServe)) });
+        estimativa = true;
+      }
+    }
 
-  if (quer.salgado) {
-    const r = rendimento.salgado_por_pessoa;
-    let qtd = Math.round(n * r.valor);
-    const min = rendimento.regras_encomenda.quantidade_minima_salgado;
-    if (min.valor && qtd < min.valor) {
-      qtd = min.valor;
-      notas.push(`Salgado ajustado pro mínimo de ${min.valor}.`);
-    }
-    pedido.push({ item: "salgado assado", qtd });
-    if (r.confirmar) {
-      estimativa = true;
-      notas.push(`Salgado: ${r.valor}/pessoa é estimativa — confirmar com a dona.`);
-    }
+    const cotacao = cotarPorItens(pedido);
+    return { pessoas: n, estimativa, notas, ...cotacao };
   }
 
-  if (quer.doce) {
-    const r = rendimento.doce_por_pessoa;
-    pedido.push({ item: "brigadeiro", qtd: Math.round(n * r.valor) });
-    if (r.confirmar) {
-      estimativa = true;
-      notas.push(`Doce: ${r.valor}/pessoa é estimativa — confirmar com a dona.`);
+  function cardapioResumo(): string {
+    // agrupa por categoria pro prompt
+    const porCat: Record<string, string[]> = {};
+    for (const p of produtos) {
+      (porCat[p.categoria] ||= []).push(`${p.nome} ${brl(p.preco)}`);
     }
+    return Object.entries(porCat)
+      .map(([cat, itens]) => `${cat}: ${itens.join(", ")}`)
+      .join("\n");
   }
 
-  if (quer.bolo) {
-    const r = rendimento.bolo_recheado_serve;
-    const qtd = Math.max(1, Math.ceil(n / r.valor));
-    pedido.push({ item: "bolo recheado a", qtd });
-    if (r.confirmar) {
-      estimativa = true;
-      notas.push(`Bolo: 1 serve ~${r.valor} pessoas é estimativa — confirmar com a dona.`);
-    }
-  }
-
-  const cotacao = cotarPorItens(pedido);
-  return { pessoas: n, estimativa, notas, ...cotacao };
+  return { cotarPorItens, sugerirPorPessoas, cardapioResumo };
 }
 
 // Texto do orçamento pronto pro WhatsApp.
-export function formatarOrcamento(c: Cotacao, titulo = "Orçamento Doce Pão"): string {
+export function formatarOrcamento(c: Cotacao, titulo = "Orçamento"): string {
   const L: string[] = [];
   L.push(titulo);
   L.push("─".repeat(28));
-  for (const l of c.linhas) {
-    L.push(`${l.qtd}x ${l.item} — ${brl(l.subtotal)}`);
-  }
+  for (const l of c.linhas) L.push(`${l.qtd}x ${l.item} — ${brl(l.subtotal)}`);
   L.push("─".repeat(28));
   L.push(`*Total: ${brl(c.total)}*`);
   L.push("(paga na retirada)");
@@ -148,10 +153,38 @@ export function formatarOrcamento(c: Cotacao, titulo = "Orçamento Doce Pão"): 
   return L.join("\n");
 }
 
-// Resumo curto do cardápio pra colocar no system prompt (a IA usa como referência).
-export function cardapioResumo(): string {
-  return `Salgados: frito ${brl(catalogo.salgados.frito.preco)}, assado ${brl(catalogo.salgados.assado.preco)} (por unidade).
-Doces: brigadeiro/beijinho a partir de ${brl(1.25)}; trufas ${brl(2.25)}.
-Bolos recheados: ${brl(46.9)} a ${brl(55.9)}. Bolos caseiros: ${brl(30.9)} a ${brl(35.9)}.
-Pizza de forma: inteira ${brl(120)} (serve 6 a 8 pessoas), meia ${brl(60)} (serve até 4).`;
+// ---------------------------------------------------------------------------
+//  MOTOR PADRÃO (Doce Pão) — do catalogo.json. Usado quando o negócio não tem
+//  cardápio próprio no banco (fallback).
+// ---------------------------------------------------------------------------
+function produtosDoCatalogo(): Produto[] {
+  const p: Produto[] = [];
+  p.push({ nome: "salgado frito", preco: catalogo.salgados.frito.preco, categoria: "salgado" });
+  p.push({ nome: "salgado assado", preco: catalogo.salgados.assado.preco, categoria: "salgado" });
+  for (const d of catalogo.doces.itens) p.push({ nome: d.nome, preco: d.preco, categoria: "doce" });
+  for (const f of catalogo.bolos_recheados.faixas) {
+    p.push({ nome: "bolo recheado " + f.faixa.toLowerCase(), preco: f.preco, categoria: "bolo_recheado" });
+    for (const s of f.sabores) p.push({ nome: "bolo " + s, preco: f.preco, categoria: "bolo_recheado" });
+  }
+  for (const b of catalogo.bolos_caseiros.itens)
+    p.push({ nome: "bolo caseiro " + b.nome, preco: b.preco, categoria: "bolo_caseiro" });
+  p.push({ nome: "pizza inteira", preco: catalogo.pizza.inteira.preco, categoria: "pizza" });
+  p.push({ nome: "pizza meia", preco: catalogo.pizza.meia.preco, categoria: "pizza" });
+  return p;
 }
+
+const rendimentoPadrao: Rendimento = {
+  salgadoPorPessoa: rendimentoJson.salgado_por_pessoa?.valor,
+  docePorPessoa: rendimentoJson.doce_por_pessoa?.valor,
+  boloServe: rendimentoJson.bolo_recheado_serve?.valor,
+  unidadePorProduto: 1,
+  minSalgado: rendimentoJson.regras_encomenda?.quantidade_minima_salgado?.valor,
+  confirmar: true,
+};
+
+export const motorPadrao = criarMotor(produtosDoCatalogo(), rendimentoPadrao);
+
+// Compat: exports antigos (Doce Pão). Novo código usa criarMotor por tenant.
+export const cotarPorItens = motorPadrao.cotarPorItens;
+export const sugerirPorPessoas = motorPadrao.sugerirPorPessoas;
+export const cardapioResumo = motorPadrao.cardapioResumo;

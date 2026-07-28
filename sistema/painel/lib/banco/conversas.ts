@@ -75,9 +75,8 @@ export async function registrarPedido(
   clienteId: string,
   pedido: NonNullable<RespostaIA["pedidoRegistrado"]>,
 ): Promise<string> {
-  // recalcula os itens pelo motor (fonte da verdade dos preços)
-  const { cotarPorItens } = await import("../ia/orcamento");
-  const cot = cotarPorItens(pedido.itens);
+  // usa as linhas já calculadas pelo motor do tenant (não recalcula com cardápio errado)
+  const linhas = pedido.linhas;
 
   const ped = await queryUm<{ id: string }>(
     `insert into pedidos
@@ -95,7 +94,7 @@ export async function registrarPedido(
   );
   if (!ped) throw new Error("Falha ao registrar pedido");
 
-  for (const l of cot.linhas) {
+  for (const l of linhas) {
     await query(
       `insert into pedido_itens (pedido_id, produto, categoria, qtd, unit_centavos, subtotal_centavos)
        values ($1, $2, $3, $4, $5, $6)`,

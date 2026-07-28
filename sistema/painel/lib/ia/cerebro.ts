@@ -12,14 +12,12 @@
 
 import OpenAI from "openai";
 import { montarSystemPrompt, DOCE_PAO, type ConfigNegocio } from "./persona";
-import {
-  cotarPorItens,
-  sugerirPorPessoas,
-  formatarOrcamento,
-  cardapioResumo,
-} from "./orcamento";
+import { motorPadrao, formatarOrcamento, type Motor, type LinhaCotacao } from "./orcamento";
 
 const MODELO = process.env.MODELO_IA || "gpt-4o-mini";
+
+// Um tenant = a persona (voz/regras) + o motor de orçamento (cardápio) do negócio.
+export type Tenant = { persona: ConfigNegocio; motor: Motor };
 
 // As ferramentas que a IA pode chamar (formato OpenAI). Descrição prescritiva.
 const FERRAMENTAS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -113,6 +111,7 @@ export type RespostaIA = {
   precisaHumano: boolean; // se true, entra na fila de "precisa de você" do painel
   pedidoRegistrado: null | {
     itens: { item: string; qtd: number }[];
+    linhas: LinhaCotacao[]; // já calculado pelo motor do tenant (pro banco não recalcular)
     retiradaData: string;
     retiradaHora?: string;
     observacoes?: string;
@@ -125,17 +124,19 @@ export type RespostaIA = {
 export type Mensagem = { role: "user" | "assistant"; content: string };
 
 // Executa uma ferramenta e devolve o texto do resultado (o que a IA "vê").
+// Usa o MOTOR do tenant (cardápio da padaria certa).
 function executarFerramenta(
   nome: string,
   input: Record<string, unknown>,
   estado: { precisaHumano: boolean; pedido: RespostaIA["pedidoRegistrado"] },
+  motor: Motor,
 ): string {
   if (nome === "montar_orcamento") {
     if (input.modo === "itens") {
-      const c = cotarPorItens((input.itens as { item: string; qtd: number }[]) || []);
+      const c = motor.cotarPorItens((input.itens as { item: string; qtd: number }[]) || []);
       return formatarOrcamento(c);
     }
-    const c = sugerirPorPessoas(
+    const c = motor.sugerirPorPessoas(
       Number(input.pessoas) || 0,
       (input.quer as { salgado?: boolean; doce?: boolean; bolo?: boolean }) || { salgado: true, doce: true },
     );
@@ -149,9 +150,10 @@ function executarFerramenta(
 
   if (nome === "registrar_pedido") {
     const itens = (input.itens as { item: string; qtd: number }[]) || [];
-    const c = cotarPorItens(itens);
+    const c = motor.cotarPorItens(itens);
     estado.pedido = {
       itens,
+      linhas: c.linhas,
       retiradaData: String(input.retirada_data || ""),
       retiradaHora: input.retirada_hora ? String(input.retirada_hora) : undefined,
       observacoes: input.observacoes ? String(input.observacoes) : undefined,
@@ -165,14 +167,15 @@ function executarFerramenta(
 }
 
 // O turno principal: recebe o histórico + a mensagem nova, devolve a resposta.
+// `tenant` traz a persona + o cardápio da padaria certa (multi-tenant).
 export async function responder(
   historico: Mensagem[],
-  cfg: ConfigNegocio = DOCE_PAO,
+  tenant: Tenant = { persona: DOCE_PAO, motor: motorPadrao },
 ): Promise<RespostaIA> {
   // Lê OPENAI_API_KEY do ambiente. OPENAI_BASE_URL (opcional) aponta pra outro
   // provedor compatível (Gemini/DeepSeek/OpenRouter) sem mudar código.
   const client = new OpenAI({ baseURL: process.env.OPENAI_BASE_URL || undefined });
-  const system = montarSystemPrompt(cfg, cardapioResumo());
+  const system = montarSystemPrompt(tenant.persona, tenant.motor.cardapioResumo());
 
   const estado = { precisaHumano: false, pedido: null as RespostaIA["pedidoRegistrado"] };
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -210,7 +213,7 @@ export async function responder(
       } catch {
         args = {};
       }
-      const saida = executarFerramenta(tc.function.name, args, estado);
+      const saida = executarFerramenta(tc.function.name, args, estado, tenant.motor);
       messages.push({ role: "tool", tool_call_id: tc.id, content: saida });
     }
   }

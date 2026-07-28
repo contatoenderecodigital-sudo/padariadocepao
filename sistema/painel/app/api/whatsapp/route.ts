@@ -14,6 +14,7 @@
 
 import { NextRequest, after } from "next/server";
 import { responder } from "@/lib/ia/cerebro";
+import { carregarTenant } from "@/lib/ia/tenant";
 import { enviarTexto, baixarMidia } from "@/lib/whatsapp/api";
 import { transcrever } from "@/lib/whatsapp/transcrever";
 import {
@@ -92,7 +93,9 @@ async function processar(corpo: WebhookPayload) {
       await salvarMensagem(negocioId, clienteId, "user", texto);
       const historico = await carregarHistorico(negocioId, clienteId);
 
-      const resp = await responder(historico);
+      // Carrega o cardápio/persona DESTE negócio (multi-tenant).
+      const tenant = await carregarTenant(negocioId);
+      const resp = await responder(historico, tenant);
 
       await enviarTexto(telefone, resp.texto);
       await salvarMensagem(negocioId, clienteId, "assistant", resp.texto);
