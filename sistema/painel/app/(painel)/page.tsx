@@ -1,7 +1,7 @@
-import Shell from "@/components/Shell";
 import FilaAprovacao from "@/components/FilaAprovacao";
 import { carregarFilaAprovacao } from "@/lib/dados";
 import { lerSessao } from "@/lib/auth";
+import { nomeNegocioAtual } from "@/lib/negocio";
 import { aprovarPedido, recusarPedido } from "./acoes";
 
 // Sempre fresco: a fila muda a cada pedido que chega do WhatsApp.
@@ -11,19 +11,13 @@ export default async function Home() {
   // Escopa pelo negócio do usuário logado (isolamento multi-tenant).
   const sessao = await lerSessao();
   const fila = await carregarFilaAprovacao(sessao?.negocioId);
-  let nomeNegocio = "";
-  if (sessao) {
-    const { carregarMarca } = await import("@/lib/banco/negocios");
-    nomeNegocio = (await carregarMarca(sessao.negocioId))?.nome ?? "";
-  }
+  const nomeNegocio = await nomeNegocioAtual("");
   return (
-    <Shell ativo="/" filaCount={fila.length}>
-      <FilaAprovacao
-        inicial={fila}
-        aprovar={aprovarPedido}
-        recusar={recusarPedido}
-        nomeNegocio={nomeNegocio}
-      />
-    </Shell>
+    <FilaAprovacao
+      inicial={fila}
+      aprovar={aprovarPedido}
+      recusar={recusarPedido}
+      nomeNegocio={nomeNegocio}
+    />
   );
 }
