@@ -34,57 +34,35 @@ type Item = { href: string; label: string; icon: string; badge?: number };
 
 const ITENS: Item[] = [
   { href: "/", label: "Aprovação", icon: "bell" },
-  { href: "/dia", label: "Pedidos do dia", icon: "box" },
+  { href: "/dia", label: "Pedidos do dia", icon: "order" },
   { href: "/atendimentos", label: "Atendimentos", icon: "chat" },
-  { href: "/recuperar", label: "Recuperar", icon: "undo" },
-  { href: "/clube", label: "Clube", icon: "star" },
+  { href: "/recuperar", label: "Recuperar", icon: "restore" },
   { href: "/numeros", label: "Números", icon: "chart" },
 ];
 
-// Ícones SVG de linha (herdam a cor do texto). Mais profissional que emoji.
+// Ícone via CSS mask: usa o SVG como máscara e pinta com a cor do texto
+// (currentColor). Assim qualquer SVG baixado herda a cor da sidebar, seja
+// ele de traço ou preenchido.
 function Icone({ nome }: { nome: string }) {
-  const paths: Record<string, React.ReactNode> = {
-    bell: (
-      <>
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-      </>
-    ),
-    box: (
-      <>
-        <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
-        <path d="m3 8 9 5 9-5M12 13v8" />
-      </>
-    ),
-    chat: <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5Z" />,
-    undo: (
-      <>
-        <path d="M3 7v6h6" />
-        <path d="M3 13a9 9 0 1 0 3-7.7L3 8" />
-      </>
-    ),
-    star: <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2Z" />,
-    chart: (
-      <>
-        <path d="M3 3v18h18" />
-        <path d="M7 15v-4M12 15V9M17 15v-7" />
-      </>
-    ),
-  };
+  const url = `url(/icones/${nome}.svg)`;
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <span
       aria-hidden="true"
-    >
-      {paths[nome] ?? null}
-    </svg>
+      style={{
+        display: "inline-block",
+        width: 18,
+        height: 18,
+        backgroundColor: "currentColor",
+        maskImage: url,
+        WebkitMaskImage: url,
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+      }}
+    />
   );
 }
 
