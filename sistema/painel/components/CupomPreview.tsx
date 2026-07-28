@@ -5,7 +5,6 @@
 // de verdade (window.print) sai preto e branco, mono, bobina estreita, sem
 // nenhum efeito visual (ver @media print no globals.css).
 
-import { useState } from "react";
 import type { Pedido } from "@/lib/tipos";
 import { brl, formatarTelefoneBR } from "@/lib/tipos";
 import { deptoDe, deptoInfo, type DeptoId } from "@/lib/departamentos";
@@ -20,13 +19,81 @@ function fmtData(iso: string | null) {
 
 type Badge = { nome: string; cor: string; id: DeptoId | "caixa" };
 
+// ===== IMPRESSAO =====================================================
+// Gera o cupom como HTML limpo (mono, P&B, bobina estreita) e imprime num
+// iframe isolado. Nao depende do CSS do app (glass/serrilha) nem de esconder
+// a tela, entao sai certo e sempre preto e branco.
+function esc(s: string) {
+  return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);
+}
+
+function htmlDoTicket(
+  t: { badge: Badge; itens: Pedido["itens"]; master?: boolean },
+  pedido: Pedido,
+  nomeNegocio: string,
+) {
+  const itens = t.itens
+    .map(
+      (it) =>
+        `<div class="row"><span><b>${it.qtd}x</b> ${esc(it.produto)}</span>${t.master ? `<span>${brl(it.subtotalCentavos)}</span>` : ""}</div>`,
+    )
+    .join("");
+  const rodape = t.master
+    ? `<div><b>TOTAL: ${brl(pedido.totalCentavos)}</b></div><div>Pagamento na RETIRADA</div>`
+    : `<div class="center">Producao ${esc(t.badge.nome)}</div>`;
+  const obs = pedido.observacoes ? `<div class="ln"></div><div><b>OBS:</b> ${esc(pedido.observacoes)}</div>` : "";
+  return `<div class="tk">
+    <div class="center"><span class="badge">${esc(t.badge.nome)}</span></div>
+    <div class="center b">${esc(nomeNegocio || "Padaria")}</div>
+    <div class="ln"></div>
+    <div><b>CLIENTE:</b> ${esc(pedido.clienteNome)}</div>
+    <div>Fone: ${formatarTelefoneBR(pedido.clienteTelefone)}</div>
+    <div><b>RETIRADA:</b> ${fmtData(pedido.retiradaData)}${pedido.retiradaHora ? " - " + pedido.retiradaHora : ""}</div>
+    ${pedido.pessoas ? `<div>Festa: ${pedido.pessoas} pessoas</div>` : ""}
+    <div>Pedido #${esc(pedido.id.slice(0, 8))}</div>
+    <div class="ln"></div>
+    ${itens}
+    <div class="ln"></div>
+    ${rodape}
+    ${obs}
+  </div>`;
+}
+
+const PRINT_CSS = `
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #000; background: #fff; font-family: "Courier New", monospace; }
+  .tk { width: 72mm; padding: 5mm 4mm; font-size: 12px; line-height: 1.4; page-break-after: always; }
+  .tk:last-child { page-break-after: auto; }
+  .b { font-weight: bold; }
+  .center { text-align: center; }
+  .badge { display: inline-block; border: 1px solid #000; padding: 1px 8px; margin-bottom: 3px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+  .ln { border-top: 1px dashed #000; margin: 5px 0; }
+  .row { display: flex; justify-content: space-between; gap: 8px; }
+`;
+
+function imprimirHTML(inner: string) {
+  const iframe = document.createElement("iframe");
+  iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow?.document;
+  if (!doc) return;
+  doc.open();
+  doc.write(`<!doctype html><html><head><meta charset="utf-8"><style>${PRINT_CSS}</style></head><body>${inner}</body></html>`);
+  doc.close();
+  const win = iframe.contentWindow;
+  setTimeout(() => {
+    win?.focus();
+    win?.print();
+    setTimeout(() => iframe.remove(), 800);
+  }, 250);
+}
+
 function Ticket({
   badge,
   itens,
   pedido,
   nomeNegocio,
   master,
-  hide,
   onImprimir,
 }: {
   badge: Badge;
@@ -34,12 +101,11 @@ function Ticket({
   pedido: Pedido;
   nomeNegocio: string;
   master?: boolean;
-  hide?: boolean;
   onImprimir: () => void;
 }) {
   return (
     <div
-      className={"cupom-ticket relative w-[248px] rounded-t-[10px] px-4 pt-4 pb-5 font-mono text-[12px] leading-tight text-black " + (hide ? "hide-print" : "")}
+      className="cupom-ticket relative w-[248px] rounded-t-[10px] px-4 pt-4 pb-5 font-mono text-[12px] leading-tight text-black"
       style={{ background: "#fdfbf7", boxShadow: "0 12px 34px rgba(0,0,0,0.4)" }}
     >
       <button
@@ -106,8 +172,6 @@ export default function CupomPreview({
   nomeNegocio?: string;
   onClose: () => void;
 }) {
-  const [soId, setSoId] = useState<string | null>(null);
-
   // agrupa itens por estacao
   const porDepto = {} as Record<DeptoId, Pedido["itens"]>;
   for (const it of pedido.itens) {
@@ -128,11 +192,9 @@ export default function CupomPreview({
   });
 
   function imprimir(id?: string) {
-    setSoId(id ?? null);
-    setTimeout(() => {
-      window.print();
-      setSoId(null);
-    }, 60);
+    const lista = id ? tickets.filter((t) => t.key === id) : tickets;
+    const html = lista.map((t) => htmlDoTicket({ badge: t.badge, itens: t.itens, master: t.master }, pedido, nomeNegocio)).join("");
+    imprimirHTML(html);
   }
 
   return (
@@ -178,7 +240,6 @@ export default function CupomPreview({
                 pedido={pedido}
                 nomeNegocio={nomeNegocio}
                 master={t.master}
-                hide={soId !== null && soId !== t.key}
                 onImprimir={() => imprimir(t.key)}
               />
             ))}

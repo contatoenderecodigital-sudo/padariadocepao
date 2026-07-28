@@ -266,8 +266,8 @@ export default function PedidosDoDia({ pedidos }: { pedidos: Pedido[] }) {
                         {deptosDoPedido(p).map((id) => {
                           const di = deptoInfo(id);
                           return (
-                            <span key={id} className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${di.cor}22`, color: di.cor }}>
-                              <DeptIcone id={id} size={11} /> {di.nome}
+                            <span key={id} className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: `${di.corClara}22`, color: di.corClara }}>
+                              <DeptIcone id={id} size={12} /> {di.nome}
                             </span>
                           );
                         })}

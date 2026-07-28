@@ -164,8 +164,8 @@ function CardPedido({
       </div>
 
       {/* Rodapé: total + ações */}
-      <div className="px-6 py-4 border-t border-white/10 flex items-end justify-between gap-3">
-        <div>
+      <div className="px-6 py-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="shrink-0">
           <div className="t-label text-cream/45">Total</div>
           <div className="t-money text-[26px] leading-none mt-1 text-grad-dourado">
             {brl(pedido.totalCentavos)}
@@ -174,7 +174,7 @@ function CardPedido({
             <PagamentoBadge forma={pedido.formaPagamento} />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap shrink-0">
           <button
             onClick={() => onVerCupom(pedido)}
             className="btn-cobre press px-3.5 py-2 text-sm font-semibold"

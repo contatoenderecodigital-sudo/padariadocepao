@@ -10,14 +10,15 @@ export type DeptoId = "padaria" | "salgados" | "confeitaria" | "bolos";
 export type Departamento = {
   id: DeptoId;
   nome: string;
-  cor: string; // acento (dentro da paleta quente da marca)
+  cor: string; // acento cheio (fundo de icone, header) - usar com texto claro
+  corClara: string; // tom claro pra TEXTO/icone sobre fundo escuro (legivel)
 };
 
 export const DEPARTAMENTOS: Departamento[] = [
-  { id: "padaria", nome: "Padaria", cor: "#d9a441" },
-  { id: "salgados", nome: "Salgados", cor: "#c46a1e" },
-  { id: "confeitaria", nome: "Confeitaria", cor: "#c65f7a" },
-  { id: "bolos", nome: "Bolos", cor: "#a06a3c" },
+  { id: "padaria", nome: "Padaria", cor: "#d9a441", corClara: "#ecc16a" },
+  { id: "salgados", nome: "Salgados", cor: "#c46a1e", corClara: "#e59355" },
+  { id: "confeitaria", nome: "Confeitaria", cor: "#c65f7a", corClara: "#e58fa6" },
+  { id: "bolos", nome: "Bolos", cor: "#a06a3c", corClara: "#cf9a68" },
 ];
 
 export function deptoInfo(id: DeptoId): Departamento {
