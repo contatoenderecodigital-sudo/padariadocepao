@@ -3,6 +3,7 @@
 // Fica no LAYOUT do grupo (painel), então a sidebar não re-renderiza a cada
 // troca de aba: só o conteúdo troca. A navegação da sidebar é client (usePathname).
 
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { bancoConfigurado } from "@/lib/banco/db";
 import { lerSessao } from "@/lib/auth";
@@ -39,9 +40,19 @@ export default async function Shell({
           borderRight: "1px solid rgba(255,255,255,0.10)",
         }}
       >
-        <div className="px-6 py-6 border-b border-white/10">
-          <div className="font-title text-2xl font-bold leading-tight">{nomeNegocio}</div>
-          <div className="text-[11px] uppercase tracking-[0.18em] text-dourado-l mt-1">Painel</div>
+        <div className="px-5 py-6 border-b border-white/10 flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={48}
+            height={48}
+            className="w-12 h-12 shrink-0 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+            priority
+          />
+          <div className="min-w-0">
+            <div className="font-title text-lg font-bold leading-tight truncate">{nomeNegocio}</div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-dourado-l mt-0.5">Painel</div>
+          </div>
         </div>
 
         <SidebarNav filaCount={filaCount} />
