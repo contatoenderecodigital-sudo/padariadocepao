@@ -46,30 +46,29 @@ function estadoInfo(estado: Conversa["estado"]) {
   return { txt: "Resolvido", dot: "bg-ink-soft/40", cls: "text-ink-soft" };
 }
 
-function Balao({ de, texto, hora, nome }: Conversa["mensagens"][number] & { nome: string }) {
+function Balao({
+  de, texto, hora, nome, avatar,
+}: Conversa["mensagens"][number] & { nome: string; avatar: boolean }) {
+  const espaco = <div style={{ width: 34 }} className="shrink-0" />;
   if (de === "cliente") {
     return (
-      <div className="flex items-start gap-2.5 justify-start">
-        <Avatar nome={nome} tam={34} raio={10} />
-        <div className="max-w-[68%]">
-          <div className="rounded-[14px] rounded-tl-[4px] bg-white text-ink px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_3px_rgba(60,70,110,0.07)]">
-            {texto}
-          </div>
-          <div className="text-[10px] mt-1 text-ink-soft/45 ml-1">{hora}</div>
+      <div className={"flex items-end gap-2 justify-start " + (avatar ? "mt-1.5" : "mt-0.5")}>
+        {avatar ? <Avatar nome={nome} tam={34} raio={10} /> : espaco}
+        <div className="max-w-[70%] rounded-[16px] rounded-bl-[5px] bg-[#ececef] text-ink px-3 py-1.5 text-[13.5px] leading-relaxed whitespace-pre-line">
+          {texto}
+          <span className="text-[10px] text-ink-soft/40 ml-2 float-right relative top-[6px]">{hora}</span>
         </div>
       </div>
     );
   }
   return (
-    <div className="flex items-start gap-2.5 justify-end">
-      <div className="max-w-[68%]">
-        <div className="rounded-[14px] rounded-tr-[4px] bg-wa text-white px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-line shadow-[0_1px_3px_rgba(31,175,84,0.18)]">
-          {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
-          {texto}
-        </div>
-        <div className="text-[10px] mt-1 text-ink-soft/45 mr-1 text-right">{hora}</div>
+    <div className={"flex items-end gap-2 justify-end " + (avatar ? "mt-1.5" : "mt-0.5")}>
+      <div className="max-w-[70%] rounded-[16px] rounded-br-[5px] bg-wa text-white px-3 py-1.5 text-[13.5px] leading-relaxed whitespace-pre-line">
+        {de === "equipe" && <div className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Equipe</div>}
+        {texto}
+        <span className="text-[10px] text-white/60 ml-2 float-right relative top-[6px]">{hora}</span>
       </div>
-      <AvatarIA tam={34} />
+      {avatar ? <AvatarIA tam={34} /> : espaco}
     </div>
   );
 }
@@ -137,25 +136,25 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                   <button
                     key={c.id}
                     onClick={() => setAtivaId(c.id)}
-                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "bg-wa/[0.10]" : "hover:bg-[#f5f6f9]")}
+                    className={"w-full text-left px-2.5 py-2.5 rounded-[12px] flex gap-2.5 transition-colors mb-0.5 " + (on ? "bg-wa" : "hover:bg-[#f5f6f9]")}
                   >
                     <Avatar nome={c.clienteNome} tam={44} raio={12} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="font-semibold text-ink text-[13.5px] truncate">{c.clienteNome}</span>
-                        <span className="text-[10px] text-ink-soft/55 shrink-0">{c.ultimaHora}</span>
+                        <span className={"font-semibold text-[13.5px] truncate " + (on ? "text-white" : "text-ink")}>{c.clienteNome}</span>
+                        <span className={"text-[10px] shrink-0 " + (on ? "text-white/70" : "text-ink-soft/55")}>{c.ultimaHora}</span>
                       </div>
                       <div className="flex items-center justify-between gap-2 mt-0.5">
-                        <span className="text-[12px] text-ink-soft/90 truncate">{c.previa}</span>
+                        <span className={"text-[12px] truncate " + (on ? "text-white/85" : "text-ink-soft/90")}>{c.previa}</span>
                         {c.naoLidas > 0 && (
-                          <span className="text-[10px] min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full bg-[#f24e4e] text-white font-bold shrink-0">
+                          <span className={"text-[10px] min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full font-bold shrink-0 " + (on ? "bg-white text-wa" : "bg-[#f24e4e] text-white")}>
                             {c.naoLidas}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 mt-1">
-                        <span className={"w-1.5 h-1.5 rounded-full " + ci.dot} />
-                        <span className={"text-[10px] " + ci.cls}>{ci.txt}</span>
+                        <span className={"w-1.5 h-1.5 rounded-full " + (on ? "bg-white/80" : ci.dot)} />
+                        <span className={"text-[10px] " + (on ? "text-white/85" : ci.cls)}>{ci.txt}</span>
                       </div>
                     </div>
                   </button>
@@ -170,8 +169,12 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
               <div className="flex-1 grid place-items-center text-[13px] text-ink-soft/60">Selecione uma conversa.</div>
             ) : (
               <>
-                <div className="px-5 h-[52px] border-b border-line/60 flex items-center justify-between">
-                  <span className="font-semibold text-ink text-[15px]">{ativa.clienteNome}</span>
+                <div className="px-5 h-[52px] border-b border-line/60 flex items-center justify-between relative">
+                  <div className="flex items-center gap-1.5 text-ink-soft/45 text-[12px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-wa inline-block" />
+                    {info?.txt}
+                  </div>
+                  <span className="font-semibold text-ink text-[15px] absolute left-1/2 -translate-x-1/2">{ativa.clienteNome}</span>
                   <div className="flex items-center gap-4 text-ink-soft/45">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M15.5 5A9.5 9.5 0 0 1 19 8.5M14 9a4 4 0 0 1 1 1M4.5 3h3l1.5 5-2 1a12 12 0 0 0 6 6l1-2 5 1.5v3a2 2 0 0 1-2 2A17 17 0 0 1 2.5 5a2 2 0 0 1 2-2Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="6" width="13" height="12" rx="2" /><path d="m15 10 6-3v10l-6-3" strokeLinejoin="round" /></svg>
@@ -181,9 +184,11 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
 
                 <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3.5 min-h-0" style={{ background: "#f6f7fb" }}>
                   <div className="self-center text-[10px] text-ink-soft/45 bg-white rounded-full px-3 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">Hoje</div>
-                  {ativa.mensagens.map((m, i) => (
-                    <Balao key={i} {...m} nome={ativa.clienteNome} />
-                  ))}
+                  {ativa.mensagens.map((m, i) => {
+                    const ant = ativa.mensagens[i - 1];
+                    const primeiro = !ant || ant.de !== m.de;
+                    return <Balao key={i} {...m} nome={ativa.clienteNome} avatar={primeiro} />;
+                  })}
                   <div ref={fim} />
                 </div>
 
