@@ -31,7 +31,7 @@ export default async function Shell({
   }
 
   return (
-    <div className="min-h-screen flex app-mesh text-ink">
+    <div className="min-h-screen flex app-mesh text-cream">
       {/* Sidebar — material fosco da marca (estilo Apple) */}
       <aside
         className="w-60 shrink-0 text-white flex flex-col"

@@ -1,5 +1,4 @@
-import Shell from "@/components/Shell";
-import { METRICAS_MOCK as M, PEDIDOS_MOCK } from "@/lib/mock";
+import { METRICAS_MOCK as M } from "@/lib/mock";
 import { nomeNegocioAtual } from "@/lib/negocio";
 import { NumberTicker } from "@/components/ui/number-ticker";
 
@@ -19,23 +18,23 @@ function Card({
       className={
         "rounded-2xl p-6 border " +
         (destaque
-          ? "grad-vinho text-white border-transparent shadow-lg"
+          ? "glass-strong text-white border-transparent"
           : "glass")
       }
     >
       <div
         className={
           "font-title text-4xl font-bold leading-none " +
-          (destaque ? "text-grad-dourado" : "text-vinho")
+          (destaque ? "text-grad-dourado" : "text-cream")
         }
       >
         {valor}
       </div>
-      <div className={"text-sm font-medium mt-2 " + (destaque ? "text-white" : "text-ink")}>
+      <div className={"text-sm font-medium mt-2 " + (destaque ? "text-white" : "text-cream")}>
         {rotulo}
       </div>
       {sub && (
-        <div className={"text-xs mt-1 " + (destaque ? "text-white/70" : "text-ink-soft")}>{sub}</div>
+        <div className={"text-xs mt-1 " + (destaque ? "text-white/70" : "text-cream/70")}>{sub}</div>
       )}
     </div>
   );
@@ -45,20 +44,18 @@ function Card({
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const fila = PEDIDOS_MOCK.filter((p) => p.status === "confirmado").length;
   const maxDia = Math.max(...M.porDia.map((d) => d.pedidos));
   const nome = await nomeNegocioAtual();
 
   return (
-    <Shell ativo="/numeros" filaCount={fila}>
       <div className="px-8 py-7">
         <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
           Números do mês
         </div>
-        <h1 className="font-title text-3xl font-bold text-vinho mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream mt-1">
           O que a {nome} ganhou este mês
         </h1>
-        <p className="text-sm text-ink-soft mt-1 mb-6 max-w-2xl">
+        <p className="text-sm text-cream/70 mt-1 mb-6 max-w-2xl">
           Não é achismo. É o resultado em número: tempo de volta, pedidos atendidos e dinheiro que
           voltou pro caixa.
         </p>
@@ -99,24 +96,23 @@ export default async function Page() {
 
         {/* gráfico de barrinhas por dia */}
         <div className="mt-8 glass rounded-2xl p-6">
-          <div className="text-sm font-semibold text-vinho mb-1">Pedidos por dia da semana</div>
-          <div className="text-xs text-ink-soft mb-5">
+          <div className="text-sm font-semibold text-cream mb-1">Pedidos por dia da semana</div>
+          <div className="text-xs text-cream/70 mb-5">
             O pico é sexta e sábado — o atendimento aguenta o movimento sem ninguém travar.
           </div>
           <div className="flex items-end gap-3" style={{ height: "180px" }}>
             {M.porDia.map((d) => (
               <div key={d.dia} className="flex-1 flex flex-col items-center justify-end gap-2 h-full">
-                <div className="text-xs font-semibold text-vinho">{d.pedidos}</div>
+                <div className="text-xs font-semibold text-cream">{d.pedidos}</div>
                 <div
                   className="grad-dourado w-full rounded-t-md min-h-[4px]"
                   style={{ height: `${Math.round((d.pedidos / maxDia) * 120)}px` }}
                 />
-                <div className="text-xs text-ink-soft">{d.dia}</div>
+                <div className="text-xs text-cream/70">{d.dia}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
-    </Shell>
   );
 }

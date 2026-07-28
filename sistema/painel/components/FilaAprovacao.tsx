@@ -41,16 +41,16 @@ function CardPedido({
       }
     >
       {/* topo: cliente + retirada */}
-      <div className="px-5 pt-4 pb-3 flex items-start justify-between gap-3 border-b border-line">
+      <div className="px-5 pt-4 pb-3 flex items-start justify-between gap-3 border-b border-white/12">
         <div className="min-w-0">
-          <div className="tracking-tight-apple text-lg font-bold text-vinho truncate">
+          <div className="tracking-tight-apple text-lg font-bold text-cream truncate">
             {pedido.clienteNome}
           </div>
-          <div className="text-xs text-ink-soft mt-0.5">{pedido.clienteTelefone}</div>
+          <div className="text-xs text-cream/70 mt-0.5">{pedido.clienteTelefone}</div>
         </div>
         <div className="text-right shrink-0">
-          <div className="text-[10px] uppercase tracking-wider text-ink-soft/60">Retirada</div>
-          <div className="text-sm font-semibold text-vinho">
+          <div className="text-[10px] uppercase tracking-wider text-cream/55">Retirada</div>
+          <div className="text-sm font-semibold text-cream">
             {data ?? "—"} {pedido.retiradaHora ? `· ${pedido.retiradaHora}` : ""}
           </div>
           {pedido.pessoas ? (
@@ -66,30 +66,30 @@ function CardPedido({
         <ul className="flex flex-col gap-1.5">
           {pedido.itens.map((it, i) => (
             <li key={i} className="flex items-baseline justify-between text-sm gap-3">
-              <span className="text-ink">
-                <span className="font-semibold text-vinho">{it.qtd}×</span> {it.produto}
+              <span className="text-cream">
+                <span className="font-semibold text-cream">{it.qtd}×</span> {it.produto}
               </span>
-              <span className="text-ink-soft tabular-nums shrink-0">
+              <span className="text-cream/70 tabular-nums shrink-0">
                 {brl(it.subtotalCentavos)}
               </span>
             </li>
           ))}
         </ul>
         {pedido.observacoes ? (
-          <div className="mt-3 text-xs text-ink-soft bg-cream2/60 border border-line rounded-lg px-3 py-2 leading-relaxed">
-            <span className="font-semibold text-vinho">Obs:</span> {pedido.observacoes}
+          <div className="mt-3 text-xs text-cream/70 bg-white/[0.05] border border-white/12 rounded-lg px-3 py-2 leading-relaxed">
+            <span className="font-semibold text-cream">Obs:</span> {pedido.observacoes}
           </div>
         ) : null}
       </div>
 
       {/* total + ações */}
-      <div className="px-5 py-3 border-t border-line flex items-center justify-between gap-3">
+      <div className="px-5 py-3 border-t border-white/12 flex items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-ink-soft/60">Total</div>
-          <div className="tracking-tight-apple text-xl font-bold text-vinho leading-none">
+          <div className="text-[10px] uppercase tracking-wider text-cream/55">Total</div>
+          <div className="tracking-tight-apple text-xl font-bold text-cream leading-none">
             {brl(pedido.totalCentavos)}
           </div>
-          <div className="text-[11px] text-ink-soft mt-0.5">pagamento na retirada</div>
+          <div className="text-[11px] text-cream/70 mt-0.5">pagamento na retirada</div>
         </div>
         <div className="flex gap-2">
           <button
@@ -157,14 +157,14 @@ export default function FilaAprovacao({
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
             Fila de aprovação
           </div>
-          <h1 className="font-title text-3xl font-bold text-vinho mt-1">
+          <h1 className="font-title text-3xl font-bold text-cream mt-1">
             {fila.length > 0
               ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
               : "Tudo aprovado 🎉"}
           </h1>
         </div>
       </div>
-      <p className="text-sm text-ink-soft mb-6 max-w-xl">
+      <p className="text-sm text-cream/70 mb-6 max-w-xl">
         Chegaram pelo WhatsApp. Aprovou, sai impresso na cozinha na hora. Nenhum entra sem você.
       </p>
 
@@ -174,8 +174,8 @@ export default function FilaAprovacao({
           className={
             "mb-5 text-sm rounded-lg px-4 py-2.5 border " +
             (ultimo.acao === "aprovado"
-              ? "bg-cobre/10 border-cobre/30 text-[color:var(--brand-cobre-d)]"
-              : "bg-cream2 border-line text-ink-soft")
+              ? "bg-cobre/15 border-cobre/40 text-[color:var(--brand-cobre-l)]"
+              : "bg-white/[0.06] border-white/12 text-cream/70")
           }
         >
           {ultimo.acao === "aprovado" ? (
@@ -201,12 +201,12 @@ export default function FilaAprovacao({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-line glass-soft px-8 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-white/12 glass-soft px-8 py-16 text-center">
           <div className="text-4xl mb-3">☕</div>
-          <div className="tracking-tight-apple text-xl font-bold text-vinho">
+          <div className="tracking-tight-apple text-xl font-bold text-cream">
             Fila vazia
           </div>
-          <p className="text-sm text-ink-soft mt-1">
+          <p className="text-sm text-cream/70 mt-1">
             Quando um cliente fechar pedido no WhatsApp, ele aparece aqui.
           </p>
         </div>
