@@ -24,3 +24,12 @@ export async function carregarParados(negocioId?: string): Promise<Pedido[]> {
   const { listarParados } = await import("./banco/pedidos");
   return listarParados(negocioId);
 }
+
+export async function carregarConversas(negocioId?: string) {
+  if (!bancoConfigurado || !negocioId) {
+    const { CONVERSAS_MOCK } = await import("./mock");
+    return CONVERSAS_MOCK;
+  }
+  const { listarConversas } = await import("./banco/atendimentos");
+  return listarConversas(negocioId);
+}
