@@ -203,6 +203,27 @@ export async function limparAvisoDoDia(negocioId: string): Promise<void> {
   );
 }
 
+// Mensagem da cobrança automática (template editável pela dona). Placeholders:
+// {nome}, {dia}, {valor}. Guardada no config; volta null se nunca personalizou.
+export async function carregarMsgCobranca(negocioId: string): Promise<string | null> {
+  const n = await queryUm<{ m: string | null }>(
+    `select config->>'cobranca_msg' as m from negocios where id = $1`,
+    [negocioId],
+  );
+  return n?.m ?? null;
+}
+export async function salvarMsgCobranca(negocioId: string, texto: string): Promise<void> {
+  const t = (texto ?? "").trim();
+  if (!t) {
+    await query(`update negocios set config = config - 'cobranca_msg' where id = $1`, [negocioId]);
+    return;
+  }
+  await query(
+    `update negocios set config = coalesce(config, '{}'::jsonb) || jsonb_build_object('cobranca_msg', $2::text) where id = $1`,
+    [negocioId, t],
+  );
+}
+
 export type NegocioMarca = {
   nome: string;
   corPrimaria: string | null;

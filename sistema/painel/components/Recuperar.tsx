@@ -82,11 +82,13 @@ export default function Recuperar({
   nomeNegocio = "",
   agora,
   stats,
+  msgCobranca = "Oi {nome}! Seu orçamento ainda está de pé. Quer confirmar? É só responder por aqui.",
 }: {
   parados: Pedido[];
   nomeNegocio?: string;
   agora: number;
   stats: Stats;
+  msgCobranca?: string;
 }) {
   const [cobrados, setCobrados] = useState<Record<string, boolean>>({});
   const [preview, setPreview] = useState<Pedido | null>(null);
@@ -95,6 +97,23 @@ export default function Recuperar({
   const [statusF, setStatusF] = useState<StatusFiltro>("todos");
   const [busca, setBusca] = useState("");
   const [autoOn, setAutoOn] = useState(true);
+  const [personalizando, setPersonalizando] = useState(false);
+  const [template, setTemplate] = useState(msgCobranca);
+  const [salvandoMsg, setSalvandoMsg] = useState(false);
+
+  async function salvarTemplate() {
+    setSalvandoMsg(true);
+    try {
+      await fetch("/api/cobranca", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto: template }),
+      });
+      setPersonalizando(false);
+    } finally {
+      setSalvandoMsg(false);
+    }
+  }
 
   // KPIs (sobre TODOS os parados, não os filtrados).
   const valorParado = parados.reduce((s, p) => s + p.totalCentavos, 0);
@@ -216,7 +235,7 @@ export default function Recuperar({
               </span>
             </div>
             <div className="text-[12px] text-cream/55 mt-0.5">
-              Envia sozinha: "Oi! Seu orçamento ainda está de pé. Quer confirmar?"
+              Envia sozinha: "{template.replace("{nome}", "").replace(/\s+/g, " ").trim()}"
             </div>
           </div>
         </div>
@@ -225,7 +244,10 @@ export default function Recuperar({
           <button
             type="button"
             className="text-[12px] text-dourado font-medium hover:underline"
-            onClick={() => setPreview(parados[0] ?? null)}
+            onClick={() => {
+              setTemplate(msgCobranca);
+              setPersonalizando(true);
+            }}
           >
             Personalizar mensagem
           </button>
@@ -386,6 +408,45 @@ export default function Recuperar({
           })}
         </div>
       )}
+
+      {/* ---------------- Modal: personalizar a mensagem da cobrança ---------------- */}
+      {personalizando ? (
+        <Overlay onClose={() => setPersonalizando(false)}>
+          <div className="text-[11px] uppercase tracking-wider text-dourado font-semibold">
+            Cobrança automática
+          </div>
+          <h3 className="tracking-tight-apple text-lg font-bold text-cream mt-1 mb-3">
+            Personalizar a mensagem
+          </h3>
+          <textarea
+            value={template}
+            onChange={(e) => setTemplate(e.target.value)}
+            rows={4}
+            className="w-full rounded-xl bg-white/[0.05] border border-white/12 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none focus:ring-1 focus:ring-dourado/40 resize-none"
+          />
+          <div className="text-[11px] text-cream/50 mt-2">
+            Use {"{nome}"} pra o nome do cliente. A mensagem é enviada como template, fora da janela de 24h.
+          </div>
+          <div className="mt-3 bg-[#f4e8d6] border border-black/5 rounded-xl rounded-tl-sm px-4 py-3 text-sm text-[#4a1020] leading-relaxed">
+            {template.replace("{nome}", "Maria")}
+          </div>
+          <div className="flex justify-end gap-2 mt-5">
+            <button
+              onClick={() => setPersonalizando(false)}
+              className="px-3.5 py-2 rounded-lg text-sm text-cream/70 border border-white/12 hover:bg-white/[0.06] transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={salvarTemplate}
+              disabled={salvandoMsg || !template.trim()}
+              className="btn-cobre press px-4 py-2 text-sm font-semibold rounded-lg inline-flex items-center gap-1.5 disabled:opacity-50"
+            >
+              Salvar mensagem
+            </button>
+          </div>
+        </Overlay>
+      ) : null}
 
       {/* ---------------- Modal: preview da cobrança ---------------- */}
       {preview ? (

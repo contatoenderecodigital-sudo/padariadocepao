@@ -152,18 +152,18 @@ export const CONVERSAS_MOCK: Conversa[] = [
     clienteNome: "Maria de Souza",
     clienteTelefone: "(49) 9 9111-1111",
     ultimaHora: "10:42",
-    previa: "Fechado! Deixei seu pedido pra sábado às 14h 😊",
+    previa: "Fechado, deixei seu pedido pra sábado às 14h.",
     estado: "ia",
     naoLidas: 0,
     mensagens: [
       { de: "cliente", texto: "Oi, bom dia! Vcs fazem salgado pra festa?", hora: "10:31" },
-      { de: "ia", texto: "Bom dia! 😊 Fazemos sim! Salgado assado sai R$ 1,25 e frito R$ 1,00 a unidade. É pra quantas pessoas a festa?", hora: "10:31" },
+      { de: "ia", texto: "Bom dia! Fazemos sim. Salgado assado sai R$ 1,25 e frito R$ 1,00 a unidade. É pra quantas pessoas a festa?", hora: "10:31" },
       { de: "cliente", texto: "umas 20 pessoas, dia 18 (sabado)", hora: "10:38" },
-      { de: "ia", texto: "Perfeito! Pra 20 pessoas eu sugiro uns 200 salgados. Quer só salgado ou coloco uns docinhos também? Nosso brigadeiro sai R$ 1,25 🍫", hora: "10:38" },
+      { de: "ia", texto: "Perfeito. Pra 20 pessoas eu sugiro uns 200 salgados. Quer só salgado ou coloco uns docinhos também? Nosso brigadeiro sai R$ 1,25.", hora: "10:38" },
       { de: "cliente", texto: "poe 100 salgado assado, 50 brigadeiro e um bolo de 4 leites", hora: "10:40" },
-      { de: "ia", texto: "Fechou! Ficou assim:\n\n100× Salgado assado — R$ 125,00\n50× Brigadeiro — R$ 62,50\n1× Bolo 4 leites — R$ 46,90\n\n*Total: R$ 234,40* (paga na retirada)\nRetirada sábado 18/07 às 14h. Confirma pra mim? 😊", hora: "10:41" },
+      { de: "ia", texto: "Fechou! Ficou assim:\n\n100x Salgado assado: R$ 125,00\n50x Brigadeiro: R$ 62,50\n1x Bolo 4 leites: R$ 46,90\n\n*Total: R$ 234,40* (paga na retirada)\nRetirada sábado 18/07 às 14h. Confirma pra mim?", hora: "10:41" },
       { de: "cliente", texto: "isso, pode confirmar", hora: "10:42" },
-      { de: "ia", texto: "Fechado! Deixei seu pedido pra sábado às 14h 😊 Qualquer coisa é só chamar!", hora: "10:42" },
+      { de: "ia", texto: "Fechado, deixei seu pedido pra sábado às 14h. Qualquer coisa é só chamar.", hora: "10:42" },
     ],
   },
   {
@@ -176,9 +176,9 @@ export const CONVERSAS_MOCK: Conversa[] = [
     naoLidas: 1,
     mensagens: [
       { de: "cliente", texto: "oi, queria encomendar um bolo pra um casamento", hora: "10:10" },
-      { de: "ia", texto: "Que lindo! 💍 Temos bolos recheados a partir de R$ 46,90. Você já tem um sabor em mente?", hora: "10:11" },
+      { de: "ia", texto: "Que lindo! Temos bolos recheados a partir de R$ 46,90. Você já tem um sabor em mente?", hora: "10:11" },
       { de: "cliente", texto: "queria um bolo bem diferente, de 3 andares, com uma decoração especial. consegue me ajudar a escolher?", hora: "10:15" },
-      { de: "ia", texto: "Esse é um pedido especial, que a nossa equipe adora fazer com carinho. Vou chamar alguém da nossa equipe pra montar isso com você certinho, tá? Já já te respondem 😊", hora: "10:15" },
+      { de: "ia", texto: "Esse é um pedido especial, que a nossa equipe adora fazer com carinho. Vou chamar alguém da equipe pra montar isso com você certinho. Já já te respondem.", hora: "10:15" },
     ],
   },
   {
@@ -191,7 +191,7 @@ export const CONVERSAS_MOCK: Conversa[] = [
     naoLidas: 0,
     mensagens: [
       { de: "cliente", texto: "que horas abre amanha?", hora: "09:27" },
-      { de: "ia", texto: "Abrimos às 6h30 da manhã! ☀️ Te espero por aqui.", hora: "09:28" },
+      { de: "ia", texto: "Abrimos às 6h30 da manhã! Te espero por aqui.", hora: "09:28" },
     ],
   },
   {
@@ -204,7 +204,7 @@ export const CONVERSAS_MOCK: Conversa[] = [
     naoLidas: 0,
     mensagens: [
       { de: "cliente", texto: "vcs tem pão de queijo de manhã?", hora: "02:13" },
-      { de: "ia", texto: "Temos sim, quentinho todo dia! 🧀 A partir das 6h30. Aparece que vale a pena 😉", hora: "02:14" },
+      { de: "ia", texto: "Temos sim, quentinho todo dia! A partir das 6h30. Aparece que vale a pena.", hora: "02:14" },
     ],
   },
 ];

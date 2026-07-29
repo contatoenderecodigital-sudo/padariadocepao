@@ -243,7 +243,7 @@ export default function FilaAprovacao({
           <h1 className="font-title text-3xl font-bold text-cream mt-1">
             {fila.length > 0
               ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
-              : "Tudo aprovado 🎉"}
+              : "Tudo aprovado"}
           </h1>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function FilaAprovacao({
           }
         >
           {ultimo.acao === "aprovado" ? (
-            <>Pedido de <b>{ultimo.nome}</b> aprovado, saiu na impressora da cozinha. 🖨️</>
+            <>Pedido de <b>{ultimo.nome}</b> aprovado, saiu na impressora da cozinha.</>
           ) : (
             <>Pedido de <b>{ultimo.nome}</b> recusado.</>
           )}
@@ -285,7 +285,9 @@ export default function FilaAprovacao({
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-white/12 glass-soft px-8 py-16 text-center">
-          <div className="text-4xl mb-3">☕</div>
+          <div className="mx-auto w-14 h-14 rounded-2xl grid place-items-center text-dourado mb-3" style={{ background: "rgba(212,175,55,0.12)" }}>
+            <CheckCircle2 size={26} />
+          </div>
           <div className="tracking-tight-apple text-xl font-bold text-cream">
             Fila vazia
           </div>

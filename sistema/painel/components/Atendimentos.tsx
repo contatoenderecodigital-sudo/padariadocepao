@@ -9,12 +9,11 @@ import type { Conversa, Mensagem } from "@/lib/tipos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatarTelefoneBR, linkWhatsapp } from "@/lib/tipos";
 import {
-  Search, Plus, Smile, Paperclip, SendHorizontal, MoreVertical, Zap,
-  UserRound, Bot, ShoppingBag, Clock, CheckCheck, Archive, Ban, X,
+  Search, Plus, Paperclip, SendHorizontal, MoreVertical, Zap,
+  UserRound, Bot, ShoppingBag, Clock, CheckCheck, Archive, Ban, X, MessageSquare,
 } from "lucide-react";
 
 const CORES = ["#5b8c7b", "#c58a3d", "#7a6cae", "#4a7ba6", "#a85b52", "#6f9b52", "#b0713e", "#8a5a86"];
-const EMOJIS = ["😊", "👍", "🙏", "🎉", "🍰", "🧁", "🥖", "😍", "👋", "✅", "❤️", "😉", "🤝", "🔥", "😅", "☕"];
 
 // Respostas rapidas (canned) da padaria. Digite "/" no campo ou clique no raio.
 const RESPOSTAS = [
@@ -150,7 +149,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const [notas, setNotas] = useState<Record<string, string>>({});
   const [arquivadas, setArquivadas] = useState<Record<string, boolean>>({});
   const [resolvidas, setResolvidas] = useState<Record<string, boolean>>({});
-  const [emojiAberto, setEmojiAberto] = useState(false);
   const [menuAberto, setMenuAberto] = useState(false);
   const [addTag, setAddTag] = useState(false);
   const [novaTag, setNovaTag] = useState("");
@@ -204,7 +202,19 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   }, [ativa?.id, mensagens.length]);
 
   if (!ativa) {
-    return <div className="px-6 py-6 text-cream/60">Nenhuma conversa ainda.</div>;
+    return (
+      <div className="h-screen grid place-items-center px-6 text-center">
+        <div>
+          <div className="mx-auto w-14 h-14 rounded-2xl grid place-items-center text-dourado mb-3" style={{ background: "rgba(212,175,55,0.12)" }}>
+            <MessageSquare size={26} />
+          </div>
+          <div className="tracking-tight-apple text-xl font-bold text-cream">Nenhuma conversa ainda</div>
+          <p className="text-sm text-cream/60 mt-1 max-w-xs mx-auto">
+            Quando um cliente chamar no WhatsApp, a conversa aparece aqui.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   const resolvida = resolvidas[ativa.id];
@@ -227,7 +237,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
     setMsgsExtra((m) => ({ ...m, [ativa.id]: [...(m[ativa.id] ?? []), { de: "equipe", texto: t, hora: agora() }] }));
     setTexto("");
     setControle((c) => ({ ...c, [ativa.id]: "humano" })); // digitou = assumiu
-    setEmojiAberto(false);
   }
   function anexar(nome: string) {
     setMsgsExtra((m) => ({ ...m, [ativa.id]: [...(m[ativa.id] ?? []), { de: "equipe", texto: `Enviou um arquivo: ${nome}`, hora: agora() }] }));
@@ -381,9 +390,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
 
               {/* composer */}
               <div className="relative flex items-center gap-1.5 pb-2.5">
-                <button onClick={() => setEmojiAberto((v) => !v)} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Emoji">
-                  <Smile size={19} />
-                </button>
                 <button onClick={() => fileRef.current?.click()} className="w-9 h-9 grid place-items-center rounded-full text-cream/55 hover:text-cream hover:bg-white/10 transition-colors" aria-label="Anexar arquivo">
                   <Paperclip size={18} />
                 </button>
@@ -401,19 +407,6 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
                 <button onClick={enviar} disabled={!texto.trim()} className="grad-cobre press w-10 h-10 rounded-full grid place-items-center text-white shrink-0 shadow-[0_6px_16px_rgba(143,71,18,0.3)] disabled:opacity-45 disabled:cursor-default" aria-label="Enviar">
                   <SendHorizontal size={18} />
                 </button>
-
-                {emojiAberto && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setEmojiAberto(false)} />
-                    <div className="absolute left-0 bottom-14 z-20 w-64 rounded-[16px] p-2 grid grid-cols-8 gap-0.5" style={POPOVER}>
-                      {EMOJIS.map((e) => (
-                        <button key={e} onClick={() => { setTexto((t) => t + e); }} className="text-lg rounded-lg hover:bg-white/10 aspect-square grid place-items-center">
-                          {e}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
 
                 {mostrarRespostas && (
                   <>
