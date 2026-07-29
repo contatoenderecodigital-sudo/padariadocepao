@@ -17,7 +17,8 @@ import { motorPadrao, formatarOrcamento, type Motor, type LinhaCotacao } from ".
 const MODELO = process.env.MODELO_IA || "gpt-4o-mini";
 
 // Um tenant = a persona (voz/regras) + o motor de orçamento (cardápio) do negócio.
-export type Tenant = { persona: ConfigNegocio; motor: Motor };
+// avisoDoDia: "cérebro temporário" do dia (já filtrado: só vem preenchido se for de hoje).
+export type Tenant = { persona: ConfigNegocio; motor: Motor; avisoDoDia?: string | null };
 
 // As ferramentas que a IA pode chamar (formato OpenAI). Descrição prescritiva.
 const FERRAMENTAS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -175,7 +176,7 @@ export async function responder(
   // Lê OPENAI_API_KEY do ambiente. OPENAI_BASE_URL (opcional) aponta pra outro
   // provedor compatível (Gemini/DeepSeek/OpenRouter) sem mudar código.
   const client = new OpenAI({ baseURL: process.env.OPENAI_BASE_URL || undefined });
-  const system = montarSystemPrompt(tenant.persona, tenant.motor.cardapioResumo());
+  const system = montarSystemPrompt(tenant.persona, tenant.motor.cardapioResumo(), tenant.avisoDoDia);
 
   const estado = { precisaHumano: false, pedido: null as RespostaIA["pedidoRegistrado"] };
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [

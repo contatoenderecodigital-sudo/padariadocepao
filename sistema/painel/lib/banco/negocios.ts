@@ -124,6 +124,32 @@ export async function carregarCredsWhatsapp(negocioId: string): Promise<CredsWha
   return { phoneId: n?.phone_id ?? null, token: n?.token ?? null, iaAtiva: n?.ia_ativa ?? true };
 }
 
+// AVISO DO DIA — "cérebro temporário" que a dona escreve (ex: "sem pão após
+// 18h"). Fica no config; a IA injeta SE for de hoje. Expira sozinho na virada.
+export type AvisoDoDia = { texto: string | null; atualizadoEm: string | null };
+export async function carregarAvisoDoDia(negocioId: string): Promise<AvisoDoDia> {
+  const n = await queryUm<{ texto: string | null; atualizado_em: string | null }>(
+    `select config->>'aviso_do_dia' as texto, config->>'aviso_atualizado_em' as atualizado_em
+       from negocios where id = $1`,
+    [negocioId],
+  );
+  return { texto: n?.texto ?? null, atualizadoEm: n?.atualizado_em ?? null };
+}
+export async function salvarAvisoDoDia(negocioId: string, texto: string): Promise<void> {
+  await query(
+    `update negocios set config = coalesce(config, '{}'::jsonb) || jsonb_build_object(
+       'aviso_do_dia', $2::text, 'aviso_atualizado_em', $3::text
+     ) where id = $1`,
+    [negocioId, texto, new Date().toISOString()],
+  );
+}
+export async function limparAvisoDoDia(negocioId: string): Promise<void> {
+  await query(
+    `update negocios set config = config - 'aviso_do_dia' - 'aviso_atualizado_em' where id = $1`,
+    [negocioId],
+  );
+}
+
 export type NegocioMarca = {
   nome: string;
   corPrimaria: string | null;

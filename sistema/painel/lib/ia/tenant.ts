@@ -7,12 +7,15 @@
 import { queryUm } from "../banco/db";
 import { criarMotor, motorPadrao, type Produto, type Rendimento } from "./orcamento";
 import { DOCE_PAO, type ConfigNegocio } from "./persona";
+import { ehHojeBR } from "../aviso";
 import type { Tenant } from "./cerebro";
 
 type ConfigDB = {
   persona?: { horario?: string; prazoMinimoDias?: number; cobraSinal?: boolean };
   rendimento?: { salgado_por_pessoa?: number; doce_por_pessoa?: number; cento_serve_pessoas?: number };
   cardapio?: Record<string, { nome: string; preco: number }[]>;
+  aviso_do_dia?: string;
+  aviso_atualizado_em?: string;
 };
 
 const CATEGORIA: Record<string, string> = {
@@ -35,8 +38,11 @@ export async function carregarTenant(negocioId: string): Promise<Tenant> {
     cobraSinal: cfg.persona?.cobraSinal ?? false,
   };
 
+  // Aviso do dia: só entra se foi escrito HOJE (senão expira sozinho).
+  const avisoDoDia = ehHojeBR(cfg.aviso_atualizado_em) ? cfg.aviso_do_dia ?? null : null;
+
   // Sem cardápio próprio no banco → motor padrão (Doce Pão).
-  if (!cfg.cardapio) return { persona, motor: motorPadrao };
+  if (!cfg.cardapio) return { persona, motor: motorPadrao, avisoDoDia };
 
   // Achata o cardápio do config numa lista de produtos.
   const produtos: Produto[] = [];
@@ -54,5 +60,5 @@ export async function carregarTenant(negocioId: string): Promise<Tenant> {
     confirmar: true,
   };
 
-  return { persona, motor: criarMotor(produtos, rendimento) };
+  return { persona, motor: criarMotor(produtos, rendimento), avisoDoDia };
 }

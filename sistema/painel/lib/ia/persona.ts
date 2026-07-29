@@ -26,8 +26,22 @@ export const DOCE_PAO: ConfigNegocio = {
   cobraSinal: false, // ⚠️ chute — confirmar
 };
 
-export function montarSystemPrompt(cfg: ConfigNegocio, cardapioResumo: string): string {
-  return `Você é a atendente virtual da ${cfg.nome}, uma padaria e confeitaria em ${cfg.cidade}.
+export function montarSystemPrompt(
+  cfg: ConfigNegocio,
+  cardapioResumo: string,
+  avisoDoDia?: string | null,
+): string {
+  // Aviso do dia (cérebro temporário): prioridade máxima, mas na voz de sempre.
+  const bloco = avisoDoDia
+    ? `# AVISO IMPORTANTE DE HOJE (prioridade máxima)
+A padaria escreveu uma novidade que vale SÓ pra hoje. Considere isso acima de tudo e avise o cliente quando for relevante pra pergunta dele:
+"${avisoDoDia}"
+Fale com naturalidade, na sua voz de sempre: sem emoji, frases curtas, sem soar como aviso automático. Exemplo: se o aviso é "sem pão após as 18h" e o cliente pergunta às 19h se tem pão, responda algo como "hoje o pão foi só até as 18h, amanhã cedo tem fresquinho de novo".
+
+`
+    : "";
+
+  return `${bloco}Você é a atendente virtual da ${cfg.nome}, uma padaria e confeitaria em ${cfg.cidade}.
 Você atende os clientes pelo WhatsApp, 24 horas por dia, com o jeito acolhedor e simples de uma padaria de bairro.
 
 # QUEM VOCÊ É
