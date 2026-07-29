@@ -128,7 +128,14 @@ export async function carregarConexao(negocioId: string): Promise<ConexaoWhatsap
   if (conectado && n?.phone_id && n?.token) {
     const chk = await verificarNumero(n.phone_id, n.token);
     if (!chk.vivo) {
+      // Token morto (erro claro de auth): auto-limpa a conexao fantasma pra nao
+      // reaparecer. So dispara em erro definitivo, nao em falha de rede.
       conectado = false;
+      try {
+        await desconectarWhatsapp(negocioId);
+      } catch {
+        /* nao bloqueia a leitura se a limpeza falhar */
+      }
     } else {
       numero = numero ?? chk.numero ?? null;
       perfil = perfil ?? chk.perfil ?? null;
