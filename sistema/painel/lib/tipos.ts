@@ -44,6 +44,10 @@ export type Pedido = {
   // Preparados para dados reais do banco (opcionais):
   formaPagamento?: FormaPagamento | null;
   historicoCliente?: HistoricoCliente | null;
+  // Recuperacao de orcamento: quando a cobranca automatica ja disparou e se o
+  // cliente ja visualizou. Ausentes ate haver o dado (UI mostra estado honesto).
+  cobrancaEm?: string | null; // ISO do envio automatico da cobranca
+  clienteViuEm?: string | null; // ISO da visualizacao (read receipt), se houver
 };
 
 export type Mensagem = {

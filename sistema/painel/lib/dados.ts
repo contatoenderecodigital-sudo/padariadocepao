@@ -7,7 +7,7 @@
 
 import { cache } from "react";
 import { bancoConfigurado } from "./banco/db";
-import { PEDIDOS_MOCK } from "./mock";
+import { PEDIDOS_MOCK, ORCAMENTOS_PARADOS_MOCK, METRICAS_MOCK } from "./mock";
 import type { Pedido } from "./tipos";
 
 // cache(): dentro da MESMA requisição, o layout e a página compartilham o
@@ -21,11 +21,28 @@ export const carregarFilaAprovacao = cache(async (negocioId?: string): Promise<P
 });
 
 export async function carregarParados(negocioId?: string): Promise<Pedido[]> {
-  if (!bancoConfigurado || !negocioId) {
-    return PEDIDOS_MOCK.filter((p) => p.status === "orcado");
-  }
+  if (!bancoConfigurado || !negocioId) return ORCAMENTOS_PARADOS_MOCK;
   const { listarParados } = await import("./banco/pedidos");
   return listarParados(negocioId);
+}
+
+// Resultado da recuperação (o card "recuperados este mês" que prova o valor).
+// Em demo, vem das métricas mock. Com banco real, ainda não há rastreio de
+// recuperação, então volta honesto (temDados=false -> a UI mostra travessão).
+export type StatsRecuperacao = {
+  recuperadoCentavos: number;
+  recuperadosQtd: number;
+  temDados: boolean;
+};
+export async function carregarStatsRecuperacao(negocioId?: string): Promise<StatsRecuperacao> {
+  if (!bancoConfigurado || !negocioId) {
+    return {
+      recuperadoCentavos: METRICAS_MOCK.valorRecuperadoCentavos,
+      recuperadosQtd: METRICAS_MOCK.orcamentosRecuperados,
+      temDados: true,
+    };
+  }
+  return { recuperadoCentavos: 0, recuperadosQtd: 0, temDados: false };
 }
 
 // Pedidos aprovados (a producao do dia). Sem banco, cai no mock.

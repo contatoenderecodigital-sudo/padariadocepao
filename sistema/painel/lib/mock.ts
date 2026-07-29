@@ -64,9 +64,50 @@ export const PEDIDOS_MOCK: Pedido[] = [
   },
 ];
 
-// candidatos à recuperação (orçamento parado, cliente sumiu sem confirmar)
+// candidatos à recuperação (orçamento parado, cliente sumiu sem confirmar).
+// Idades variadas de propósito, pra a tela mostrar a urgência por cor
+// (1 dia dourado, alguns dias cobre, 7+ dias vermelho) e ordenar por prioridade.
+const horas = (h: number) => new Date(hoje.getTime() - 1000 * 60 * 60 * h).toISOString();
 export const ORCAMENTOS_PARADOS_MOCK: Pedido[] = [
   {
+    // 8 dias parado, retirada sem data, cobrança automática já foi e o cliente
+    // até visualizou, mas não respondeu. Prioridade máxima (vermelho).
+    id: "o3",
+    clienteNome: "Fernanda Costa",
+    clienteTelefone: "(49) 9 9888-1234",
+    status: "orcado",
+    retiradaData: null,
+    retiradaHora: null,
+    pessoas: 120,
+    totalCentavos: 124000,
+    observacoes: "Casamento. Pediu bolo de 3 andares com decoração especial.",
+    criadoEm: horas(8 * 24),
+    cobrancaEm: horas(6 * 24),
+    clienteViuEm: horas(5 * 24),
+    itens: [
+      { produto: "Bolo 3 andares", categoria: "bolo_recheado", qtd: 1, unitCentavos: 98000, subtotalCentavos: 98000 },
+      { produto: "Salgado assado", categoria: "salgado", qtd: 200, unitCentavos: 130, subtotalCentavos: 26000 },
+    ],
+  },
+  {
+    // 3 dias parado, retirada AMANHÃ. Urgência real alta apesar da cor cobre.
+    id: "o2",
+    clienteNome: "Roberto Lima",
+    clienteTelefone: "(49) 9 9555-7788",
+    status: "orcado",
+    retiradaData: maisDias(1),
+    retiradaHora: "08:00",
+    pessoas: null,
+    totalCentavos: 18000,
+    observacoes: "Café da firma. Pediu orçamento e sumiu.",
+    criadoEm: horas(3 * 24 + 2),
+    itens: [
+      { produto: "Salgado assado", categoria: "salgado", qtd: 100, unitCentavos: 125, subtotalCentavos: 12500 },
+      { produto: "Mini pizza", categoria: "salgado", qtd: 20, unitCentavos: 275, subtotalCentavos: 5500 },
+    ],
+  },
+  {
+    // ~1 dia parado, cobrança automática já disparou. Atenção (dourado).
     id: "o1",
     clienteNome: "Ana Beatriz",
     clienteTelefone: "(49) 9 9333-3333",
@@ -76,10 +117,28 @@ export const ORCAMENTOS_PARADOS_MOCK: Pedido[] = [
     pessoas: 30,
     totalCentavos: 50000,
     observacoes: "Falou que ia ver com o marido.",
-    criadoEm: new Date(hoje.getTime() - 1000 * 60 * 60 * 26).toISOString(),
+    criadoEm: horas(26),
+    cobrancaEm: horas(2),
     itens: [
       { produto: "Salgado assado", categoria: "salgado", qtd: 300, unitCentavos: 125, subtotalCentavos: 37500 },
       { produto: "Brigadeiro", categoria: "doce", qtd: 100, unitCentavos: 125, subtotalCentavos: 12500 },
+    ],
+  },
+  {
+    // 5 horas parado, ainda não cobrado. Recém-parado (dourado).
+    id: "o4",
+    clienteNome: "Marcos Vinícius",
+    clienteTelefone: "(49) 9 9222-4646",
+    status: "orcado",
+    retiradaData: maisDias(3),
+    retiradaHora: "15:00",
+    pessoas: null,
+    totalCentavos: 9600,
+    observacoes: null,
+    criadoEm: horas(5),
+    itens: [
+      { produto: "Coxinha", categoria: "salgado", qtd: 60, unitCentavos: 100, subtotalCentavos: 6000 },
+      { produto: "Trufa de morango", categoria: "doce", qtd: 16, unitCentavos: 225, subtotalCentavos: 3600 },
     ],
   },
 ];
