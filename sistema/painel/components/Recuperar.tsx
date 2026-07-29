@@ -184,7 +184,7 @@ export default function Recuperar({
 
         <Kpi icon={<Target size={18} />} rotulo="Taxa de recuperação" accent="#5fd08a">
           {taxa === null ? (
-            <span className="font-title text-[26px] font-bold text-cream/50">—</span>
+            <span className="text-sm text-cream/40 font-medium">Sem dados ainda</span>
           ) : (
             <NumberTicker
               value={taxa}
@@ -215,7 +215,7 @@ export default function Recuperar({
                 {autoOn ? "Ativada" : "Desligada"}
               </span>
             </div>
-            <div className="text-[12px] text-cream/55 mt-0.5 max-w-md truncate">
+            <div className="text-[12px] text-cream/55 mt-0.5">
               Envia sozinha: "Oi! Seu orçamento ainda está de pé. Quer confirmar?"
             </div>
           </div>
