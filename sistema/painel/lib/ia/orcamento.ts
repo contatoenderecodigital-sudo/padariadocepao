@@ -148,7 +148,7 @@ export function formatarOrcamento(c: Cotacao, titulo = "Orçamento"): string {
   L.push("".padEnd(28, "."));
   L.push(`*Total: ${brl(c.total)}*`);
   L.push("(paga na retirada)");
-  if (c.estimativa) L.push("\nObs: as quantidades são uma estimativa, a equipe confirma o rendimento.");
+  if (c.estimativa) L.push("\nEssa quantidade é uma sugestão pro tamanho da festa. Se quiser mais ou menos de algo, é só falar.");
   if (c.avisos?.length) L.push("\n" + c.avisos.join("\n"));
   return L.join("\n");
 }

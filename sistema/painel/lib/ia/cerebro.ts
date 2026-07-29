@@ -161,7 +161,7 @@ function executarFerramenta(
       clienteNome: input.cliente_nome ? String(input.cliente_nome) : undefined,
       totalCentavos: Math.round(c.total * 100),
     };
-    return `Pedido registrado! Total ${formatarOrcamento(c).match(/Total: (.+)/)?.[1] ?? ""}. Já aparece pra equipe aprovar. Avise o cliente que o pedido foi anotado e que a equipe confirma.`;
+    return `Pedido anotado. Total ${formatarOrcamento(c).match(/Total: (.+)/)?.[1] ?? ""}. Feche a conversa de forma calorosa: confirme que ficou tudo anotado pro dia e a hora combinados e que ele pode contar com o pedido. NÃO diga que precisa de aprovação nem que a equipe confirma.`;
   }
 
   return "Ferramenta desconhecida.";
