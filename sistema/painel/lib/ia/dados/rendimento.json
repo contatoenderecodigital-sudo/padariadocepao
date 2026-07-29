@@ -5,20 +5,20 @@
 
   "salgado_por_pessoa": {
     "valor": 10,
-    "confirmar": true,
-    "nota": "Padrão de mercado: 8–12 salgados/pessoa numa festa. Chute conservador em 10. PERGUNTAR: 'Numa festa de 50 pessoas, quantos salgados vocês costumam mandar?'"
+    "confirmar": false,
+    "nota": "Media de mercado de buffet BR: 8 a 12 salgados/pessoa numa festa. 10 e o meio-termo classico. Da pra ajustar se a dona trabalhar com outra conta."
   },
 
   "doce_por_pessoa": {
-    "valor": 4,
-    "confirmar": true,
-    "nota": "Padrão de mercado: 3–5 doces/pessoa. Chute em 4. PERGUNTAR o número dela."
+    "valor": 5,
+    "confirmar": false,
+    "nota": "Media de mercado: 4 a 5 doces/pessoa. Usamos 5 (regra classica '10 salgados + 5 doces'). Evita faltar. Ajustavel."
   },
 
   "bolo_recheado_serve": {
     "valor": 20,
-    "confirmar": true,
-    "nota": "Quantas pessoas UM bolo recheado serve. Chute em 20 (bolo de aniversário médio). Depende do tamanho/peso que ela faz. PERGUNTAR."
+    "confirmar": false,
+    "nota": "1 bolo recheado serve ~20 pessoas (fatia de ~100g, bolo medio de aniversario). Ajustavel ao tamanho que a dona faz."
   },
 
   "pizza_inteira_serve": {
