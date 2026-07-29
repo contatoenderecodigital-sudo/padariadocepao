@@ -14,7 +14,7 @@ const ITENS: Item[] = [
   { href: "/dia", label: "Pedidos do dia", icon: "order" },
   { href: "/atendimentos", label: "Atendimentos", icon: "chat" },
   { href: "/recuperar", label: "Recuperar", icon: "restore" },
-  { href: "/numeros", label: "Números", icon: "chart" },
+  { href: "/numeros", label: "Resultados", icon: "chart" },
   { href: "/conectar", label: "Conectar WhatsApp", icon: "whatsapp" },
 ];
 
