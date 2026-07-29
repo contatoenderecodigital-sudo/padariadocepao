@@ -73,15 +73,44 @@ export type ConexaoWhatsapp = {
   mensagensHoje: number;
   problema?: boolean; // conexao caiu (alerta vermelho). Deteccao de queda: futuro.
 };
+// Confere na Meta se o numero ainda esta vivo (token valido). Evita a "conexao
+// fantasma": phone_id salvo no banco de um teste antigo, com token ja morto.
+// Defensivo: so trata como MORTO em erro claro de token/permissao; rede/timeout
+// nao derruba (pode ser transitorio).
+async function verificarNumero(
+  phoneId: string,
+  token: string,
+): Promise<{ vivo: boolean; numero?: string | null; perfil?: string | null }> {
+  try {
+    const r = await fetch(
+      `https://graph.facebook.com/v22.0/${phoneId}?fields=display_phone_number,verified_name`,
+      { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(5000) },
+    );
+    if (r.ok) {
+      const j = (await r.json()) as { display_phone_number?: string; verified_name?: string };
+      return { vivo: true, numero: j.display_phone_number ?? null, perfil: j.verified_name ?? null };
+    }
+    const j = (await r.json().catch(() => ({}))) as { error?: { code?: number; type?: string } };
+    const code = j?.error?.code;
+    // 190 token invalido/expirado, 102 sessao, 10/200/104 permissao, 100 objeto invalido.
+    const morto = [190, 102, 10, 200, 104, 100].includes(Number(code)) || j?.error?.type === "OAuthException";
+    return { vivo: !morto };
+  } catch {
+    return { vivo: true }; // rede/timeout: nao derruba, mantem o que o banco diz
+  }
+}
+
 export async function carregarConexao(negocioId: string): Promise<ConexaoWhatsapp> {
   const n = await queryUm<{
     phone_id: string | null;
+    token: string | null;
     numero: string | null;
     perfil: string | null;
     conectado_em: string | null;
     ia_ativa: boolean;
   }>(
     `select config->>'whatsapp_phone_id' as phone_id,
+            config->>'whatsapp_token' as token,
             config->>'whatsapp_numero' as numero,
             config->>'whatsapp_perfil' as perfil,
             config->>'whatsapp_conectado_em' as conectado_em,
@@ -89,7 +118,23 @@ export async function carregarConexao(negocioId: string): Promise<ConexaoWhatsap
        from negocios where id = $1`,
     [negocioId],
   );
-  const conectado = Boolean(n?.phone_id);
+
+  // Sem phone_id E token, nao ha conexao funcional.
+  let conectado = Boolean(n?.phone_id && n?.token);
+  let numero = n?.numero ?? null;
+  let perfil = n?.perfil ?? null;
+
+  // Confere na Meta se esta vivo; mata a conexao fantasma e preenche o numero real.
+  if (conectado && n?.phone_id && n?.token) {
+    const chk = await verificarNumero(n.phone_id, n.token);
+    if (!chk.vivo) {
+      conectado = false;
+    } else {
+      numero = numero ?? chk.numero ?? null;
+      perfil = perfil ?? chk.perfil ?? null;
+    }
+  }
+
   let mensagensHoje = 0;
   if (conectado) {
     const c = await queryUm<{ c: number }>(
@@ -99,11 +144,12 @@ export async function carregarConexao(negocioId: string): Promise<ConexaoWhatsap
     );
     mensagensHoje = c?.c ?? 0;
   }
+
   return {
     conectado,
     phoneId: n?.phone_id ?? null,
-    numero: n?.numero ?? null,
-    perfil: n?.perfil ?? null,
+    numero,
+    perfil,
     iaAtiva: n?.ia_ativa ?? true,
     conectadoEm: n?.conectado_em ?? null,
     mensagensHoje,
