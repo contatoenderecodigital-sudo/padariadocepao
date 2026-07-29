@@ -22,6 +22,19 @@ export async function salvarWhatsappTenant(
   );
 }
 
+// Credenciais do WhatsApp DESTE negocio (salvas pelo Embedded Signup no config).
+// O webhook usa isso pra responder pelo numero conectado do cliente, nao pelo
+// token global. Se o negocio ainda nao conectou, volta null e cai no env.
+export type CredsWhatsapp = { phoneId: string | null; token: string | null };
+export async function carregarCredsWhatsapp(negocioId: string): Promise<CredsWhatsapp> {
+  const n = await queryUm<{ phone_id: string | null; token: string | null }>(
+    `select config->>'whatsapp_phone_id' as phone_id, config->>'whatsapp_token' as token
+       from negocios where id = $1`,
+    [negocioId],
+  );
+  return { phoneId: n?.phone_id ?? null, token: n?.token ?? null };
+}
+
 export type NegocioMarca = {
   nome: string;
   corPrimaria: string | null;

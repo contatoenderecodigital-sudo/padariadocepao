@@ -24,6 +24,7 @@ import {
   registrarPedido,
   marcarWebhookNovo,
 } from "@/lib/banco/conversas";
+import { carregarCredsWhatsapp, type CredsWhatsapp } from "@/lib/banco/negocios";
 import { queryUm } from "@/lib/banco/db";
 import crypto from "node:crypto";
 
@@ -101,12 +102,17 @@ async function processar(corpo: WebhookPayload) {
         continue;
       }
 
+      // Credenciais DESTE negócio (número conectado pelo botão). Responde pelo
+      // número que recebeu a mensagem; token do tenant, com fallback no env.
+      const credsTenant = await carregarCredsWhatsapp(negocioId);
+      const creds = { phoneId: phoneNumberId ?? credsTenant.phoneId, token: credsTenant.token };
+
       const telefone = msg.from;
       const nomePerfil = valor.contacts?.[0]?.profile?.name;
       const clienteId = await acharOuCriarCliente(negocioId, telefone, nomePerfil);
 
       // Extrai o texto (ou transcreve o áudio).
-      const texto = await extrairTexto(msg);
+      const texto = await extrairTexto(msg, creds);
       if (!texto) continue;
 
       await salvarMensagem(negocioId, clienteId, "user", texto);
@@ -116,7 +122,7 @@ async function processar(corpo: WebhookPayload) {
       const tenant = await carregarTenant(negocioId);
       const resp = await responder(historico, tenant);
 
-      await enviarTexto(telefone, resp.texto);
+      await enviarTexto(telefone, resp.texto, creds);
       await salvarMensagem(negocioId, clienteId, "assistant", resp.texto);
 
       if (resp.pedidoRegistrado) {
@@ -128,10 +134,10 @@ async function processar(corpo: WebhookPayload) {
 }
 
 // Texto puro, ou áudio transcrito. Outros tipos: pede pra escrever.
-async function extrairTexto(msg: WhatsAppMessage): Promise<string | null> {
+async function extrairTexto(msg: WhatsAppMessage, creds: CredsWhatsapp): Promise<string | null> {
   if (msg.type === "text") return msg.text?.body ?? null;
   if (msg.type === "audio" && msg.audio?.id) {
-    const bin = await baixarMidia(msg.audio.id);
+    const bin = await baixarMidia(msg.audio.id, creds);
     return transcrever(bin);
   }
   return "[cliente mandou uma mídia que não é texto nem áudio]";
