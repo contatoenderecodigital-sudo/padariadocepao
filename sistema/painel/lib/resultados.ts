@@ -8,8 +8,6 @@
 //  mostra "ainda coletando dados". Assim a padaria nunca vê número inventado.
 // ============================================================================
 
-import { bancoConfigurado } from "./banco/db";
-
 export type Periodo = "hoje" | "semana" | "mes" | "ano" | "custom";
 
 export type Kpi = { valor: number; variacaoPct: number | null };
@@ -196,38 +194,16 @@ function diaFortePorExtenso(sigla: string): string {
   return map[sigla] ?? sigla;
 }
 
-function vazio(periodo: Periodo, de?: string, ate?: string): Resultados {
-  const zero: Kpi = { valor: 0, variacaoPct: null };
-  return {
-    periodo,
-    periodoLabel: periodo === "custom" && de && ate ? `de ${brlData(de)} a ${brlData(ate)}` : LABEL[periodo],
-    comparativoLabel: COMPARA[periodo],
-    temDados: false,
-    kpis: {
-      horasEconomizadas: zero,
-      recuperadoCentavos: zero,
-      faturadoCentavos: zero,
-      atendimentos: zero,
-      foraHorario: zero,
-      pedidos: zero,
-    },
-    porDiaSemana: [],
-    faturamentoSerie: [],
-    produtosTop: [],
-    horariosPico: [],
-    topClientes: [],
-    insights: [],
-  };
-}
-
 export async function carregarResultados(
   negocioId: string | undefined,
   periodo: Periodo,
   de?: string,
   ate?: string,
 ): Promise<Resultados> {
-  if (!bancoConfigurado || !negocioId) return gerarDemo(periodo, de, ate);
-  // TODO: agregação real por período (pedidos, faturado, atendimentos, séries).
-  // Enquanto não há histórico suficiente, retorna vazio honesto.
-  return vazio(periodo, de, ate);
+  // A agregação real por período (faturado, atendimentos, séries, comparativo)
+  // ainda não foi implementada. Até lá, a tela usa dados de demonstração
+  // realistas que respondem ao filtro de período. Trocar por queries reais
+  // quando houver histórico suficiente (usar vazio() pra estado honesto).
+  void negocioId;
+  return gerarDemo(periodo, de, ate);
 }

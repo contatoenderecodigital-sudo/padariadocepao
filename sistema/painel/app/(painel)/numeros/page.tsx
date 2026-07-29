@@ -1,25 +1,18 @@
-import Resultados from "@/components/Resultados";
-import { carregarResultados, type Periodo } from "@/lib/resultados";
-import { lerSessao } from "@/lib/auth";
-import { nomeNegocioAtual } from "@/lib/negocio";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-const VALIDOS: Periodo[] = ["hoje", "semana", "mes", "ano", "custom"];
-
+// Rota antiga: virou /resultados. Redireciona pra não quebrar links antigos.
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ periodo?: string; de?: string; ate?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const periodo: Periodo = VALIDOS.includes(sp.periodo as Periodo) ? (sp.periodo as Periodo) : "mes";
-
-  const sessao = await lerSessao();
-  const [dados, nome] = await Promise.all([
-    carregarResultados(sessao?.negocioId, periodo, sp.de, sp.ate),
-    nomeNegocioAtual(),
-  ]);
-
-  return <Resultados dados={dados} nome={nome} de={sp.de ?? ""} ate={sp.ate ?? ""} />;
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (typeof v === "string") qs.set(k, v);
+  }
+  const s = qs.toString();
+  redirect("/resultados" + (s ? `?${s}` : ""));
 }

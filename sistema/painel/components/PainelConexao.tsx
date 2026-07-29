@@ -13,7 +13,7 @@ import AjudaInfo from "./AjudaInfo";
 import { useEmbeddedSignup } from "./useEmbeddedSignup";
 import type { ConexaoWhatsapp } from "@/lib/banco/negocios";
 import {
-  Shield,
+  Lock,
   Clock,
   MessageSquare,
   CheckCircle2,
@@ -123,7 +123,7 @@ function Onboarding() {
 
       {/* selo de seguranca */}
       <div className="flex items-center gap-2 text-[12.5px] text-cream/55 mt-4">
-        <Shield size={15} className="text-[#5fd08a]" />
+        <Lock size={15} className="text-[#5fd08a]" />
         Conexão oficial e segura via Meta. Não pedimos a sua senha.
       </div>
 

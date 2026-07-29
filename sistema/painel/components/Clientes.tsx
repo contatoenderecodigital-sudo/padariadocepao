@@ -69,7 +69,9 @@ export default function Clientes({
   const sel = clientes.find((c) => c.id === selId) ?? lista[0] ?? null;
 
   const totalClientes = clientes.length;
-  const faturamento = clientes.reduce((s, c) => s + c.totalGastoCentavos, 0);
+  // Number() defensivo: o banco pode devolver o total como string (bigint do sum),
+  // e "s + string" concatenaria em vez de somar.
+  const faturamento = clientes.reduce((s, c) => s + (Number(c.totalGastoCentavos) || 0), 0);
   const aniversariantes = clientes.filter(
     (c) => c.aniversario && Number(c.aniversario.slice(5, 7)) === mesAtual,
   ).length;

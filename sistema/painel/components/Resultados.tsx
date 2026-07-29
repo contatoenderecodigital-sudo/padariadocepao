@@ -66,13 +66,13 @@ export default function Resultados({
   function trocar(p: Periodo) {
     if (p === "custom") {
       const hoje = new Date().toISOString().slice(0, 10);
-      router.push(`/numeros?periodo=custom&de=${d1 || hoje}&ate=${d2 || hoje}`);
+      router.push(`/resultados?periodo=custom&de=${d1 || hoje}&ate=${d2 || hoje}`);
     } else {
-      router.push(`/numeros?periodo=${p}`);
+      router.push(`/resultados?periodo=${p}`);
     }
   }
   function aplicarCustom() {
-    if (d1 && d2) router.push(`/numeros?periodo=custom&de=${d1}&ate=${d2}`);
+    if (d1 && d2) router.push(`/resultados?periodo=custom&de=${d1}&ate=${d2}`);
   }
 
   const K = dados.kpis;

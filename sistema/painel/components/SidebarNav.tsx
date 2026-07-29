@@ -15,7 +15,7 @@ const ITENS: Item[] = [
   { href: "/atendimentos", label: "Atendimentos", icon: "chat" },
   { href: "/clientes", label: "Clientes", icon: "clientes" },
   { href: "/recuperar", label: "Recuperar", icon: "restore" },
-  { href: "/numeros", label: "Resultados", icon: "chart" },
+  { href: "/resultados", label: "Resultados", icon: "chart" },
   { href: "/conectar", label: "Conectar WhatsApp", icon: "whatsapp" },
   { href: "/configuracoes", label: "Configurações", icon: "config" },
 ];
