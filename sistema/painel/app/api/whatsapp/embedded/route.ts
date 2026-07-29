@@ -65,12 +65,28 @@ export async function POST(req: NextRequest) {
       if (!regRes.ok && reg?.error?.code !== 133005) throw new Error("register falhou: " + JSON.stringify(reg));
     }
 
-    // 4) mapeia pro tenant do dono logado (ou o padrao)
+    // 4) busca o numero bonito + nome do perfil (pra mostrar no painel)
+    let numero: string | null = null;
+    let perfil: string | null = null;
+    try {
+      const infoRes = await fetch(
+        `${GRAPH}/${phone_number_id}?fields=display_phone_number,verified_name`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const info = (await infoRes.json()) as { display_phone_number?: string; verified_name?: string };
+      numero = info.display_phone_number ?? null;
+      perfil = info.verified_name ?? null;
+    } catch {
+      /* nao bloqueia a conexao se o fetch do numero falhar */
+    }
+
+    // 5) mapeia pro tenant do dono logado (ou o padrao)
     const sessao = await lerSessao();
     const negocioId = sessao?.negocioId ?? NEGOCIO_PADRAO;
-    if (negocioId) await salvarWhatsappTenant(negocioId, { phoneId: phone_number_id, wabaId: waba_id, token });
+    if (negocioId)
+      await salvarWhatsappTenant(negocioId, { phoneId: phone_number_id, wabaId: waba_id, token, numero, perfil });
 
-    return Response.json({ ok: true, phone_number_id, waba_id });
+    return Response.json({ ok: true, phone_number_id, waba_id, numero, perfil });
   } catch (e) {
     console.error("[embedded] erro:", e);
     return Response.json({ ok: false, erro: e instanceof Error ? e.message : String(e) }, { status: 500 });

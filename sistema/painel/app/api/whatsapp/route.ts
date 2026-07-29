@@ -15,7 +15,7 @@
 import { NextRequest, after } from "next/server";
 import { responder } from "@/lib/ia/cerebro";
 import { carregarTenant } from "@/lib/ia/tenant";
-import { enviarTexto, baixarMidia } from "@/lib/whatsapp/api";
+import { enviarTexto, baixarMidia, type CredsEnvio } from "@/lib/whatsapp/api";
 import { transcrever } from "@/lib/whatsapp/transcrever";
 import {
   acharOuCriarCliente,
@@ -24,7 +24,7 @@ import {
   registrarPedido,
   marcarWebhookNovo,
 } from "@/lib/banco/conversas";
-import { carregarCredsWhatsapp, type CredsWhatsapp } from "@/lib/banco/negocios";
+import { carregarCredsWhatsapp } from "@/lib/banco/negocios";
 import { queryUm } from "@/lib/banco/db";
 import crypto from "node:crypto";
 
@@ -116,6 +116,11 @@ async function processar(corpo: WebhookPayload) {
       if (!texto) continue;
 
       await salvarMensagem(negocioId, clienteId, "user", texto);
+
+      // IA desligada no painel: guarda a mensagem pra equipe ver, mas não
+      // responde automático (a equipe assume pelo Atendimentos).
+      if (!credsTenant.iaAtiva) continue;
+
       const historico = await carregarHistorico(negocioId, clienteId);
 
       // Carrega o cardápio/persona DESTE negócio (multi-tenant).
@@ -134,7 +139,7 @@ async function processar(corpo: WebhookPayload) {
 }
 
 // Texto puro, ou áudio transcrito. Outros tipos: pede pra escrever.
-async function extrairTexto(msg: WhatsAppMessage, creds: CredsWhatsapp): Promise<string | null> {
+async function extrairTexto(msg: WhatsAppMessage, creds: CredsEnvio): Promise<string | null> {
   if (msg.type === "text") return msg.text?.body ?? null;
   if (msg.type === "audio" && msg.audio?.id) {
     const bin = await baixarMidia(msg.audio.id, creds);
