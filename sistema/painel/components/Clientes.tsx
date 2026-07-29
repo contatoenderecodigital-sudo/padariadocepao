@@ -9,6 +9,7 @@ import Link from "next/link";
 import type { ClienteCRM, PedidoStatus } from "@/lib/tipos";
 import { brl, formatarTelefoneBR, linkWhatsapp, mesAno } from "@/lib/tipos";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import AjudaInfo from "@/components/AjudaInfo";
 import {
   Users,
   Search,
@@ -76,7 +77,10 @@ export default function Clientes({
   return (
     <div className="px-8 py-7">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">CRM</div>
-      <h1 className="font-title text-3xl font-bold text-cream mt-1">Clientes</h1>
+      <div className="flex items-center gap-2 mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream">Clientes</h1>
+        <AjudaInfo titulo="Clientes" texto="A ficha de cada cliente: histórico de pedidos, quanto já gastou, aniversário e as preferências que a equipe anota. Clique num cliente pra ver tudo e abrir a conversa dele." />
+      </div>
       <p className="text-sm text-cream/60 mt-1 mb-5 max-w-2xl">
         Todo mundo que já falou com a padaria, com histórico e preferências. Saiba quem fidelizar e
         atenda cada um pelo nome.

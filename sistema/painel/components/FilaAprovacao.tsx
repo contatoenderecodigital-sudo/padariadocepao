@@ -11,6 +11,7 @@ import type { Pedido, FormaPagamento, HistoricoCliente } from "@/lib/tipos";
 import { brl, formatarTelefoneBR, linkWhatsapp, mesAno } from "@/lib/tipos";
 import { Repeat, UserPlus, Wallet, CalendarDays, AlertTriangle, CreditCard, Banknote, Zap, CheckCircle2, Clock } from "lucide-react";
 import CupomPreview from "./CupomPreview";
+import AjudaInfo from "./AjudaInfo";
 
 // Icone verde do WhatsApp (marca; lucide nao tem logo de marca).
 function WhatsAppIcon({ size = 14 }: { size?: number }) {
@@ -240,11 +241,14 @@ export default function FilaAprovacao({
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
             Fila de aprovação
           </div>
-          <h1 className="font-title text-3xl font-bold text-cream mt-1">
-            {fila.length > 0
-              ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
-              : "Tudo aprovado"}
-          </h1>
+          <div className="flex items-center gap-2 mt-1">
+            <h1 className="font-title text-3xl font-bold text-cream">
+              {fila.length > 0
+                ? `${fila.length} pedido${fila.length > 1 ? "s" : ""} esperando você`
+                : "Tudo aprovado"}
+            </h1>
+            <AjudaInfo titulo="Fila de aprovação" texto="Pedidos que a IA fechou no WhatsApp esperando o seu OK. Aprovar manda pra cozinha e imprime; recusar avisa o cliente. Nenhum pedido entra em produção sem você ver." />
+          </div>
         </div>
       </div>
       <p className="text-sm text-cream/70 mb-6 max-w-xl">

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { brl } from "@/lib/tipos";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import AjudaInfo from "@/components/AjudaInfo";
 import type { Resultados as Dados, Periodo, PontoSerie } from "@/lib/resultados";
 import {
   ResponsiveContainer,
@@ -85,9 +86,12 @@ export default function Resultados({
           <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
             Resultados
           </div>
-          <h1 className="font-title text-3xl font-bold text-cream mt-1">
-            O que a {nome || "padaria"} fez {dados.periodoLabel}
-          </h1>
+          <div className="flex items-center gap-2 mt-1">
+            <h1 className="font-title text-3xl font-bold text-cream">
+              O que a {nome || "padaria"} fez {dados.periodoLabel}
+            </h1>
+            <AjudaInfo titulo="Resultados" texto="Os números do negócio no período que você escolher lá em cima: faturamento, atendimentos, produtos mais vendidos e clientes que mais compram. Serve pra tomar decisão." />
+          </div>
           <p className="text-sm text-cream/65 mt-1 max-w-2xl">
             Não é achismo. É o resultado em número: tempo de volta, pedidos atendidos, dinheiro que
             entrou e o que decidir a seguir.

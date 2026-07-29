@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ConectarWhatsApp from "./ConectarWhatsApp";
+import AjudaInfo from "./AjudaInfo";
 import { useEmbeddedSignup } from "./useEmbeddedSignup";
 import type { ConexaoWhatsapp } from "@/lib/banco/negocios";
 import {
@@ -45,9 +46,12 @@ export default function PainelConexao({
   return (
     <div className="px-8 py-7">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">Conectar</div>
-      <h1 className="font-title text-3xl font-bold text-cream mt-1">
-        {conexao.conectado ? "WhatsApp do atendimento" : "Conectar o WhatsApp"}
-      </h1>
+      <div className="flex items-center gap-2 mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream">
+          {conexao.conectado ? "WhatsApp do atendimento" : "Conectar o WhatsApp"}
+        </h1>
+        <AjudaInfo titulo="Conectar WhatsApp" texto="Onde você conecta o número de WhatsApp da padaria pra IA atender. Depois de conectado, aqui você liga, desliga, reconecta ou troca o número." />
+      </div>
       <p className="text-sm text-cream/60 mt-1 mb-8 max-w-2xl">
         {conexao.conectado
           ? `O número de ${nome || "sua padaria"} está ligado ao atendimento com IA. Gerencie a conexão aqui.`

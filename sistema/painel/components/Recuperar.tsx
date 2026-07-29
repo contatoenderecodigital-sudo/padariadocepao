@@ -10,6 +10,7 @@ import Link from "next/link";
 import type { Pedido } from "@/lib/tipos";
 import { brl, formatarTelefoneBR, linkWhatsapp } from "@/lib/tipos";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import AjudaInfo from "@/components/AjudaInfo";
 import {
   AlertTriangle,
   TrendingUp,
@@ -150,9 +151,12 @@ export default function Recuperar({
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">
         Recuperar orçamento
       </div>
-      <h1 className="font-title text-3xl font-bold text-cream mt-1">
-        Dinheiro que ia embora sem ninguém perceber
-      </h1>
+      <div className="flex items-center gap-2 mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream">
+          Dinheiro que ia embora sem ninguém perceber
+        </h1>
+        <AjudaInfo titulo="Recuperar orçamento" texto="Clientes que pediram orçamento e sumiram sem confirmar. O sistema cobra sozinho na hora certa, e aqui você vê quem priorizar e dá o empurrão com um toque." />
+      </div>
       <p className="text-sm text-cream/65 mt-1 mb-6 max-w-2xl">
         Clientes que pediram orçamento e sumiram sem confirmar. O sistema cobra sozinho na hora
         certa, mas aqui você vê quem priorizar e dá o empurrão com um toque.

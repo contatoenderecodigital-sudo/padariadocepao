@@ -1,5 +1,6 @@
 import AvisoDoDia from "@/components/AvisoDoDia";
 import ToggleIA from "@/components/ToggleIA";
+import AjudaInfo from "@/components/AjudaInfo";
 import { lerSessao } from "@/lib/auth";
 import { bancoConfigurado } from "@/lib/banco/db";
 import { carregarAvisoDoDia, carregarIaAtiva } from "@/lib/banco/negocios";
@@ -31,7 +32,10 @@ export default async function Page() {
   return (
     <div className="px-8 py-7">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">Configurações</div>
-      <h1 className="font-title text-3xl font-bold text-cream mt-1">Configurações</h1>
+      <div className="flex items-center gap-2 mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream">Configurações</h1>
+        <AjudaInfo titulo="Configurações" texto="Ajustes do atendimento: ligue ou desligue a IA e escreva o aviso do dia que a IA deve passar aos clientes." />
+      </div>
       <p className="text-sm text-cream/60 mt-1 mb-8 max-w-2xl">
         Ajustes do atendimento: ligue ou desligue a IA e avise as novidades do dia.
       </p>

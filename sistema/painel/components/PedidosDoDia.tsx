@@ -17,6 +17,7 @@ import {
 } from "@/lib/departamentos";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { DeptIcone } from "@/components/DeptIcone";
+import AjudaInfo from "@/components/AjudaInfo";
 
 type StatusUI = "a_produzir" | "pronto" | "retirado";
 
@@ -118,7 +119,10 @@ export default function PedidosDoDia({ pedidos }: { pedidos: Pedido[] }) {
   return (
     <div className="px-8 py-7 min-h-screen">
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">Pedidos do dia</div>
-      <h1 className="font-title text-3xl font-bold text-cream mt-1">Produção da cozinha</h1>
+      <div className="flex items-center gap-2 mt-1">
+        <h1 className="font-title text-3xl font-bold text-cream">Produção da cozinha</h1>
+        <AjudaInfo titulo="Pedidos do dia" texto="A produção do dia separada por estação (padaria, salgados, confeitaria, bolos). Cada equipe vê só o que precisa fazer e marca o que já ficou pronto." />
+      </div>
       <p className="text-sm text-cream/60 mt-1 mb-6 max-w-2xl">
         Cada equipe vê só o que precisa produzir. A soma de todos os pedidos do dia, separada por estação.
       </p>

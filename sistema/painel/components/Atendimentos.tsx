@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Conversa, Mensagem } from "@/lib/tipos";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AjudaInfo from "@/components/AjudaInfo";
 import { formatarTelefoneBR, linkWhatsapp } from "@/lib/tipos";
 import {
   Search, Plus, Paperclip, SendHorizontal, MoreVertical, Zap,
@@ -202,16 +203,52 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   }, [ativa?.id, mensagens.length]);
 
   if (!ativa) {
+    // Sem conversas ainda: mantém o layout (busca + abas) e mostra o vazio no chat.
     return (
-      <div className="h-screen grid place-items-center px-6 text-center">
-        <div>
-          <div className="mx-auto w-14 h-14 rounded-2xl grid place-items-center text-dourado mb-3" style={{ background: "rgba(212,175,55,0.12)" }}>
-            <MessageSquare size={26} />
+      <div className="px-6 py-6 h-screen flex flex-col">
+        <div className="flex items-center gap-2 mb-3 shrink-0">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">Atendimentos</span>
+          <AjudaInfo titulo="Atendimentos" texto="As conversas do WhatsApp num só lugar. A IA atende sozinha e você assume a conversa quando quiser. Use a busca pra achar um cliente e as abas pra filtrar." />
+        </div>
+        <div className="flex-1 min-h-0">
+          <div className="grid grid-cols-[300px_1fr] gap-4 h-full">
+            {/* lista (busca + abas), vazia */}
+            <div className="glass rounded-[20px] flex flex-col min-h-0 overflow-hidden">
+              <div className="p-3">
+                <div className="relative">
+                  <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/45" />
+                  <input
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    placeholder="Pesquisar"
+                    className="w-full bg-white/10 rounded-[10px] pl-9 pr-3 py-2 text-[13px] text-cream placeholder:text-cream/45 focus:outline-none focus:ring-2 focus:ring-cobre/25"
+                  />
+                </div>
+              </div>
+              <div className="px-3 pb-2 flex items-center gap-1">
+                {ABAS.map((a) => (
+                  <button key={a.id} onClick={() => setAba(a.id)} className={"text-[11.5px] font-medium px-2.5 py-1 rounded-full transition-colors " + (aba === a.id ? "bg-cobre/20 text-[color:var(--brand-cobre-l)]" : "text-cream/55 hover:text-cream hover:bg-white/8")}>
+                    {a.nome}
+                  </button>
+                ))}
+              </div>
+              <div className="flex-1 grid place-items-center px-4 text-center">
+                <div className="text-[13px] text-cream/50">Nenhum cliente ainda.</div>
+              </div>
+            </div>
+            {/* chat vazio */}
+            <div className="glass rounded-[20px] grid place-items-center px-6 text-center">
+              <div>
+                <div className="mx-auto w-14 h-14 rounded-2xl grid place-items-center text-dourado mb-3" style={{ background: "rgba(212,175,55,0.12)" }}>
+                  <MessageSquare size={26} />
+                </div>
+                <div className="tracking-tight-apple text-xl font-bold text-cream">Nenhuma conversa ainda</div>
+                <p className="text-sm text-cream/60 mt-1 max-w-xs mx-auto">
+                  Quando um cliente chamar no WhatsApp, a conversa aparece aqui.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="tracking-tight-apple text-xl font-bold text-cream">Nenhuma conversa ainda</div>
-          <p className="text-sm text-cream/60 mt-1 max-w-xs mx-auto">
-            Quando um cliente chamar no WhatsApp, a conversa aparece aqui.
-          </p>
         </div>
       </div>
     );
