@@ -52,6 +52,16 @@ export async function carregarDoDia(negocioId?: string): Promise<Pedido[]> {
   return listarDoDia(negocioId);
 }
 
+// Clientes (CRM). Sem banco, cai no mock.
+export async function carregarClientes(negocioId?: string) {
+  if (!bancoConfigurado || !negocioId) {
+    const { CLIENTES_MOCK } = await import("./mock");
+    return CLIENTES_MOCK;
+  }
+  const { listarClientes } = await import("./banco/clientes");
+  return listarClientes(negocioId);
+}
+
 export async function carregarConversas(negocioId?: string) {
   if (!bancoConfigurado || !negocioId) {
     const { CONVERSAS_MOCK } = await import("./mock");

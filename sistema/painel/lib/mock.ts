@@ -2,7 +2,7 @@
 // Quando o Supabase entrar, esta camada é trocada por queries reais
 // (mesma forma de dados, então as telas não mudam).
 
-import type { Pedido, Conversa, MembroClube } from "./tipos";
+import type { Pedido, Conversa, MembroClube, ClienteCRM } from "./tipos";
 
 // datas relativas a "hoje" pra demo nunca ficar velha
 const hoje = new Date();
@@ -218,6 +218,95 @@ export const CLUBE_MOCK: MembroClube[] = [
   { nome: "Maria de Souza", telefone: "(49) 9 9111-1111", selos: 3, metaSelos: 10, totalGasto: 23440, ultimaCompra: "hoje" },
   { nome: "Ana Beatriz", telefone: "(49) 9 9333-3333", selos: 1, metaSelos: 10, totalGasto: 5000, ultimaCompra: "há 1 semana" },
   { nome: "Pedro Alves", telefone: "(49) 9 9555-5555", selos: 9, metaSelos: 10, totalGasto: 67800, ultimaCompra: "ontem" },
+];
+
+// ---------------------------------------------------------------------------
+//  CLIENTES (CRM) — ficha de cada cliente com histórico e preferências
+// ---------------------------------------------------------------------------
+const diasAtras = (d: number) => new Date(hoje.getTime() - d * 86400000).toISOString();
+// aniversário no mês atual (pra a demo mostrar o KPI "aniversários no mês")
+const aniversarioEsteMes = `1988-${String(hoje.getMonth() + 1).padStart(2, "0")}-14`;
+export const CLIENTES_MOCK: ClienteCRM[] = [
+  {
+    id: "c1",
+    nome: "Maria de Souza",
+    telefone: "5549991111111",
+    aniversario: aniversarioEsteMes,
+    selos: 8,
+    qtdPedidos: 12,
+    totalGastoCentavos: 289400,
+    ultimoPedidoEm: diasAtras(3),
+    clienteDesde: diasAtras(210),
+    nota: "Cliente fiel. Sempre pede salgado assado, nao gosta de coco. Aniversario do filho em marco, costuma encomendar bolo grande.",
+    pedidos: [
+      { id: "p1", data: maisDias(-3), totalCentavos: 23440, status: "impresso", criadoEm: diasAtras(3), itens: 3 },
+      { id: "p2", data: maisDias(-24), totalCentavos: 18000, status: "impresso", criadoEm: diasAtras(24), itens: 2 },
+      { id: "p3", data: maisDias(-51), totalCentavos: 46900, status: "impresso", criadoEm: diasAtras(51), itens: 1 },
+    ],
+  },
+  {
+    id: "c2",
+    nome: "João Pereira",
+    telefone: "5549992222222",
+    aniversario: null,
+    selos: 7,
+    qtdPedidos: 6,
+    totalGastoCentavos: 148900,
+    ultimoPedidoEm: diasAtras(2),
+    clienteDesde: diasAtras(120),
+    nota: "Pede pra retirar sempre de manha cedo. Costuma levar pizza.",
+    pedidos: [
+      { id: "p4", data: maisDias(-2), totalCentavos: 36000, status: "aprovado", criadoEm: diasAtras(2), itens: 1 },
+      { id: "p5", data: maisDias(-30), totalCentavos: 24000, status: "impresso", criadoEm: diasAtras(30), itens: 2 },
+    ],
+  },
+  {
+    id: "c3",
+    nome: "Carlos Menezes",
+    telefone: "5549994444444",
+    aniversario: "1975-11-02",
+    selos: 5,
+    qtdPedidos: 4,
+    totalGastoCentavos: 61200,
+    ultimoPedidoEm: diasAtras(5),
+    clienteDesde: diasAtras(80),
+    nota: null,
+    pedidos: [
+      { id: "p6", data: maisDias(0), totalCentavos: 10625, status: "confirmado", criadoEm: diasAtras(0), itens: 3 },
+      { id: "p7", data: maisDias(-40), totalCentavos: 18000, status: "impresso", criadoEm: diasAtras(40), itens: 2 },
+    ],
+  },
+  {
+    id: "c4",
+    nome: "Ana Beatriz",
+    telefone: "5549993333333",
+    aniversario: null,
+    selos: 1,
+    qtdPedidos: 1,
+    totalGastoCentavos: 0,
+    ultimoPedidoEm: diasAtras(8),
+    clienteDesde: diasAtras(8),
+    nota: "Primeiro contato foi por um casamento (bolo 3 andares). Passou pro humano.",
+    pedidos: [
+      { id: "p8", data: null, totalCentavos: 124000, status: "orcado", criadoEm: diasAtras(8), itens: 2 },
+    ],
+  },
+  {
+    id: "c5",
+    nome: "Pedro Alves",
+    telefone: "5549995555555",
+    aniversario: "1990-08-03",
+    selos: 9,
+    qtdPedidos: 9,
+    totalGastoCentavos: 213700,
+    ultimoPedidoEm: diasAtras(1),
+    clienteDesde: diasAtras(160),
+    nota: "Quase fechando a cartela do clube (9 de 10 selos). Bom candidato pra brinde.",
+    pedidos: [
+      { id: "p9", data: maisDias(-1), totalCentavos: 32000, status: "impresso", criadoEm: diasAtras(1), itens: 2 },
+      { id: "p10", data: maisDias(-15), totalCentavos: 28000, status: "impresso", criadoEm: diasAtras(15), itens: 3 },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------

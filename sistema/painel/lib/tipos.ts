@@ -67,6 +67,29 @@ export type Conversa = {
   mensagens: Mensagem[];
 };
 
+// Ficha do cliente no CRM: dados + histórico agregado + nota da equipe.
+export type PedidoResumo = {
+  id: string;
+  data: string | null; // retirada
+  totalCentavos: number;
+  status: PedidoStatus;
+  criadoEm: string;
+  itens: number;
+};
+export type ClienteCRM = {
+  id: string;
+  nome: string;
+  telefone: string;
+  aniversario: string | null;
+  selos: number;
+  qtdPedidos: number;
+  totalGastoCentavos: number;
+  ultimoPedidoEm: string | null;
+  clienteDesde: string | null;
+  nota: string | null;
+  pedidos: PedidoResumo[];
+};
+
 export type MembroClube = {
   nome: string;
   telefone: string;
