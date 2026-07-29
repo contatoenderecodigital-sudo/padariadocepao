@@ -3,7 +3,24 @@
 //  negócio do usuário logado (multi-tenant). Isolado por negocio_id.
 // ============================================================================
 
-import { queryUm } from "./db";
+import { query, queryUm } from "./db";
+
+// Mapeia o WhatsApp conectado (Embedded Signup) pro tenant: grava phone_id,
+// waba_id e o token do negocio no config. O webhook usa whatsapp_phone_id pra
+// rotear as mensagens desse numero pra este negocio.
+export async function salvarWhatsappTenant(
+  negocioId: string,
+  dados: { phoneId: string; wabaId: string; token: string },
+): Promise<void> {
+  await query(
+    `update negocios set config = coalesce(config, '{}'::jsonb) || jsonb_build_object(
+       'whatsapp_phone_id', $2::text,
+       'whatsapp_waba_id', $3::text,
+       'whatsapp_token', $4::text
+     ) where id = $1`,
+    [negocioId, dados.phoneId, dados.wabaId, dados.token],
+  );
+}
 
 export type NegocioMarca = {
   nome: string;
