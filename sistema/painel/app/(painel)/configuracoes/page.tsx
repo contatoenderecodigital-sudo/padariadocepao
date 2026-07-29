@@ -1,7 +1,8 @@
 import AvisoDoDia from "@/components/AvisoDoDia";
+import ToggleIA from "@/components/ToggleIA";
 import { lerSessao } from "@/lib/auth";
 import { bancoConfigurado } from "@/lib/banco/db";
-import { carregarAvisoDoDia } from "@/lib/banco/negocios";
+import { carregarAvisoDoDia, carregarIaAtiva } from "@/lib/banco/negocios";
 import { ehHojeBR } from "@/lib/aviso";
 
 export const dynamic = "force-dynamic";
@@ -11,10 +12,15 @@ export default async function Page() {
 
   let texto: string | null = null;
   let atualizadoEm: string | null = null;
+  let iaAtiva = true;
   if (bancoConfigurado && sessao?.negocioId) {
-    const a = await carregarAvisoDoDia(sessao.negocioId);
+    const [a, ia] = await Promise.all([
+      carregarAvisoDoDia(sessao.negocioId),
+      carregarIaAtiva(sessao.negocioId),
+    ]);
     texto = a.texto;
     atualizadoEm = a.atualizadoEm;
+    iaAtiva = ia;
   } else {
     // Modo demo (sem banco): exemplo preenchido pra mostrar a feature.
     texto = "Hoje o pão francês vai só até as 18h. Amanhã cedo tem fresquinho de novo.";
@@ -27,10 +33,13 @@ export default async function Page() {
       <div className="text-[11px] uppercase tracking-[0.2em] text-dourado font-semibold">Configurações</div>
       <h1 className="font-title text-3xl font-bold text-cream mt-1">Configurações</h1>
       <p className="text-sm text-cream/60 mt-1 mb-8 max-w-2xl">
-        Ajustes do atendimento. Comece pelo aviso do dia, o jeito rápido de a IA saber as novidades de hoje.
+        Ajustes do atendimento: ligue ou desligue a IA e avise as novidades do dia.
       </p>
 
-      <AvisoDoDia texto={texto} atualizadoEm={atualizadoEm} ativoHoje={ativoHoje} />
+      <div className="flex flex-col gap-4">
+        <ToggleIA ativa={iaAtiva} />
+        <AvisoDoDia texto={texto} atualizadoEm={atualizadoEm} ativoHoje={ativoHoje} />
+      </div>
     </div>
   );
 }

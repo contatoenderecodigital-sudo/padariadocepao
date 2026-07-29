@@ -41,6 +41,15 @@ export async function salvarWhatsappTenant(
   );
 }
 
+// Estado atual do liga/desliga da IA (pra pintar o toggle no painel).
+export async function carregarIaAtiva(negocioId: string): Promise<boolean> {
+  const n = await queryUm<{ a: boolean }>(
+    `select coalesce((config->>'ia_ativa')::boolean, true) as a from negocios where id = $1`,
+    [negocioId],
+  );
+  return n?.a ?? true;
+}
+
 // Liga/desliga a resposta automatica da IA (sem desconectar o numero).
 export async function definirIaAtiva(negocioId: string, ativa: boolean): Promise<void> {
   await query(
