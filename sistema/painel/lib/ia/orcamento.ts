@@ -73,7 +73,7 @@ export function criarMotor(produtos: Produto[], rend: Rendimento = {}): Motor {
         });
       }
       if (!ref) {
-        avisos.push(`Não achei "${item}" no cardápio — conferir com a equipe.`);
+        avisos.push(`Não achei "${item}" no cardápio, conferir com a equipe.`);
         continue;
       }
       const q = Number(qtd) || 0;
@@ -143,12 +143,12 @@ export function criarMotor(produtos: Produto[], rend: Rendimento = {}): Motor {
 export function formatarOrcamento(c: Cotacao, titulo = "Orçamento"): string {
   const L: string[] = [];
   L.push(titulo);
-  L.push("─".repeat(28));
-  for (const l of c.linhas) L.push(`${l.qtd}x ${l.item} — ${brl(l.subtotal)}`);
-  L.push("─".repeat(28));
+  L.push("".padEnd(28, "."));
+  for (const l of c.linhas) L.push(`${l.qtd}x ${l.item}: ${brl(l.subtotal)}`);
+  L.push("".padEnd(28, "."));
   L.push(`*Total: ${brl(c.total)}*`);
   L.push("(paga na retirada)");
-  if (c.estimativa) L.push("\n⚠️ Quantidades são estimativa (rendimento a confirmar).");
+  if (c.estimativa) L.push("\nObs: as quantidades são uma estimativa, a equipe confirma o rendimento.");
   if (c.avisos?.length) L.push("\n" + c.avisos.join("\n"));
   return L.join("\n");
 }

@@ -141,7 +141,7 @@ function executarFerramenta(
       Number(input.pessoas) || 0,
       (input.quer as { salgado?: boolean; doce?: boolean; bolo?: boolean }) || { salgado: true, doce: true },
     );
-    return formatarOrcamento(c, `Orçamento — festa ${input.pessoas} pessoas`);
+    return formatarOrcamento(c, `Orçamento da festa de ${input.pessoas} pessoas`);
   }
 
   if (nome === "chamar_humano") {
@@ -221,7 +221,7 @@ export async function responder(
 
   // Se estourou o loop (raro), devolve algo seguro.
   return {
-    texto: "Deixa eu chamar alguém da equipe pra te ajudar com isso 😊",
+    texto: "Deixa eu chamar alguém da equipe pra te ajudar com isso.",
     precisaHumano: true,
     pedidoRegistrado: estado.pedido,
   };

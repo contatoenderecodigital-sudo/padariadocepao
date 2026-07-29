@@ -32,8 +32,9 @@ export async function carregarTenant(negocioId: string): Promise<Tenant> {
   const cfg = n.config || {};
   const persona: ConfigNegocio = {
     nome: n.nome,
-    cidade: n.cidade || "",
-    horario: cfg.persona?.horario || "confirmar com a equipe",
+    cidade: n.cidade || DOCE_PAO.cidade,
+    horario: cfg.persona?.horario || DOCE_PAO.horario,
+    endereco: DOCE_PAO.endereco,
     prazoMinimoDias: cfg.persona?.prazoMinimoDias ?? 2,
     cobraSinal: cfg.persona?.cobraSinal ?? false,
   };
