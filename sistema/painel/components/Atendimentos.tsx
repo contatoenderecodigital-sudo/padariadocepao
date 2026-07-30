@@ -140,9 +140,10 @@ function Balao({ de, texto, hora, nome, primeiro }: Mensagem & { nome: string; p
   );
 }
 
-export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
+export default function Atendimentos({ conversas: conversasIniciais }: { conversas: Conversa[] }) {
+  const [conversas, setConversas] = useState<Conversa[]>(conversasIniciais);
   const [busca, setBusca] = useState("");
-  const [ativaId, setAtivaId] = useState<string | undefined>(conversas[0]?.id);
+  const [ativaId, setAtivaId] = useState<string | undefined>(conversasIniciais[0]?.id);
   const [texto, setTexto] = useState("");
   const [msgsExtra, setMsgsExtra] = useState<Record<string, Mensagem[]>>({});
   const [controle, setControle] = useState<Record<string, "ia" | "humano">>({});
@@ -158,6 +159,19 @@ export default function Atendimentos({ conversas }: { conversas: Conversa[] }) {
   const [respostasAbertas, setRespostasAbertas] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const fim = useRef<HTMLDivElement>(null);
+
+  // Tempo real: atualiza conversas/mensagens sozinho, sem recarregar a página.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const r = await fetch("/api/conversas", { cache: "no-store" });
+        if (r.ok) setConversas(await r.json());
+      } catch {
+        /* falha de rede: tenta de novo no próximo ciclo */
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
 
   // ultima mensagem de uma conversa (considerando as enviadas agora).
   const ultimaDe = (c: Conversa): Mensagem | undefined => {
