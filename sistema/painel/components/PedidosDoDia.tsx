@@ -5,7 +5,7 @@
 // producao agregada por estacao (com progresso e baixa), lista de pedidos e
 // mini-calendario do mes com os dias mais cheios.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Pedido } from "@/lib/tipos";
 import { brl } from "@/lib/tipos";
 import {
@@ -56,7 +56,23 @@ function statusInfo(s: StatusUI) {
   return { txt: "A produzir", cor: "#e0b04a", bg: "rgba(231,207,148,0.15)" };
 }
 
-export default function PedidosDoDia({ pedidos }: { pedidos: Pedido[] }) {
+export default function PedidosDoDia({ pedidos: pedidosIniciais }: { pedidos: Pedido[] }) {
+  const [pedidos, setPedidos] = useState(pedidosIniciais);
+
+  // Auto-update: busca os pedidos do dia a cada 8s (produção nova aparece sozinha).
+  useEffect(() => {
+    const t = setInterval(async () => {
+      try {
+        const r = await fetch("/api/dia");
+        if (!r.ok) return;
+        setPedidos((await r.json()) as Pedido[]);
+      } catch {
+        /* silencioso */
+      }
+    }, 8000);
+    return () => clearInterval(t);
+  }, []);
+
   const hoje = useMemo(() => iso(new Date()), []);
   const [sel, setSel] = useState(() => {
     const m: Record<string, number> = {};

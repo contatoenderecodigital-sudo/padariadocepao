@@ -6,7 +6,7 @@
 //
 // Anima otimista (some na hora) e grava no banco por trás via Server Action.
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Pedido, FormaPagamento, HistoricoCliente } from "@/lib/tipos";
 import { brl, formatarTelefoneBR, linkWhatsapp, mesAno } from "@/lib/tipos";
 import { Repeat, UserPlus, Wallet, CalendarDays, AlertTriangle, CreditCard, Banknote, Zap, CheckCircle2, Clock } from "lucide-react";
@@ -215,9 +215,27 @@ export default function FilaAprovacao({
   const [saindo, setSaindo] = useState<Record<string, boolean>>({});
   const [ultimo, setUltimo] = useState<{ nome: string; acao: "aprovado" | "recusado" } | null>(null);
   const [cupom, setCupom] = useState<Pedido | null>(null);
+  // ids resolvidos localmente: nao deixa reaparecer se o poll rodar antes do banco atualizar.
+  const resolvidosRef = useRef<Set<string>>(new Set());
+
+  // Auto-update: busca a fila a cada 5s (pedido novo cai na tela sozinho).
+  useEffect(() => {
+    const t = setInterval(async () => {
+      try {
+        const r = await fetch("/api/aprovacao");
+        if (!r.ok) return;
+        const nova = (await r.json()) as Pedido[];
+        setFila(nova.filter((p) => !resolvidosRef.current.has(p.id)));
+      } catch {
+        /* silencioso */
+      }
+    }, 5000);
+    return () => clearInterval(t);
+  }, []);
 
   function resolver(id: string, acao: "aprovado" | "recusado") {
     const p = fila.find((x) => x.id === id);
+    resolvidosRef.current.add(id);
     setSaindo((s) => ({ ...s, [id]: true }));
     setUltimo(p ? { nome: p.clienteNome, acao } : null);
     // grava no banco por trás (se as ações vierem plugadas)
