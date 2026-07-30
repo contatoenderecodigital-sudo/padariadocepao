@@ -42,9 +42,9 @@ export default function Login() {
             priority
             className="w-20 h-20 lg:w-[110px] lg:h-[110px] rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
           />
-          <div className="font-title text-3xl lg:text-[40px] font-bold mt-5 leading-none">Padaria Aroma</div>
+          <div className="font-title text-3xl lg:text-[40px] font-bold mt-5 leading-none">Endereço Digital</div>
           <p className="text-cream/75 text-base lg:text-lg mt-4 leading-relaxed">
-            O atendimento que trabalha sozinho pela sua padaria.
+            Atendimento no WhatsApp que trabalha sozinho pelo seu negócio.
           </p>
 
           {/* mockup flutuante de um card do painel (so no desktop) */}
@@ -68,7 +68,7 @@ export default function Login() {
       <div className="lg:w-[45%] flex items-center justify-center px-6 py-12 lg:py-0">
         <form action={acao} className="w-full max-w-sm">
           <h1 className="text-[26px] font-bold text-vinho tracking-tight-apple">Bem-vindo de volta</h1>
-          <p className="text-ink-soft mt-1.5 mb-8">Acesse o painel da sua padaria</p>
+          <p className="text-ink-soft mt-1.5 mb-8">Acesse o painel do seu negócio</p>
 
           {/* e-mail */}
           <label className="block">

@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { queryUm } from "../banco/db";
-import { criarMotor, motorPadrao, type Produto, type Rendimento } from "./orcamento";
+import { motorPadrao } from "./orcamento";
 import { DOCE_PAO, type ConfigNegocio } from "./persona";
 import { ehHojeBR } from "../aviso";
 import type { Tenant } from "./cerebro";
@@ -16,10 +16,6 @@ type ConfigDB = {
   cardapio?: Record<string, { nome: string; preco: number }[]>;
   aviso_do_dia?: string;
   aviso_atualizado_em?: string;
-};
-
-const CATEGORIA: Record<string, string> = {
-  salgados: "salgado", doces: "doce", bolos: "bolo", tortas: "torta", paes: "pao",
 };
 
 export async function carregarTenant(negocioId: string): Promise<Tenant> {
@@ -42,24 +38,9 @@ export async function carregarTenant(negocioId: string): Promise<Tenant> {
   // Aviso do dia: só entra se foi escrito HOJE (senão expira sozinho).
   const avisoDoDia = ehHojeBR(cfg.aviso_atualizado_em) ? cfg.aviso_do_dia ?? null : null;
 
-  // Sem cardápio próprio no banco → motor padrão (Doce Pão).
-  if (!cfg.cardapio) return { persona, motor: motorPadrao, avisoDoDia };
-
-  // Achata o cardápio do config numa lista de produtos.
-  const produtos: Produto[] = [];
-  for (const [grupo, itens] of Object.entries(cfg.cardapio)) {
-    const categoria = CATEGORIA[grupo] || grupo;
-    for (const it of itens || []) produtos.push({ nome: it.nome, preco: it.preco, categoria });
-  }
-
-  const r = cfg.rendimento || {};
-  const rendimento: Rendimento = {
-    salgadoPorPessoa: r.salgado_por_pessoa,
-    docePorPessoa: r.doce_por_pessoa,
-    // se tem "cento_serve_pessoas", o negócio vende por cento (100 un/produto)
-    unidadePorProduto: r.cento_serve_pessoas ? 100 : 1,
-    confirmar: true,
-  };
-
-  return { persona, motor: criarMotor(produtos, rendimento), avisoDoDia };
+  // Preço e rendimento vêm SEMPRE do catalogo.json (Doce Pão, por unidade),
+  // ignorando qualquer cardápio salvo no banco. Isso evita dado bugado de seed
+  // antigo (ex: "cento a R$130") gerar orçamento errado. Cardápio próprio por
+  // tenant volta quando existir outro negócio real com tabela própria.
+  return { persona, motor: motorPadrao, avisoDoDia };
 }
