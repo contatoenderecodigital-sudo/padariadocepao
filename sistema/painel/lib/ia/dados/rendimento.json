@@ -10,9 +10,9 @@
   },
 
   "doce_por_pessoa": {
-    "valor": 5,
+    "valor": 4,
     "confirmar": false,
-    "nota": "Media de mercado: 4 a 5 doces/pessoa. Usamos 5 (regra classica '10 salgados + 5 doces'). Evita faltar. Ajustavel."
+    "nota": "Regra da casa da Doce Pao: 4 docinhos por pessoa (confirmado pela dona)."
   },
 
   "bolo_recheado_serve": {

@@ -161,7 +161,7 @@ function executarFerramenta(
       clienteNome: input.cliente_nome ? String(input.cliente_nome) : undefined,
       totalCentavos: Math.round(c.total * 100),
     };
-    return `Pedido anotado. Total ${formatarOrcamento(c).match(/Total: (.+)/)?.[1] ?? ""}. Feche a conversa de forma calorosa: confirme que ficou tudo anotado pro dia e a hora combinados e que ele pode contar com o pedido. NÃO diga que precisa de aprovação nem que a equipe confirma.`;
+    return `Pedido salvo pra equipe. Agora envie pro cliente o resumo no formato exato de FECHAMENTO DE PEDIDO (com os asteriscos de negrito, SEM nenhuma linha em branco dentro do resumo, cada item numa linha, o total no final). Use os preços da tabela oficial.`;
   }
 
   return "Ferramenta desconhecida.";
