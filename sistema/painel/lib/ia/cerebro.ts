@@ -176,7 +176,16 @@ export async function responder(
   // Lê OPENAI_API_KEY do ambiente. OPENAI_BASE_URL (opcional) aponta pra outro
   // provedor compatível (Gemini/DeepSeek/OpenRouter) sem mudar código.
   const client = new OpenAI({ baseURL: process.env.OPENAI_BASE_URL || undefined });
-  const system = montarSystemPrompt(tenant.persona, tenant.motor.cardapioResumo(), tenant.avisoDoDia);
+  const hojeBR = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date());
+  const system =
+    montarSystemPrompt(tenant.persona, tenant.motor.cardapioResumo(), tenant.avisoDoDia) +
+    `\n\n# DATA DE HOJE\nHoje é ${hojeBR} (fuso de Brasília). Use isso pra completar o ANO das datas de retirada: se o cliente disser só o dia e o mês (ex: 05/05) e essa data ainda não passou este ano, use o ano atual. Data sempre no formato DD/MM/AAAA.`;
 
   const estado = { precisaHumano: false, pedido: null as RespostaIA["pedidoRegistrado"] };
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
