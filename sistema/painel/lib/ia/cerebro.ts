@@ -188,7 +188,8 @@ export async function responder(
   for (let i = 0; i < 6; i++) {
     const resp = await client.chat.completions.create({
       model: MODELO,
-      max_tokens: 1024,
+      max_tokens: 350, // resposta de WhatsApp é curta; corta desperdício de token
+      temperature: 0.4, // menos "criatividade" = segue mais as regras (usar a ferramenta)
       messages,
       tools: FERRAMENTAS,
     });
