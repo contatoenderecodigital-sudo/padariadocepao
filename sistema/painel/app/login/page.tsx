@@ -4,8 +4,7 @@
 // esquerda, formulario creme limpo na direita. Coerente com o painel.
 
 import { useActionState, useState } from "react";
-import Image from "next/image";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, MapPin } from "lucide-react";
 import { entrar } from "./acao";
 
 const GRAO =
@@ -34,28 +33,32 @@ export default function Login() {
         <div className="absolute inset-0 pointer-events-none opacity-[0.045]" style={{ backgroundImage: GRAO }} />
 
         <div className="relative z-10 flex flex-col items-center text-center max-w-md">
-          <Image
-            src="/logo.png"
-            alt=""
-            width={110}
-            height={110}
-            priority
-            className="w-20 h-20 lg:w-[110px] lg:h-[110px] rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-          />
+          <div
+            className="w-20 h-20 lg:w-[110px] lg:h-[110px] rounded-[22px] grid place-items-center shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+            style={{ background: "linear-gradient(135deg,#e7cf94,#b5601a)" }}
+          >
+            <MapPin className="w-9 h-9 lg:w-14 lg:h-14 text-vinho-d" strokeWidth={2.2} />
+          </div>
           <div className="font-title text-3xl lg:text-[40px] font-bold mt-5 leading-none">Endereço Digital</div>
           <p className="text-cream/75 text-base lg:text-lg mt-4 leading-relaxed">
             Atendimento no WhatsApp que trabalha sozinho pelo seu negócio.
           </p>
 
-          {/* mockup flutuante de um card do painel (so no desktop) */}
+          {/* mockup de atendimento no WhatsApp (so no desktop) */}
           <div className="hidden lg:block w-full mt-12">
-            <div className="glass rounded-2xl p-5 text-left">
-              <div className="t-label text-dourado-l">Pedido novo</div>
-              <div className="font-semibold text-cream mt-1.5">Maria de Souza</div>
-              <div className="text-cream/60 text-sm mt-0.5">100x Salgado assado · 50x Brigadeiro</div>
-              <div className="flex items-center justify-between mt-3">
-                <span className="t-money text-xl text-grad-dourado">R$ 234,40</span>
-                <span className="chip-marca text-[11px] font-semibold px-2.5 py-1 rounded-full">Aprovar</span>
+            <div className="glass rounded-2xl p-4 text-left">
+              <div className="flex mb-2">
+                <div className="bg-white/90 text-[#4a1020] text-[13px] rounded-xl rounded-tl-sm px-3 py-2">
+                  Oi! Vocês atendem por aqui?
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <div className="grad-cobre text-white text-[13px] rounded-xl rounded-br-sm px-3 py-2 max-w-[85%]">
+                  Atendemos sim, todo dia. O que você precisa?
+                </div>
+              </div>
+              <div className="text-[11px] text-cream/50 text-center pt-2.5">
+                Atendimento automático no WhatsApp
               </div>
             </div>
           </div>

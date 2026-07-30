@@ -12,7 +12,7 @@
 
 import OpenAI from "openai";
 import { montarSystemPrompt, DOCE_PAO, type ConfigNegocio } from "./persona";
-import { motorPadrao, formatarOrcamento, type Motor, type LinhaCotacao } from "./orcamento";
+import { motorPadrao, formatarOrcamento, brl, type Motor, type LinhaCotacao } from "./orcamento";
 
 const MODELO = process.env.MODELO_IA || "gpt-4o-mini";
 
@@ -161,7 +161,10 @@ function executarFerramenta(
       clienteNome: input.cliente_nome ? String(input.cliente_nome) : undefined,
       totalCentavos: Math.round(c.total * 100),
     };
-    return `Pedido salvo pra equipe. Agora envie pro cliente o resumo no formato exato de FECHAMENTO DE PEDIDO (com os asteriscos de negrito, SEM nenhuma linha em branco dentro do resumo, cada item numa linha, o total no final). Use os preços da tabela oficial.`;
+    const itensFmt = c.linhas
+      .map((l) => `${l.item}: ${l.qtd} un x ${brl(l.unit)} = ${brl(l.subtotal)}`)
+      .join("\n");
+    return `Pedido salvo pra equipe. Envie o resumo no formato de FECHAMENTO DE PEDIDO usando EXATAMENTE estas linhas e este total, sem recalcular nada de cabeça:\n${itensFmt}\nTotal: ${brl(c.total)}\nMantenha o formato (asteriscos de negrito, sem linha em branco dentro do resumo).`;
   }
 
   return "Ferramenta desconhecida.";
