@@ -8,7 +8,7 @@
 // responde pelo numero do cliente. Sem conexao, usa o env (numero de teste).
 const ENV_TOKEN = process.env.WHATSAPP_TOKEN;
 const ENV_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const BASE = "https://graph.facebook.com/v22.0";
+const BASE = "https://graph.facebook.com/v25.0";
 
 // Token+numero usados pra falar com a Graph API. Prioriza o do tenant.
 export type CredsEnvio = { token?: string | null; phoneId?: string | null };

@@ -14,7 +14,7 @@ import { salvarWhatsappTenant } from "@/lib/banco/negocios";
 
 export const dynamic = "force-dynamic";
 
-const GRAPH = "https://graph.facebook.com/v22.0";
+const GRAPH = "https://graph.facebook.com/v25.0";
 const APP_ID = process.env.WHATSAPP_APP_ID ?? "986426127711722";
 const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;

@@ -92,7 +92,7 @@ async function verificarNumero(
 ): Promise<{ vivo: boolean; numero?: string | null; perfil?: string | null }> {
   try {
     const r = await fetch(
-      `https://graph.facebook.com/v22.0/${phoneId}?fields=display_phone_number,verified_name`,
+      `https://graph.facebook.com/v25.0/${phoneId}?fields=display_phone_number,verified_name`,
       { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(5000) },
     );
     if (r.ok) {

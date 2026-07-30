@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 const APP_ID = process.env.NEXT_PUBLIC_FB_APP_ID ?? "986426127711722";
 const CONFIG_ID = process.env.NEXT_PUBLIC_FB_CONFIG_ID ?? "1031470826450642";
-const VERSION = "v22.0";
+const VERSION = "v25.0";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -25,6 +25,7 @@ export function useEmbeddedSignup() {
   const [estado, setEstado] = useState<EstadoConexao>("idle");
   const [msg, setMsg] = useState("");
   const waData = useRef<{ waba_id?: string; phone_number_id?: string }>({});
+  const eventoRef = useRef<string>(""); // ultimo evento do Embedded Signup (raio-x)
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
@@ -37,7 +38,10 @@ export function useEmbeddedSignup() {
       if (!host.endsWith("facebook.com")) return;
       try {
         const data = JSON.parse(event.data);
+        // Raio-x: registra o que a Meta manda (pra diagnosticar quando o popup fecha).
+        console.log("[ES msg]", data);
         if (data.type === "WA_EMBEDDED_SIGNUP") {
+          eventoRef.current = data.event || "(sem evento)";
           waData.current = { waba_id: data.data?.waba_id, phone_number_id: data.data?.phone_number_id };
         }
       } catch {
@@ -73,10 +77,22 @@ export function useEmbeddedSignup() {
     waData.current = {};
     window.FB.login(
       (response: any) => {
+        console.log("[ES] FB.login response:", response);
         const code = response?.authResponse?.code;
         if (!code) {
           setEstado("erro");
-          setMsg("Conexão cancelada. Tente novamente.");
+          setMsg("Login não concluído ou cancelado. Tente de novo.");
+          onDone?.(false);
+          return;
+        }
+        // Raio-x: se o popup fechou sem escolher o número, mostra o motivo.
+        const wa = waData.current;
+        if (!wa.waba_id || !wa.phone_number_id) {
+          setEstado("erro");
+          setMsg(
+            `O cadastro fechou sem concluir o número (evento: ${eventoRef.current || "nenhum"}). ` +
+              "Vá até o fim do popup escolhendo/adicionando o número do WhatsApp.",
+          );
           onDone?.(false);
           return;
         }
@@ -111,7 +127,7 @@ export function useEmbeddedSignup() {
         config_id: CONFIG_ID,
         response_type: "code",
         override_default_response_type: true,
-        extras: { setup: {}, featureType: "", sessionInfoVersion: "3" },
+        extras: { setup: {} },
       },
     );
   }
